@@ -19,6 +19,7 @@ import (
 
 var apiManager *igdb.APIManager
 var gameLibrary *library.Library
+
 //go:embed all:frontend/dist
 var assets embed.FS
 
@@ -30,7 +31,7 @@ func main() {
 	gameLibrary = library.GetLibrary()
 	apiManager = igdb.NewAPI()
 
-	setting, err := settings.LoadSettings(filepath.Join( "settings.json"))
+	setting, err := settings.LoadSettings(filepath.Join("settings.json"))
 	if err != nil {
 		fmt.Println(err)
 		return
