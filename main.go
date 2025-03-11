@@ -30,13 +30,13 @@ func main() {
 	gameLibrary = library.GetLibrary()
 	apiManager = igdb.NewAPI()
 
-	go func() {
-		results := torrent.Scrape_1337x("goat simulator 3")
-		for _, result := range results {
-			data := torrent.Get_1337x_data(result)
-			fmt.Printf("Title: %s\nUploader: %s\nDownloads: %d\nDate: %s\n\n", data.Title, data.Uploader, data.Downloads, data.Date)
-		}
-	}()
+	//go func() {
+	//	results := torrent.Scrape_1337x("goat simulator 3")
+	//	for _, result := range results {
+	//		data := torrent.Get_1337x_data(result)
+	//		fmt.Printf("Title: %s\nUploader: %s\nDownloads: %d\nDate: %s\n\n", data.Title, data.Uploader, data.Downloads, data.Date)
+	//	}
+	//}()
 
 	// Create a new Wails application by providing the necessary options.
 	// Variables 'Name' and 'Description' are for application metadata.
