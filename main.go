@@ -3,8 +3,11 @@ package main
 import (
 	"derpy-launcher072/igdb"
 	"derpy-launcher072/library"
+	"derpy-launcher072/settings"
 	"embed"
+	"fmt"
 	"log"
+	"path/filepath"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
@@ -16,7 +19,6 @@ import (
 
 var apiManager *igdb.APIManager
 var gameLibrary *library.Library
-
 //go:embed all:frontend/dist
 var assets embed.FS
 
@@ -27,6 +29,14 @@ func main() {
 	// 🐐routine
 	gameLibrary = library.GetLibrary()
 	apiManager = igdb.NewAPI()
+
+	setting, err := settings.LoadSettings(filepath.Join( "settings.json"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(setting)
 
 	//go func() {
 	//	results := torrent.Scrape_1337x("goat simulator 3")
@@ -73,7 +83,7 @@ func main() {
 	})
 
 	// Run the application. This blocks until the application has been exited.
-	err := app.Run()
+	err = app.Run()
 
 	// If an error occurred while running the application, log it and exit.
 	if err != nil {

@@ -8,6 +8,7 @@ require (
 	github.com/gocolly/colly v1.2.0
 	github.com/joho/godotenv v1.5.1
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.9
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (

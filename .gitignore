@@ -4,3 +4,4 @@ frontend/dist
 bin
 .env
 ./.task
+settings.json
