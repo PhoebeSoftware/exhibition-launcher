@@ -3,7 +3,6 @@ package settings
 import (
 	"encoding/json"
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"os"
 	"path/filepath"
 )
@@ -11,6 +10,21 @@ import (
 type Settings struct {
 	PathToSettings string `json:"path_to_settings"`
 	DownloadPath   string `json:"download_path"`
+}
+
+func (settings Settings) SaveSettings() error {
+	// Idk random perms idk
+	file, err := os.OpenFile(settings.PathToSettings, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("could not save settings: %w", err)
+	}
+
+	jsonData, err := json.MarshalIndent(settings, "", "    ")
+	if _, err := file.Write(jsonData); err != nil {
+		return fmt.Errorf("could not write json data to settings: %w", err)
+	}
+
+	return nil
 }
 
 func LoadSettings(path string) (*Settings, error) {
@@ -32,7 +46,7 @@ func LoadSettings(path string) (*Settings, error) {
 
 	defer file.Close()
 
-	decoder := yaml.NewDecoder(file)
+	decoder := json.NewDecoder(file)
 	err = decoder.Decode(settings)
 	if err != nil {
 		return nil, fmt.Errorf("Could not decode %v: %w", settings.PathToSettings, err.Error())
@@ -47,11 +61,11 @@ func (settings *Settings) GenerateSettings() error {
 	}
 	defer settingsFile.Close()
 
-	jsonData, err := json.MarshalIndent(settings, "", "    ")
-	if _, err := settingsFile.Write(jsonData); err != nil {
-		return fmt.Errorf("could not write json data to settings: %w", err)
+	err = settings.SaveSettings()
+	if err != nil {
+		return err
 	}
-
+	
 	settings, err = LoadSettings(settings.PathToSettings)
 	if err != nil {
 		return fmt.Errorf("could not load settings: %w", err)
