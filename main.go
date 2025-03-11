@@ -3,9 +3,7 @@ package main
 import (
 	"derpy-launcher072/igdb"
 	"derpy-launcher072/library"
-	"derpy-launcher072/torrent"
 	"embed"
-	"fmt"
 	"log"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
