@@ -6,5 +6,3 @@ import * as Library from "./library.js";
 export {
     Library
 };
-
-export * from "./models.js";

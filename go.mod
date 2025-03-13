@@ -8,6 +8,7 @@ require (
 	github.com/anacrolix/torrent v1.58.1
 	github.com/gocolly/colly v1.2.0
 	github.com/joho/godotenv v1.5.1
+	github.com/sqweek/dialog v0.0.0-20240226140203-065105509627
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.9
 )
 
@@ -112,7 +113,6 @@ require (
 	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 // indirect
 	github.com/skeema/knownhosts v1.3.1 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
-	github.com/sqweek/dialog v0.0.0-20240226140203-065105509627 // indirect
 	github.com/temoto/robotstxt v1.1.2 // indirect
 	github.com/tidwall/btree v1.6.0 // indirect
 	github.com/wailsapp/go-webview2 v1.0.19 // indirect

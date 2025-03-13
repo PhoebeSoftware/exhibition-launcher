@@ -6,24 +6,20 @@
 // @ts-ignore: Unused imports
 import {Call as $Call, Create as $Create} from "@wailsio/runtime";
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore: Unused imports
-import * as $models from "./models.js";
-
 /**
- * @param {$models.Game} gameData
+ * @param {number} igdbId
  * @returns {Promise<void> & { cancel(): void }}
  */
-export function AddToLibrary(gameData) {
-    let $resultPromise = /** @type {any} */($Call.ByID(174990277, gameData));
+export function AddToLibrary(igdbId) {
+    let $resultPromise = /** @type {any} */($Call.ByID(174990277, igdbId));
     return $resultPromise;
 }
 
 /**
- * @param {number} appID
+ * @param {number} igdbId
  * @returns {Promise<boolean> & { cancel(): void }}
  */
-export function StartApp(appID) {
-    let $resultPromise = /** @type {any} */($Call.ByID(1893788683, appID));
+export function StartApp(igdbId) {
+    let $resultPromise = /** @type {any} */($Call.ByID(1893788683, igdbId));
     return $resultPromise;
 }
