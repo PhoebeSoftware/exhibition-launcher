@@ -9,10 +9,13 @@ import (
 	"os/exec"
 	"path/filepath"
 	"time"
+
+	"github.com/sqweek/dialog"
+	_ "github.com/sqweek/dialog"
 )
 
 type Game struct {
-	AppID       int    `json:"appid"`
+	IGDBID      int    `json:"igdb_id"`
 	PlayTime    int    `json:"playtime"`
 	Achievments []int  `json:"achievments"`
 	Executable  string `json:"executable"`
@@ -61,9 +64,22 @@ func GetLibrary() *Library {
 	return &library
 }
 
-func (lib *Library) AddToLibrary(gameData Game) error {
+func (lib *Library) AddToLibrary(igdbId int) error {
+	// prompt executable location
+	executable, err := dialog.File().Title("Select game executable").Filter("Executable files", "exe").Load()
+	if err != nil {
+		return fmt.Errorf("failed to select executable: %w", err)
+	}
+
 	// Append the new game
-	lib.Games[gameData.AppID] = gameData
+	lib.Games[igdbId] = Game{
+		IGDBID:      igdbId,
+		PlayTime:    0,
+		Achievments: []int{},
+		Executable:  executable,
+		Running:     false,
+		Favorite:    false,
+	}
 
 	// Marshal the entire library to JSON
 	jsonData, err := json.Marshal(lib)
@@ -80,8 +96,8 @@ func (lib *Library) AddToLibrary(gameData Game) error {
 	return nil
 }
 
-func (lib *Library) StartApp(appID int) bool {
-	game := lib.Games[appID]
+func (lib *Library) StartApp(igdbId int) bool {
+	game := lib.Games[igdbId]
 
 	cmd := exec.Command(game.Executable)
 	cmd.Dir = filepath.Dir(game.Executable)
@@ -90,7 +106,6 @@ func (lib *Library) StartApp(appID int) bool {
 	fmt.Printf("Started game with PID: %d\n", cmd.Process.Pid)
 
 	game.Running = true
-	lib.AddToLibrary(game)
 
 	go func() {
 		seconds := 0
@@ -112,7 +127,6 @@ func (lib *Library) StartApp(appID int) bool {
 
 				game.Running = false
 				game.PlayTime += seconds
-				lib.AddToLibrary(game)
 				return
 			}
 		}
