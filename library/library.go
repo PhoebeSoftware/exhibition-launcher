@@ -26,7 +26,7 @@ type Library struct {
 
 // geeft library.json als Library struct vol met data
 func GetLibrary() *Library {
-	file, err := os.OpenFile("./library.json", os.O_RDWR|os.O_CREATE, 0644)
+	file, err := os.OpenFile(filepath.Join(".", "downloads"), os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		log.Printf("Error opening/creating library.json: %v", err)
 		return &Library{Games: make(map[int]Game)}

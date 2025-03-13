@@ -4,6 +4,7 @@ import (
 	"derpy-launcher072/igdb"
 	"derpy-launcher072/library"
 	"derpy-launcher072/settings"
+	"derpy-launcher072/torrent"
 	"embed"
 	"fmt"
 	"log"
@@ -16,9 +17,10 @@ import (
 // Any files in the frontend/dist folder will be embedded into the binary and
 // made available to the frontend.
 // See https://pkg.go.dev/embed for more information.
-
-var apiManager *igdb.APIManager
 var gameLibrary *library.Library
+var apiManager *igdb.APIManager
+var torrentManager *torrent.Manager
+
 //go:embed all:frontend/dist
 var assets embed.FS
 
@@ -29,8 +31,9 @@ func main() {
 	// 🐐routine
 	gameLibrary = library.GetLibrary()
 	apiManager = igdb.NewAPI()
+	torrentManager = torrent.StartClient()
 
-	setting, err := settings.LoadSettings(filepath.Join( "settings.json"))
+	setting, err := settings.LoadSettings(filepath.Join("settings.json"))
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -53,6 +56,11 @@ func main() {
 	// 'Mac' options tailor the application when running an macOS.
 	app := application.New(application.Options{
 		Name: "derp-launcher072",
+		Services: []application.Service{
+			application.NewService(torrent.StartClient()),
+			application.NewService(igdb.NewAPI()),
+			application.NewService(library.GetLibrary()),
+		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
 		},
