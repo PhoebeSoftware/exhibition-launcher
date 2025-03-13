@@ -5,3 +5,4 @@ bin
 .env
 ./.task
 settings.json
+library.json
