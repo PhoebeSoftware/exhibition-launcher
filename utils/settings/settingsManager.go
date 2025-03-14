@@ -10,6 +10,7 @@ import (
 type Settings struct {
 	PathToSettings string `json:"path_to_settings"`
 	DownloadPath   string `json:"download_path"`
+	UseRealDebrid bool `json:"use_real_debrid"`
 }
 
 func (settings Settings) SaveSettings() error {
