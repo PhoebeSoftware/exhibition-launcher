@@ -17,7 +17,7 @@ import (
 // Any files in the frontend/dist folder will be embedded into the binary and
 // made available to the frontend.
 // See https://pkg.go.dev/embed for more information.
-var gameLibrary *library.Library
+var libraryManager *library.Library
 var apiManager *igdb.APIManager
 var torrentManager *torrent.Manager
 
@@ -29,17 +29,18 @@ var assets embed.FS
 // logs any error that might occur.
 func main() {
 	// 🐐routine
-	gameLibrary = library.GetLibrary()
-	apiManager = igdb.NewAPI()
-	torrentManager = torrent.StartClient()
-
-	setting, err := settings.LoadSettings(filepath.Join("settings.json"))
+	settings, err := settings.LoadSettings(filepath.Join("settings.json"))
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	fmt.Println(setting)
+	libraryManager = library.GetLibrary()
+	apiManager = igdb.NewAPI()
+	torrentManager = torrent.StartClient(settings.DownloadPath)
+
+
+	fmt.Println(settings)
 
 	//go func() {
 	//	results := torrent.Scrape_1337x("goat simulator 3")
@@ -57,9 +58,9 @@ func main() {
 	app := application.New(application.Options{
 		Name: "derp-launcher072",
 		Services: []application.Service{
-			application.NewService(torrent.StartClient()),
-			application.NewService(igdb.NewAPI()),
-			application.NewService(library.GetLibrary()),
+			application.NewService(torrentManager),
+			application.NewService(apiManager),
+			application.NewService(libraryManager),
 		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),

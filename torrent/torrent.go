@@ -3,7 +3,6 @@ package torrent
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/anacrolix/torrent"
@@ -21,15 +20,15 @@ type Manager struct {
 }
 
 // start client en geef manager zodat je makkelijk kan bedienen zawg
-func StartClient() *Manager {
-	torrentPath := filepath.Join(".", "downloads")
-
-	dirErr := os.MkdirAll(torrentPath, os.ModePerm)
+func StartClient(path string) *Manager {
+	dirErr := os.MkdirAll(path, os.ModePerm)
 	if dirErr != nil {
 		fmt.Println("Error creating downloads directory")
 	}
 
-	client, err := torrent.NewClient(nil)
+	clientConfig := torrent.NewDefaultClientConfig();
+	clientConfig.DataDir = path
+	client, err := torrent.NewClient(clientConfig)
 
 	if err != nil {
 		fmt.Println("Error starting torrent client")
