@@ -3,8 +3,8 @@ package main
 import (
 	"derpy-launcher072/igdb"
 	"derpy-launcher072/library"
-	"derpy-launcher072/settings"
 	"derpy-launcher072/torrent"
+	"derpy-launcher072/utils/settings"
 	"embed"
 	"fmt"
 	"log"
