@@ -66,7 +66,7 @@ func GetLibrary() *Library {
 
 func (lib *Library) AddToLibrary(igdbId int) error {
 	// prompt executable location
-	executable, err := dialog.File().Title("Select game executable").Filter("Executable files", "exe").Load()
+	executable, err := dialog.File().Title("Select game executable").Filter("Executable files", "exe", "app").Load()
 	if err != nil {
 		return fmt.Errorf("failed to select executable: %w", err)
 	}
