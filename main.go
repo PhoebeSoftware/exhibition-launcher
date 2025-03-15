@@ -47,14 +47,14 @@ func main() {
 				fmt.Println(err)
 			}
 
-			hosts, err := debridClient.AvailableHosts()
+			downloads, err := debridClient.GetDownloads()
 			if err != nil {
 				fmt.Println(err)
 				return
 			}
 
-			for _, host := range hosts {
-				fmt.Println(host.Host)
+			for _, download := range downloads {
+				fmt.Println(download.Link)
 			}
 
 			fmt.Println(user)
