@@ -21,6 +21,7 @@ import (
 var libraryManager *library.Library
 var apiManager *igdb.APIManager
 var torrentManager *torrent.Manager
+var debridManager *realdebrid.RealDebridClient
 
 //go:embed all:frontend/dist
 var assets embed.FS
@@ -40,29 +41,9 @@ func main() {
 	apiManager = igdb.NewAPI()
 
 	if settings.UseRealDebrid {
-		go func() {
-			debridClient := realdebrid.NewRealDebridClient(settings.DebridToken)
-			user, err := debridClient.GetUser()
-			if err != nil {
-				fmt.Println(err)
-			}
-
-			downloads, err := debridClient.GetDownloads()
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-
-			for _, download := range downloads {
-				fmt.Println(download.Link)
-			}
-
-			fmt.Println(user)
-
-		}()
-	} else {
-		torrentManager = torrent.StartClient(settings.DownloadPath)
+		debridManager = realdebrid.NewRealDebridClient(settings.DebridToken)
 	}
+
 	torrentManager = torrent.StartClient(settings.DownloadPath)
 
 	//go func() {
@@ -78,20 +59,40 @@ func main() {
 	// 'Assets' configures the asset server with the 'FS' variable pointing to the frontend files.
 	// 'Bind' is a list of Go struct instances. The frontend has access to the methods of these instances.
 	// 'Mac' options tailor the application when running an macOS.
-	app := application.New(application.Options{
-		Name: "derp-launcher072",
-		Services: []application.Service{
-			application.NewService(torrentManager),
-			application.NewService(apiManager),
-			application.NewService(libraryManager),
-		},
-		Assets: application.AssetOptions{
-			Handler: application.AssetFileServerFS(assets),
-		},
-		Mac: application.MacOptions{
-			ApplicationShouldTerminateAfterLastWindowClosed: true,
-		},
-	})
+
+	var app *application.App
+	if debridManager != nil {
+		app = application.New(application.Options{
+			Name: "derp-launcher072",
+			Services: []application.Service{
+				application.NewService(debridManager),
+				application.NewService(torrentManager),
+				application.NewService(apiManager),
+				application.NewService(libraryManager),
+			},
+			Assets: application.AssetOptions{
+				Handler: application.AssetFileServerFS(assets),
+			},
+			Mac: application.MacOptions{
+				ApplicationShouldTerminateAfterLastWindowClosed: true,
+			},
+		})
+	} else {
+		app = application.New(application.Options{
+			Name: "derp-launcher072",
+			Services: []application.Service{
+				application.NewService(torrentManager),
+				application.NewService(apiManager),
+				application.NewService(libraryManager),
+			},
+			Assets: application.AssetOptions{
+				Handler: application.AssetFileServerFS(assets),
+			},
+			Mac: application.MacOptions{
+				ApplicationShouldTerminateAfterLastWindowClosed: true,
+			},
+		})
+	}
 
 	// Create a new window with the necessary options.
 	// 'Title' is the title of the window.

@@ -14,11 +14,11 @@ type AvailableHost struct {
 	MaxFileSize int    `json:"max_file_size"`
 }
 
-type AvailableHostsResponse struct {
-	availableHosts []AvailableHost
-}
-
 func (client *RealDebridClient) AvailableHosts() ([]AvailableHost, error) {
+
+	type AvailableHostsResponse struct {
+		availableHosts []AvailableHost
+	}
 
 	var availableHostResponse AvailableHostsResponse
 
@@ -40,10 +40,6 @@ func (client *RealDebridClient) AvailableHosts() ([]AvailableHost, error) {
 	return result, nil
 }
 
-type DownloadResponse struct {
-	DownloadItemList []DownloadItem
-}
-
 type DownloadItem struct {
 	Id string
 	FileName string
@@ -57,6 +53,10 @@ type DownloadItem struct {
 }
 
 func (client *RealDebridClient) GetDownloads() ([]DownloadItem, error) {
+
+	type DownloadResponse struct {
+		DownloadItemList []DownloadItem
+	}
 
 	var downloadResponse DownloadResponse
 
@@ -72,6 +72,44 @@ func (client *RealDebridClient) GetDownloads() ([]DownloadItem, error) {
 	}
 
 	for _, downloadItem := range downloadResponse.DownloadItemList {
+		result = append(result, downloadItem)
+	}
+
+	return result, nil
+}
+
+
+type TraficInfo struct {
+	Left int
+	Bytes int
+	Links int
+	Limit int
+	Type string
+	Extra int
+	Reset string
+}
+
+
+func (client *RealDebridClient) GetTrafic() ([]TraficInfo, error) {
+	type TraficResponse struct {
+		HostMainDomain string
+		TraficInfo []TraficInfo
+	}
+
+	var traficResponse TraficResponse
+
+	req, err := client.newRequest(http.MethodGet, "/traffic", nil, "", nil)
+	if err != nil {
+		return nil, fmt.Errorf("get request failed while requesting available hosts: %w", err)
+	}
+	var result []TraficInfo
+
+	err = client.do(req, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, downloadItem := range traficResponse.TraficInfo {
 		result = append(result, downloadItem)
 	}
 
