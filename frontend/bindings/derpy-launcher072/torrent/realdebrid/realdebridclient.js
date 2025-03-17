@@ -43,12 +43,12 @@ export function GetDownloads() {
 }
 
 /**
- * @returns {Promise<$models.TraficInfo[]> & { cancel(): void }}
+ * @returns {Promise<$models.TraficResponse> & { cancel(): void }}
  */
 export function GetTrafic() {
     let $resultPromise = /** @type {any} */($Call.ByID(3269242439));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
-        return $$createType5($result);
+        return $$createType4($result);
     }));
     $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
     return $typingPromise;
@@ -61,7 +61,7 @@ export function GetTrafic() {
 export function GetUser() {
     let $resultPromise = /** @type {any} */($Call.ByID(1276040153));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
-        return $$createType7($result);
+        return $$createType8($result);
     }));
     $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
     return $typingPromise;
@@ -72,7 +72,13 @@ const $$createType0 = $models.AvailableHost.createFrom;
 const $$createType1 = $Create.Array($$createType0);
 const $$createType2 = $models.DownloadItem.createFrom;
 const $$createType3 = $Create.Array($$createType2);
-const $$createType4 = $models.TraficInfo.createFrom;
-const $$createType5 = $Create.Array($$createType4);
-const $$createType6 = $models.RealDebridUser.createFrom;
-const $$createType7 = $Create.Nullable($$createType6);
+var $$createType4 = /** @type {(...args: any[]) => any} */(function $$initCreateType4(...args) {
+    if ($$createType4 === $$initCreateType4) {
+        $$createType4 = $$createType6;
+    }
+    return $$createType4(...args);
+});
+const $$createType5 = $models.TraficInfo.createFrom;
+const $$createType6 = $Create.Map($Create.Any, $$createType5);
+const $$createType7 = $models.RealDebridUser.createFrom;
+const $$createType8 = $Create.Nullable($$createType7);

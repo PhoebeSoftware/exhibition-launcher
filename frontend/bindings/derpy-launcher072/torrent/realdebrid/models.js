@@ -298,3 +298,7 @@ export class TraficInfo {
         return new TraficInfo(/** @type {Partial<TraficInfo>} */($$parsedSource));
     }
 }
+
+/**
+ * @typedef {{ [_: string]: TraficInfo }} TraficResponse
+ */

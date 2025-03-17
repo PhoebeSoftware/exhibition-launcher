@@ -90,28 +90,19 @@ type TraficInfo struct {
 }
 
 
-func (client *RealDebridClient) GetTrafic() ([]TraficInfo, error) {
-	type TraficResponse struct {
-		HostMainDomain string
-		TraficInfo []TraficInfo
-	}
-
+type TraficResponse map[string]TraficInfo
+func (client *RealDebridClient) GetTrafic() (TraficResponse, error) {
 	var traficResponse TraficResponse
 
 	req, err := client.newRequest(http.MethodGet, "/traffic", nil, "", nil)
 	if err != nil {
 		return nil, fmt.Errorf("get request failed while requesting available hosts: %w", err)
 	}
-	var result []TraficInfo
 
-	err = client.do(req, &result)
+	err = client.do(req, &traficResponse)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, downloadItem := range traficResponse.TraficInfo {
-		result = append(result, downloadItem)
-	}
-
-	return result, nil
+	return traficResponse, nil
 }
