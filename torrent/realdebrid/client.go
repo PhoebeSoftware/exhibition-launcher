@@ -20,8 +20,8 @@ var (
 )
 
 type RealDebridClient struct {
-	ApiKey string
-	client *http.Client
+	ApiKey  string
+	client  *http.Client
 	BaseURL string
 }
 

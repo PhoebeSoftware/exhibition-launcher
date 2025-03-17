@@ -14,6 +14,12 @@ function real() {
     RealDebridClient.GetTrafic().then((result) => {
         console.log(result)
     })
+    RealDebridClient.GetUser().then((result) => {
+        console.log(result)
+    })
+    RealDebridClient.GetDownloads().then((result) => {
+        console.log(result)
+    })
 }
 </script>
 
