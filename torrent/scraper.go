@@ -1,4 +1,4 @@
-package main
+package torrent
 
 import (
 	"fmt"
@@ -16,7 +16,7 @@ type Game1337x struct {
 	Magnet    string
 }
 
-func scrape_1337x(item string) []string {
+func Scrape_1337x(item string) []string {
 	billCollector := colly.NewCollector()
 	results := []string{}
 
@@ -30,7 +30,7 @@ func scrape_1337x(item string) []string {
 	return results
 }
 
-func get_1337x_data(torrent_page string) Game1337x {
+func Get_1337x_data(torrent_page string) Game1337x {
 	billCollector := colly.NewCollector()
 
 	results := Game1337x{

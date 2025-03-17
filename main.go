@@ -1,10 +1,14 @@
 package main
 
 import (
+	"derpy-launcher072/igdb"
+	"derpy-launcher072/library"
+	"derpy-launcher072/torrent"
+	"derpy-launcher072/utils/settings"
 	"embed"
 	"fmt"
 	"log"
-	"time"
+	"path/filepath"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
@@ -13,40 +17,66 @@ import (
 // Any files in the frontend/dist folder will be embedded into the binary and
 // made available to the frontend.
 // See https://pkg.go.dev/embed for more information.
+var libraryManager *library.Library
+var apiManager *igdb.APIManager
+var torrentManager *torrent.Manager
 
-var apiManager *APIManager
-var library *Library
+var app *application.App
 
 //go:embed all:frontend/dist
 var assets embed.FS
+
+type WindowService struct{}
+
+func (w *WindowService) Minimize() {
+	app.CurrentWindow().Minimise()
+}
+
+func (w *WindowService) Maximize() {
+	app.CurrentWindow().Maximise()
+}
+
+func (w *WindowService) Close() {
+	app.CurrentWindow().Close()
+}
 
 // main function serves as the application's entry point. It initializes the application, creates a window,
 // and starts a goroutine that emits a time-based event every second. It subsequently runs the application and
 // logs any error that might occur.
 func main() {
 	// 🐐routine
-	go func() {
-		library = get_library()
-		apiManager = NewAPI()
-	}()
+	settings, err := settings.LoadSettings(filepath.Join("settings.json"))
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-	go func() {
-		results := scrape_1337x("goat simulator 3")
-		for _, result := range results {
-			data := get_1337x_data(result)
-			fmt.Printf("Title: %s\nUploader: %s\nDownloads: %d\nDate: %s\n\n", data.Title, data.Uploader, data.Downloads, data.Date)
-		}
-	}()
+	libraryManager = library.GetLibrary()
+	apiManager = igdb.NewAPI()
+	torrentManager = torrent.StartClient(settings.DownloadPath)
+
+	fmt.Println(settings)
+
+	//go func() {
+	//	results := torrent.Scrape_1337x("goat simulator 3")
+	//	for _, result := range results {
+	//		data := torrent.Get_1337x_data(result)
+	//		fmt.Printf("Title: %s\nUploader: %s\nDownloads: %d\nDate: %s\n\n", data.Title, data.Uploader, data.Downloads, data.Date)
+	//	}
+	//}()
 
 	// Create a new Wails application by providing the necessary options.
 	// Variables 'Name' and 'Description' are for application metadata.
 	// 'Assets' configures the asset server with the 'FS' variable pointing to the frontend files.
 	// 'Bind' is a list of Go struct instances. The frontend has access to the methods of these instances.
 	// 'Mac' options tailor the application when running an macOS.
-	app := application.New(application.Options{
-		Name: "derp-launcher072",
+	app = application.New(application.Options{
+		Name: "derpyLauncher",
 		Services: []application.Service{
-			application.NewService(&GreetService{}),
+			application.NewService(torrentManager),
+			application.NewService(apiManager),
+			application.NewService(libraryManager),
+			application.NewService(&WindowService{}),
 		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
@@ -62,7 +92,7 @@ func main() {
 	// 'BackgroundColour' is the background colour of the window.
 	// 'URL' is the URL that will be loaded into the webview.
 	app.NewWebviewWindowWithOptions(application.WebviewWindowOptions{
-		Title:     "derp",
+		Title:     "derpyLauncher",
 		Width:     1200,
 		Height:    900,
 		MinHeight: 700,
@@ -77,19 +107,8 @@ func main() {
 		URL:              "/",
 	})
 
-	// Create a goroutine that emits an event containing the current time every second.
-	// The frontend can listen to this event and update the UI accordingly.
-	go func() {
-		for {
-			now := time.Now().Format(time.RFC1123)
-			app.EmitEvent("time", now)
-			time.Sleep(time.Second)
-		}
-	}()
-
 	// Run the application. This blocks until the application has been exited.
-	err := app.Run()
-
+	err = app.Run()
 	// If an error occurred while running the application, log it and exit.
 	if err != nil {
 		log.Fatal(err)

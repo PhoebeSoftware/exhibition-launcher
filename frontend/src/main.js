@@ -1,6 +1,11 @@
-import './assets/main.css'
-
 import { createApp } from 'vue'
 import App from './App.vue'
+import router from './router'
 
-createApp(App).mount('#app')
+import { AddToLibrary } from '../bindings/derpy-launcher072/library/library'
+
+AddToLibrary(69)
+
+const app = createApp(App)
+app.use(router)
+app.mount('#app')
