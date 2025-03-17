@@ -11,10 +11,11 @@ import {Call as $Call, Create as $Create} from "@wailsio/runtime";
 import * as $models from "./models.js";
 
 /**
+ * @param {string} magnetLink
  * @returns {Promise<void> & { cancel(): void }}
  */
-export function AddTorrent() {
-    let $resultPromise = /** @type {any} */($Call.ByID(1789522657));
+export function AddTorrentByMagnet(magnetLink) {
+    let $resultPromise = /** @type {any} */($Call.ByID(4152170002, magnetLink));
     return $resultPromise;
 }
 
