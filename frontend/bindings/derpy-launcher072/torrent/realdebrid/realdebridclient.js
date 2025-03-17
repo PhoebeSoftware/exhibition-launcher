@@ -12,11 +12,15 @@ import * as $models from "./models.js";
 
 /**
  * @param {string} magnetLink
- * @returns {Promise<void> & { cancel(): void }}
+ * @returns {Promise<$models.AddMagnetResponse> & { cancel(): void }}
  */
 export function AddTorrentByMagnet(magnetLink) {
     let $resultPromise = /** @type {any} */($Call.ByID(4152170002, magnetLink));
-    return $resultPromise;
+    let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
+        return $$createType0($result);
+    }));
+    $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
+    return $typingPromise;
 }
 
 /**
@@ -25,7 +29,7 @@ export function AddTorrentByMagnet(magnetLink) {
 export function AvailableHosts() {
     let $resultPromise = /** @type {any} */($Call.ByID(3101348416));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
-        return $$createType1($result);
+        return $$createType2($result);
     }));
     $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
     return $typingPromise;
@@ -37,7 +41,19 @@ export function AvailableHosts() {
 export function GetDownloads() {
     let $resultPromise = /** @type {any} */($Call.ByID(229522759));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
-        return $$createType3($result);
+        return $$createType4($result);
+    }));
+    $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
+    return $typingPromise;
+}
+
+/**
+ * @returns {Promise<$models.Torrent[]> & { cancel(): void }}
+ */
+export function GetTorents() {
+    let $resultPromise = /** @type {any} */($Call.ByID(327308577));
+    let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
+        return $$createType6($result);
     }));
     $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
     return $typingPromise;
@@ -49,7 +65,7 @@ export function GetDownloads() {
 export function GetTrafic() {
     let $resultPromise = /** @type {any} */($Call.ByID(3269242439));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
-        return $$createType5($result);
+        return $$createType8($result);
     }));
     $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
     return $typingPromise;
@@ -62,18 +78,21 @@ export function GetTrafic() {
 export function GetUser() {
     let $resultPromise = /** @type {any} */($Call.ByID(1276040153));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
-        return $$createType7($result);
+        return $$createType10($result);
     }));
     $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
     return $typingPromise;
 }
 
 // Private type creation functions
-const $$createType0 = $models.AvailableHost.createFrom;
-const $$createType1 = $Create.Array($$createType0);
-const $$createType2 = $models.DownloadItem.createFrom;
-const $$createType3 = $Create.Array($$createType2);
-const $$createType4 = $models.TraficInfo.createFrom;
-const $$createType5 = $Create.Map($Create.Any, $$createType4);
-const $$createType6 = $models.RealDebridUser.createFrom;
-const $$createType7 = $Create.Nullable($$createType6);
+const $$createType0 = $models.AddMagnetResponse.createFrom;
+const $$createType1 = $models.AvailableHost.createFrom;
+const $$createType2 = $Create.Array($$createType1);
+const $$createType3 = $models.DownloadItem.createFrom;
+const $$createType4 = $Create.Array($$createType3);
+const $$createType5 = $models.Torrent.createFrom;
+const $$createType6 = $Create.Array($$createType5);
+const $$createType7 = $models.TraficInfo.createFrom;
+const $$createType8 = $Create.Map($Create.Any, $$createType7);
+const $$createType9 = $models.RealDebridUser.createFrom;
+const $$createType10 = $Create.Nullable($$createType9);

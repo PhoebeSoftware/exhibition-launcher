@@ -11,7 +11,7 @@ type AvailableHost struct {
 }
 
 func (client *RealDebridClient) AvailableHosts() ([]AvailableHost, error) {
-	req, err := client.newRequest(http.MethodGet, "/torrents/availableHosts", nil, nil, nil)
+	req, err := client.newRequest(http.MethodGet, "/torrents/availableHosts", nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("get request failed while requesting available hosts: %w", err)
 	}

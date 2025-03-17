@@ -1,9 +1,9 @@
 package realdebrid
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
-	"io"
 	"net/http"
 	"net/url"
 	"time"
@@ -36,19 +36,13 @@ func NewRealDebridClient(apiKey string) *RealDebridClient {
 	}
 }
 
-func (client *RealDebridClient) newRequest(method, path string, headers http.Header, params url.Values, body io.Reader) (*http.Request, error) {
+func (client *RealDebridClient) newRequest(method, path string, headers http.Header, params url.Values) (*http.Request, error) {
 	if params == nil {
 		params = url.Values{}
 	}
 
-	base, err := url.Parse(client.BaseURL+path)
-	if err != nil {
-		return nil, err
-	}
-
-	base.RawQuery = params.Encode()
-
-	req, err := http.NewRequest(method, base.String(), body)
+	encodedParams := params.Encode()
+	req, err := http.NewRequest(method, client.BaseURL+path, bytes.NewBufferString(encodedParams))
 	if err != nil {
 		return nil, err
 	}

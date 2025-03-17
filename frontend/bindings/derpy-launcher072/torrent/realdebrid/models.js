@@ -6,6 +6,41 @@
 // @ts-ignore: Unused imports
 import {Create as $Create} from "@wailsio/runtime";
 
+export class AddMagnetResponse {
+    /**
+     * Creates a new AddMagnetResponse instance.
+     * @param {Partial<AddMagnetResponse>} [$$source = {}] - The source object to create the AddMagnetResponse.
+     */
+    constructor($$source = {}) {
+        if (!("id" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["id"] = "";
+        }
+        if (!("uri" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["uri"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new AddMagnetResponse instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {AddMagnetResponse}
+     */
+    static createFrom($$source = {}) {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new AddMagnetResponse(/** @type {Partial<AddMagnetResponse>} */($$parsedSource));
+    }
+}
+
 export class AvailableHost {
     /**
      * Creates a new AvailableHost instance.
@@ -229,6 +264,122 @@ export class RealDebridUser {
     }
 }
 
+export class Torrent {
+    /**
+     * Creates a new Torrent instance.
+     * @param {Partial<Torrent>} [$$source = {}] - The source object to create the Torrent.
+     */
+    constructor($$source = {}) {
+        if (!("id" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["id"] = "";
+        }
+        if (!("filename" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["filename"] = "";
+        }
+        if (!("hash" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["hash"] = "";
+        }
+        if (!("bytes" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["bytes"] = 0;
+        }
+        if (!("host" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["host"] = "";
+        }
+        if (!("split" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["split"] = 0;
+        }
+        if (!("progress" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["progress"] = 0;
+        }
+        if (!("status" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["status"] = "";
+        }
+        if (!("added" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["added"] = "";
+        }
+        if (!("links" in $$source)) {
+            /**
+             * @member
+             * @type {string[]}
+             */
+            this["links"] = [];
+        }
+        if (/** @type {any} */(false)) {
+            /**
+             * @member
+             * @type {string | null | undefined}
+             */
+            this["ended"] = null;
+        }
+        if (/** @type {any} */(false)) {
+            /**
+             * @member
+             * @type {number | null | undefined}
+             */
+            this["speed"] = null;
+        }
+        if (/** @type {any} */(false)) {
+            /**
+             * @member
+             * @type {number | null | undefined}
+             */
+            this["seeders"] = null;
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new Torrent instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {Torrent}
+     */
+    static createFrom($$source = {}) {
+        const $$createField9_0 = $$createType0;
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("links" in $$parsedSource) {
+            $$parsedSource["links"] = $$createField9_0($$parsedSource["links"]);
+        }
+        return new Torrent(/** @type {Partial<Torrent>} */($$parsedSource));
+    }
+}
+
 export class TraficInfo {
     /**
      * Creates a new TraficInfo instance.
@@ -298,3 +449,6 @@ export class TraficInfo {
         return new TraficInfo(/** @type {Partial<TraficInfo>} */($$parsedSource));
     }
 }
+
+// Private type creation functions
+const $$createType0 = $Create.Array($Create.Any);
