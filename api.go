@@ -25,16 +25,16 @@ type APIManager struct {
 }
 
 func SetupHeader(request *http.Request) {
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println("Error loading .env file")
-	}
-
 	request.Header.Set("Client-ID", os.Getenv("IGDB_CLIENT"))
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", os.Getenv("IGDB_AUTH")))
 }
 
 func NewAPI() *APIManager {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
+
 	return &APIManager{client: &http.Client{}}
 }
 
