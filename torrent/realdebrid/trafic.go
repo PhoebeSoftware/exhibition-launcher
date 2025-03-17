@@ -20,7 +20,7 @@ func (client *RealDebridClient) GetTrafic() (map[string]TraficInfo, error) {
 
 	var traficResponse TraficResponse
 
-	req, err := client.newRequest(http.MethodGet, "/traffic", nil, "", nil)
+	req, err := client.newRequest(http.MethodGet, "/traffic", nil, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("get request failed while requesting trafic: %w", err)
 	}

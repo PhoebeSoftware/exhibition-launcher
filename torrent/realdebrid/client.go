@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -35,8 +36,19 @@ func NewRealDebridClient(apiKey string) *RealDebridClient {
 	}
 }
 
-func (client *RealDebridClient) newRequest(method, path string, headers http.Header, params string, body io.Reader) (*http.Request, error) {
-	req, err := http.NewRequest(method, client.BaseURL+path+params, body)
+func (client *RealDebridClient) newRequest(method, path string, headers http.Header, params url.Values, body io.Reader) (*http.Request, error) {
+	if params == nil {
+		params = url.Values{}
+	}
+
+	base, err := url.Parse(client.BaseURL+path)
+	if err != nil {
+		return nil, err
+	}
+
+	base.RawQuery = params.Encode()
+
+	req, err := http.NewRequest(method, base.String(), body)
 	if err != nil {
 		return nil, err
 	}

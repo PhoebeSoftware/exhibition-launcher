@@ -31,7 +31,7 @@ type RealDebridUser struct {
 
 // Returns some informations on the current user.
 func (client *RealDebridClient) GetUser() (*RealDebridUser, error) {
-	req, err := client.newRequest(http.MethodGet, "/user", nil, "", nil)
+	req, err := client.newRequest(http.MethodGet, "/user", nil, nil, nil)
 
 	if err != nil {
 		return nil, err

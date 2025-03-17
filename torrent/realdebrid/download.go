@@ -19,7 +19,7 @@ type DownloadItem struct {
 
 func (client *RealDebridClient) GetDownloads() ([]DownloadItem, error) {
 
-	req, err := client.newRequest(http.MethodGet, "/downloads", nil, "", nil)
+	req, err := client.newRequest(http.MethodGet, "/downloads", nil, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("get request failed while requesting downloads: %w", err)
 	}
