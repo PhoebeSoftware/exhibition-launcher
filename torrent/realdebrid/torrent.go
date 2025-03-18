@@ -44,6 +44,24 @@ func (client *RealDebridClient) AddTorrentByMagnet(magnetLink string) (AddMagnet
 	return result, nil
 }
 
+func (client *RealDebridClient) GetTorrentInfoById(id string) (Torrent, error) {
+	var result Torrent
+	path := "/torrents/info/" + id
+	fmt.Println(path)
+	req, err := client.newRequest(http.MethodGet, path, nil, nil)
+
+	if err != nil {
+		return result, fmt.Errorf("could not get info from torrent: %w", err)
+	}
+
+	err = client.do(req, &result)
+	if err != nil {
+		return result, fmt.Errorf("could unmarshal response: %w", err)
+	}
+
+	return result, nil
+}
+
 func (client *RealDebridClient) GetTorents() ([]Torrent, error) {
 
 	req, err := client.newRequest(http.MethodGet, "/torrents", nil, nil)

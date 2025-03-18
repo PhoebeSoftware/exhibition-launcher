@@ -60,6 +60,19 @@ export function GetTorents() {
 }
 
 /**
+ * @param {string} id
+ * @returns {Promise<$models.Torrent> & { cancel(): void }}
+ */
+export function GetTorrentInfoById(id) {
+    let $resultPromise = /** @type {any} */($Call.ByID(2745584388, id));
+    let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
+        return $$createType5($result);
+    }));
+    $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
+    return $typingPromise;
+}
+
+/**
  * @returns {Promise<{ [_: string]: $models.TrafficInfo }> & { cancel(): void }}
  */
 export function GetTraffic() {
