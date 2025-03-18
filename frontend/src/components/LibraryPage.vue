@@ -24,7 +24,7 @@
     </div>
 
     <div class="game-library-container">
-      <div class="game-library-game-box" v-for="n in 2" :key="n">
+      <div class="game-library-game-box" v-for="n in 90" :key="n">
         <div class="game-box-info">
           <div class="text-container">
             <h1>Game</h1>
@@ -35,16 +35,6 @@
       </div>
     </div>
 
-    <div id="discover-content" class="page-content" style="display: none;">
-      <div class="game-discover-container">
-        <h1>🥷'ERRRRss</h1>
-      </div>
-    </div>
-
-    <div id="favorites-content" class="page-content" style="display: none;">
-      <div class="game-favorites-container">
-      </div>
-    </div>
   </div>
 </template>
 
@@ -57,12 +47,13 @@ export default {
 <style scoped>
 .page {
   padding: 20px;
+  height: auto;
 }
 
 .game-library-container {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(170px, 2fr));
   gap: 20px;
   padding-top: 30px;
   margin-bottom: 50px;
