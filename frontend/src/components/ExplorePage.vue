@@ -2,7 +2,7 @@
     <div class="page">
       <h1>Explore</h1>
       <p>Discover new content here.</p>
-      <button @click="real()">bruh button</button>
+      <button @click="addTorrentByMagnet()">Add torrent by magnet</button>
     </div>
 
 </template>
@@ -10,7 +10,7 @@
 <script setup>
 import {RealDebridClient} from "../../bindings/derpy-launcher072/torrent/realdebrid/index.js";
 
-function real() {
+function addTorrentByMagnet() {
     // RealDebridClient.GetTrafic().then((result) => {
     //     console.log(result)
     // });
@@ -28,9 +28,6 @@ function real() {
     // RealDebridClient.GetTorents().then((result) => {
     //     console.log(result)
     // });
-    RealDebridClient.AvailableHosts().then((result) => {
-        console.log(result)
-    })
 }
 </script>
 
