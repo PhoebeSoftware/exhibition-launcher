@@ -7,7 +7,6 @@ import (
 	"derpy-launcher072/torrent/realdebrid"
 	"derpy-launcher072/utils/settingsManager"
 	"embed"
-	"errors"
 	"fmt"
 	"log"
 	"path/filepath"
