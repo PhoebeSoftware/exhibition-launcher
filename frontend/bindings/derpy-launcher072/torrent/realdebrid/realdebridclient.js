@@ -97,6 +97,15 @@ export function GetUser() {
     return $typingPromise;
 }
 
+/**
+ * @param {$models.Torrent} torrent
+ * @returns {Promise<void> & { cancel(): void }}
+ */
+export function SelectFiles(torrent) {
+    let $resultPromise = /** @type {any} */($Call.ByID(2036866405, torrent));
+    return $resultPromise;
+}
+
 // Private type creation functions
 const $$createType0 = $models.AddMagnetResponse.createFrom;
 const $$createType1 = $models.AvailableHost.createFrom;

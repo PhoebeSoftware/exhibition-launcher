@@ -284,6 +284,13 @@ export class Torrent {
              */
             this["filename"] = "";
         }
+        if (!("original_filename" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["original_filename"] = "";
+        }
         if (!("hash" in $$source)) {
             /**
              * @member
@@ -297,6 +304,13 @@ export class Torrent {
              * @type {number}
              */
             this["bytes"] = 0;
+        }
+        if (!("original_bytes" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["original_bytes"] = 0;
         }
         if (!("host" in $$source)) {
             /**
@@ -332,6 +346,13 @@ export class Torrent {
              * @type {string}
              */
             this["added"] = "";
+        }
+        if (!("files" in $$source)) {
+            /**
+             * @member
+             * @type {TorrentFile[]}
+             */
+            this["files"] = [];
         }
         if (!("links" in $$source)) {
             /**
@@ -371,12 +392,65 @@ export class Torrent {
      * @returns {Torrent}
      */
     static createFrom($$source = {}) {
-        const $$createField9_0 = $$createType0;
+        const $$createField11_0 = $$createType1;
+        const $$createField12_0 = $$createType2;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("files" in $$parsedSource) {
+            $$parsedSource["files"] = $$createField11_0($$parsedSource["files"]);
+        }
         if ("links" in $$parsedSource) {
-            $$parsedSource["links"] = $$createField9_0($$parsedSource["links"]);
+            $$parsedSource["links"] = $$createField12_0($$parsedSource["links"]);
         }
         return new Torrent(/** @type {Partial<Torrent>} */($$parsedSource));
+    }
+}
+
+export class TorrentFile {
+    /**
+     * Creates a new TorrentFile instance.
+     * @param {Partial<TorrentFile>} [$$source = {}] - The source object to create the TorrentFile.
+     */
+    constructor($$source = {}) {
+        if (!("id" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["id"] = 0;
+        }
+        if (!("path" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["path"] = "";
+        }
+        if (!("bytes" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["bytes"] = 0;
+        }
+        if (!("selected" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["selected"] = 0;
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new TorrentFile instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {TorrentFile}
+     */
+    static createFrom($$source = {}) {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new TorrentFile(/** @type {Partial<TorrentFile>} */($$parsedSource));
     }
 }
 
@@ -451,4 +525,6 @@ export class TrafficInfo {
 }
 
 // Private type creation functions
-const $$createType0 = $Create.Array($Create.Any);
+const $$createType0 = TorrentFile.createFrom;
+const $$createType1 = $Create.Array($$createType0);
+const $$createType2 = $Create.Array($Create.Any);
