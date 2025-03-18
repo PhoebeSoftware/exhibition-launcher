@@ -30,11 +30,10 @@ var assets embed.FS
 type WindowService struct{}
 
 func (w *WindowService) Minimize() {
-	win := app.CurrentWindow()
-	if win.IsMinimised() {
-		win.UnMinimise()
+	if app.CurrentWindow().IsMinimised() {
+		app.CurrentWindow().UnMinimise()
 	} else {
-		win.Minimise()
+		app.CurrentWindow().Minimise()
 	}
 }
 

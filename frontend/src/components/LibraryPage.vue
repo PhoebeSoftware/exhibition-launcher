@@ -17,7 +17,7 @@
       </div>
       <div class="add-game-to-library-wrapper">
         <button id="refresh-page"><i class="fa-solid fa-arrows-rotate"></i></button>
-        <button class="game-add-button" id="Import-from-PC-TT" @click="addGame">
+        <button class="game-add-button" id="Import-from-PC-TT">
           Import from PC<i class="fa-solid fa-desktop"></i>
         </button>
       </div>
@@ -45,7 +45,7 @@
   </div>
 </template>
 
-  
+
 <script>
 import { GetAllGames } from '../../bindings/derpy-launcher072/library/library';
 
@@ -58,9 +58,6 @@ export default {
     };
   },
   methods: {
-    addGame() {
-      console.log('Add game button clicked');
-    },
     addItem(item) {
       this.items.push(item);
     }

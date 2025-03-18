@@ -1,5 +1,5 @@
 <template>
-<div class="topbar">
+    <div class="topbar">
         <div class="topbar-left">
             <span class="app-name">Sigma Launcher</span>
         </div>
@@ -7,11 +7,11 @@
             <button class="topbar-button" id="minimize-btn" @click="minimize">
                 <i class="fa-solid fa-minus"></i>
             </button>
-    
+
             <button class="topbar-button" id="maximize-btn" @click="maximize">
                 <i class="fa-regular fa-square"></i>
             </button>
-    
+
             <button class="topbar-button" id="close-btn" @click="close">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -23,21 +23,21 @@
 import { Close, Maximize, Minimize } from '../../bindings/derpy-launcher072/windowservice';
 
 export default {
-  name: 'AppTopbar',
-  methods: {
-    minimize() {    
-      console.log('Minimize button clicked');
-      Minimize();
-    },
-    maximize() {
-      console.log('Maximize button clicked');
-      Maximize();
-    },
-    close() {
-      console.log('Close button clicked');
-      Close();
+    name: 'AppTopbar',
+    methods: {
+        minimize() {
+            console.log('Minimize button clicked');
+            Minimize();
+        },
+        maximize() {
+            console.log('Maximize button clicked');
+            Maximize();
+        },
+        close() {
+            console.log('Close button clicked');
+            Close();
+        }
     }
-  }
 }
 </script>
 
@@ -65,7 +65,7 @@ export default {
 }
 
 .topbar-button {
-    background: none;   
+    background: none;
     border: none;
     color: white;
     font-size: 16px;
@@ -89,5 +89,4 @@ export default {
     font-size: 12px;
     margin: 0;
 }
-
 </style>
