@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-type TraficInfo struct {
+type TrafficInfo struct {
 	Left  int
 	Bytes int
 	Links int
@@ -14,22 +14,22 @@ type TraficInfo struct {
 	Extra int
 	Reset string
 }
-func (client *RealDebridClient) GetTrafic() (map[string]TraficInfo, error) {
+func (client *RealDebridClient) GetTraffic() (map[string]TrafficInfo, error) {
 
-	type TraficResponse map[string]TraficInfo
+	type TrafficResponse map[string]TrafficInfo
 
-	var traficResponse TraficResponse
+	var trafficResponse TrafficResponse
 
 	req, err := client.newRequest(http.MethodGet, "/traffic", nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("get request failed while requesting trafic: %w", err)
 	}
 
-	err = client.do(req, &traficResponse)
+	err = client.do(req, &trafficResponse)
 	if err != nil {
 		return nil, err
 	}
 
-	return traficResponse, nil
+	return trafficResponse, nil
 }
 
