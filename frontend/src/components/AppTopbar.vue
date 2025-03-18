@@ -43,6 +43,7 @@ export default {
 
 <style scoped>
 .topbar {
+    --wails-draggable: drag;
     position: fixed;
     color: white;
     top: 0;
