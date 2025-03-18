@@ -7,9 +7,11 @@ import (
 	"derpy-launcher072/utils/settings"
 	"embed"
 	"fmt"
-	"github.com/wailsapp/wails/v3/pkg/application"
 	"log"
 	"path/filepath"
+	"runtime"
+
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 // Wails uses Go's `embed` package to embed the frontend files into the binary.
@@ -94,20 +96,13 @@ func main() {
 		},
 	})
 
-	// Create a new window with the necessary options.
-	// 'Title' is the title of the window.
-	// 'Mac' options tailor the window when running on macOS.
-	// 'BackgroundColour' is the background colour of the window.
-	// 'URL' is the URL that will be loaded into the webview.
-	app.NewWebviewWindowWithOptions(application.WebviewWindowOptions{
-		Title:               "derpyLauncher",
-		Width:               1200,
-		Height:              900,
-		MinHeight:           700,
-		MinWidth:            1064,
-		MinimiseButtonState: application.ButtonHidden,
-		MaximiseButtonState: application.ButtonHidden,
-		CloseButtonState:    application.ButtonHidden,
+	opt := application.WebviewWindowOptions{
+		Title:     "derpyLauncher",
+		Width:     1200,
+		Height:    900,
+		MinHeight: 700,
+		MinWidth:  1064,
+		Frameless: true,
 		Mac: application.MacWindow{
 			InvisibleTitleBarHeight: 50,
 			Backdrop:                application.MacBackdropTranslucent,
@@ -115,7 +110,21 @@ func main() {
 		},
 		BackgroundColour: application.NewRGB(27, 38, 54),
 		URL:              "/",
-	})
+	}
+
+	// Create a new window with the necessary options.
+	// 'Title' is the title of the window.
+	// 'Mac' options tailor the window when running on macOS.
+	// 'BackgroundColour' is the background colour of the window.
+	// 'URL' is the URL that will be loaded into the webview.
+	if runtime.GOOS == "darwin" {
+		opt.Frameless = false
+
+		opt.MinimiseButtonState = application.ButtonHidden
+		opt.MaximiseButtonState = application.ButtonHidden
+		opt.CloseButtonState = application.ButtonHidden
+	}
+	app.NewWebviewWindowWithOptions(opt)
 
 	// Run the application. This blocks until the application has been exited.
 	err = app.Run()
