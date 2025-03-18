@@ -1,11 +1,12 @@
 package realdebrid
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 )
 
@@ -40,14 +41,26 @@ func (client *RealDebridClient) newRequest(method, path string, headers http.Hea
 	if params == nil {
 		params = url.Values{}
 	}
+	queryString := params.Encode()
+	var body io.Reader
+	fullURL := client.BaseURL + path
 
-	encodedParams := params.Encode()
-	req, err := http.NewRequest(method, client.BaseURL+path, bytes.NewBufferString(encodedParams))
+	if queryString != "" && method == http.MethodGet {
+		fullURL += "?" + queryString
+	}
+
+	if method != http.MethodGet {
+		body = strings.NewReader(queryString)
+	}
+
+	req, err := http.NewRequest(method, fullURL, body)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("Authorization", "Bearer "+client.ApiKey)
-	req.Header.Set("Content-Type", "application/json")
+	if method == http.MethodPost || method == http.MethodPut {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
 	for k, v := range headers {
 		req.Header[k] = v
 	}
