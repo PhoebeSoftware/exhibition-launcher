@@ -380,10 +380,10 @@ export class Torrent {
     }
 }
 
-export class TraficInfo {
+export class TrafficInfo {
     /**
-     * Creates a new TraficInfo instance.
-     * @param {Partial<TraficInfo>} [$$source = {}] - The source object to create the TraficInfo.
+     * Creates a new TrafficInfo instance.
+     * @param {Partial<TrafficInfo>} [$$source = {}] - The source object to create the TrafficInfo.
      */
     constructor($$source = {}) {
         if (!("Left" in $$source)) {
@@ -440,13 +440,13 @@ export class TraficInfo {
     }
 
     /**
-     * Creates a new TraficInfo instance from a string or object.
+     * Creates a new TrafficInfo instance from a string or object.
      * @param {any} [$$source = {}]
-     * @returns {TraficInfo}
+     * @returns {TrafficInfo}
      */
     static createFrom($$source = {}) {
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
-        return new TraficInfo(/** @type {Partial<TraficInfo>} */($$parsedSource));
+        return new TrafficInfo(/** @type {Partial<TrafficInfo>} */($$parsedSource));
     }
 }
 

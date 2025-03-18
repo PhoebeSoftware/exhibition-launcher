@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
+	"runtime"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
@@ -25,6 +26,32 @@ var debridManager *realdebrid.RealDebridClient
 
 //go:embed all:frontend/dist
 var assets embed.FS
+
+type WindowService struct{}
+
+var app *application.App
+
+func (w *WindowService) Minimize() {
+	win := app.CurrentWindow()
+	if win.IsMinimised() {
+		win.UnMinimise()
+	} else {
+		win.Minimise()
+	}
+}
+
+func (w *WindowService) Maximize() {
+	win := app.CurrentWindow()
+	if win.IsMaximised() {
+		win.UnMaximise()
+	} else {
+		win.Maximise()
+	}
+}
+
+func (w *WindowService) Close() {
+	app.CurrentWindow().Close()
+}
 
 // main function serves as the application's entry point. It initializes the application, creates a window,
 // and starts a goroutine that emits a time-based event every second. It subsequently runs the application and
@@ -65,47 +92,8 @@ func main() {
 	// 'Bind' is a list of Go struct instances. The frontend has access to the methods of these instances.
 	// 'Mac' options tailor the application when running an macOS.
 
-	var app *application.App
-	if debridManager != nil {
-		app = application.New(application.Options{
-			Name: "derp-launcher072",
-			Services: []application.Service{
-				application.NewService(debridManager),
-				application.NewService(torrentManager),
-				application.NewService(apiManager),
-				application.NewService(libraryManager),
-			},
-			Assets: application.AssetOptions{
-				Handler: application.AssetFileServerFS(assets),
-			},
-			Mac: application.MacOptions{
-				ApplicationShouldTerminateAfterLastWindowClosed: true,
-			},
-		})
-	} else {
-		app = application.New(application.Options{
-			Name: "derp-launcher072",
-			Services: []application.Service{
-				application.NewService(torrentManager),
-				application.NewService(apiManager),
-				application.NewService(libraryManager),
-			},
-			Assets: application.AssetOptions{
-				Handler: application.AssetFileServerFS(assets),
-			},
-			Mac: application.MacOptions{
-				ApplicationShouldTerminateAfterLastWindowClosed: true,
-			},
-		})
-	}
-
-	// Create a new window with the necessary options.
-	// 'Title' is the title of the window.
-	// 'Mac' options tailor the window when running on macOS.
-	// 'BackgroundColour' is the background colour of the window.
-	// 'URL' is the URL that will be loaded into the webview.
-	app.NewWebviewWindowWithOptions(application.WebviewWindowOptions{
-		Title:     "Window 1",
+	webViewWindowOpt := application.WebviewWindowOptions{
+		Title:     "derpyLauncher",
 		Width:     1200,
 		Height:    900,
 		MinHeight: 700,
@@ -118,7 +106,42 @@ func main() {
 		},
 		BackgroundColour: application.NewRGB(27, 38, 54),
 		URL:              "/",
-	})
+	}
+
+
+	services := []application.Service{
+		application.NewService(torrentManager),
+		application.NewService(apiManager),
+		application.NewService(libraryManager),
+		application.NewService(&WindowService{}),
+	}
+
+	if debridManager != nil {
+		services = append(services, application.NewService(debridManager))
+	}
+
+	appOptions := application.Options{
+		Name: "derp-launcher072",
+		Services: services,
+		Assets: application.AssetOptions{
+			Handler: application.AssetFileServerFS(assets),
+		},
+		Mac: application.MacOptions{
+			ApplicationShouldTerminateAfterLastWindowClosed: true,
+		},
+	}
+	// If macos turn off frameless so minimizing works
+	if runtime.GOOS == "darwin" {
+		webViewWindowOpt.Frameless = false
+
+		webViewWindowOpt.MinimiseButtonState = application.ButtonHidden
+		webViewWindowOpt.MaximiseButtonState = application.ButtonHidden
+		webViewWindowOpt.CloseButtonState = application.ButtonHidden
+	}
+
+	app = application.New(appOptions)
+
+	app.NewWebviewWindowWithOptions(webViewWindowOpt)
 
 	// Run the application. This blocks until the application has been exited.
 	err = app.Run()

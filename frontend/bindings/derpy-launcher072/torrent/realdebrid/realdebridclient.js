@@ -60,10 +60,10 @@ export function GetTorents() {
 }
 
 /**
- * @returns {Promise<{ [_: string]: $models.TraficInfo }> & { cancel(): void }}
+ * @returns {Promise<{ [_: string]: $models.TrafficInfo }> & { cancel(): void }}
  */
-export function GetTrafic() {
-    let $resultPromise = /** @type {any} */($Call.ByID(3269242439));
+export function GetTraffic() {
+    let $resultPromise = /** @type {any} */($Call.ByID(3157381907));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
         return $$createType8($result);
     }));
@@ -92,7 +92,7 @@ const $$createType3 = $models.DownloadItem.createFrom;
 const $$createType4 = $Create.Array($$createType3);
 const $$createType5 = $models.Torrent.createFrom;
 const $$createType6 = $Create.Array($$createType5);
-const $$createType7 = $models.TraficInfo.createFrom;
+const $$createType7 = $models.TrafficInfo.createFrom;
 const $$createType8 = $Create.Map($Create.Any, $$createType7);
 const $$createType9 = $models.RealDebridUser.createFrom;
 const $$createType10 = $Create.Nullable($$createType9);
