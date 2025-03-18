@@ -159,11 +159,11 @@ export default {
   justify-content: space-between;
   align-items: center;
   position: sticky;
-  top: 0;
+  top: 50px;
   padding: 10px;
   backdrop-filter: blur(15px);
   background-color: rgba(25, 25, 25, 0.4);
-  z-index: 10;
+  z-index: 1;
 }
 
 .game-library-game-box {

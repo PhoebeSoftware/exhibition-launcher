@@ -44,11 +44,11 @@ export default {
 <style scoped>
 .topbar {
     --wails-draggable: drag;
+    z-index: 10;
     position: fixed;
     color: white;
     top: 0;
     left: 0;
-    z-index: 1;
     width: 100%;
     background-color: rgb(22, 22, 22);
     padding: 10px 20px;
