@@ -7,10 +7,9 @@ import (
 	"derpy-launcher072/utils/settings"
 	"embed"
 	"fmt"
+	"github.com/wailsapp/wails/v3/pkg/application"
 	"log"
 	"path/filepath"
-
-	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 // Wails uses Go's `embed` package to embed the frontend files into the binary.
@@ -29,10 +28,11 @@ var assets embed.FS
 type WindowService struct{}
 
 func (w *WindowService) Minimize() {
-	if app.CurrentWindow().IsMinimised() {
-		app.CurrentWindow().UnMinimise()
+	win := app.CurrentWindow()
+	if win.IsMinimised() {
+		win.UnMinimise()
 	} else {
-		app.CurrentWindow().Minimise()
+		win.Minimise()
 	}
 }
 
@@ -100,12 +100,14 @@ func main() {
 	// 'BackgroundColour' is the background colour of the window.
 	// 'URL' is the URL that will be loaded into the webview.
 	app.NewWebviewWindowWithOptions(application.WebviewWindowOptions{
-		Title:     "derpyLauncher",
-		Width:     1200,
-		Height:    900,
-		MinHeight: 700,
-		MinWidth:  1064,
-		Frameless: true,
+		Title:               "derpyLauncher",
+		Width:               1200,
+		Height:              900,
+		MinHeight:           700,
+		MinWidth:            1064,
+		MinimiseButtonState: application.ButtonHidden,
+		MaximiseButtonState: application.ButtonHidden,
+		CloseButtonState:    application.ButtonHidden,
 		Mac: application.MacWindow{
 			InvisibleTitleBarHeight: 50,
 			Backdrop:                application.MacBackdropTranslucent,
