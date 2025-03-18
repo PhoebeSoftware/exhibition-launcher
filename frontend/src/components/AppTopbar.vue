@@ -25,7 +25,7 @@ import { Close, Maximize, Minimize } from '../../bindings/derpy-launcher072/wind
 export default {
   name: 'AppTopbar',
   methods: {
-    minimize() {
+    minimize() {    
       console.log('Minimize button clicked');
       Minimize();
     },

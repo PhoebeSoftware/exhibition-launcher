@@ -17,14 +17,14 @@
       </div>
       <div class="add-game-to-library-wrapper">
         <button id="refresh-page"><i class="fa-solid fa-arrows-rotate"></i></button>
-        <button class="game-add-button" id="Import-from-PC-TT">
+        <button class="game-add-button" id="Import-from-PC-TT" @click="addGame">
           Import from PC<i class="fa-solid fa-desktop"></i>
         </button>
       </div>
     </div>
 
     <div class="game-library-container">
-      <div class="game-library-game-box" v-for="n in 2" :key="n">
+      <div class="game-library-game-box" v-for="n in 91" :key="n">
         <div class="game-box-info">
           <div class="text-container">
             <h1>Game</h1>
@@ -35,11 +35,8 @@
       </div>
     </div>
 
-    <div id="discover-content" class="page-content" style="display: none;">
-      <div class="game-discover-container">
-        <h1>🥷'ERRRRss</h1>
-      </div>
-    </div>
+    <div id="discover-content" class="page-content" style="display: none;" v-for="item in items" :key="item.id">{{
+      item.name }}</div>
 
     <div id="favorites-content" class="page-content" style="display: none;">
       <div class="game-favorites-container">
@@ -48,10 +45,31 @@
   </div>
 </template>
 
+  
 <script>
+import { GetAllGames } from '../../bindings/derpy-launcher072/library/library';
+
 export default {
-  name: 'LibraryPage'
-}
+  name: 'LibraryPage',
+
+  data() {
+    return {
+      items: []
+    };
+  },
+  methods: {
+    addGame() {
+      console.log('Add game button clicked');
+    },
+    addItem(item) {
+      this.items.push(item);
+    }
+  },
+  async mounted() {
+    const idk = await GetAllGames();
+    console.log(idk);
+  }
+};
 </script>
 
 <style scoped>
