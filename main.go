@@ -7,6 +7,7 @@ import (
 	"derpy-launcher072/torrent/realdebrid"
 	"derpy-launcher072/utils/settingsManager"
 	"embed"
+	"errors"
 	"fmt"
 	"log"
 	"path/filepath"
@@ -41,6 +42,11 @@ func main() {
 	apiManager = igdb.NewAPI()
 
 	if settings.UseRealDebrid {
+		if settings.DebridToken == "" {
+			// TO:DO ADD A UI FOR THIS OR SMTH
+			fmt.Println("Debrid does not exist")
+			return
+		}
 		debridManager = realdebrid.NewRealDebridClient(settings.DebridToken)
 	}
 
