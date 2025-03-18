@@ -29,11 +29,19 @@ var assets embed.FS
 type WindowService struct{}
 
 func (w *WindowService) Minimize() {
-	app.CurrentWindow().Minimise()
+	if app.CurrentWindow().IsMinimised() {
+		app.CurrentWindow().UnMinimise()
+	} else {
+		app.CurrentWindow().Minimise()
+	}
 }
 
 func (w *WindowService) Maximize() {
-	app.CurrentWindow().Maximise()
+	if app.CurrentWindow().IsMaximised() {
+		app.CurrentWindow().UnMaximise()
+	} else {
+		app.CurrentWindow().Maximise()
+	}
 }
 
 func (w *WindowService) Close() {
