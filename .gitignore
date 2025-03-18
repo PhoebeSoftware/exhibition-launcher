@@ -7,3 +7,4 @@ bin
 settings.json
 library.json
 downloads
+.task
