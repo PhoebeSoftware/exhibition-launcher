@@ -2,7 +2,9 @@ package realdebrid
 
 import (
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 )
 
 type DownloadItem struct {
@@ -33,3 +35,25 @@ func (client *RealDebridClient) GetDownloads() ([]DownloadItem, error) {
 	return result, nil
 }
 
+func (client *RealDebridClient) DownloadByLink(link string, filePath string) error {
+	file, err := os.Create(filePath)
+	if err != nil {
+		return fmt.Errorf("could not create file: %w", err)
+	}
+
+	defer file.Close()
+
+	resp, err := client.client.Get(link)
+	if err != nil {
+		return fmt.Errorf("could not encode link: %w", err)
+	}
+
+	defer resp.Body.Close()
+
+	_, err = io.Copy(file, resp.Body)
+	if err != nil {
+		return fmt.Errorf("could not copy files: %w", err)
+	}
+
+	return nil
+}

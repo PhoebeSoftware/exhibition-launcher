@@ -36,6 +36,16 @@ export function AvailableHosts() {
 }
 
 /**
+ * @param {string} link
+ * @param {string} filePath
+ * @returns {Promise<void> & { cancel(): void }}
+ */
+export function Download(link, filePath) {
+    let $resultPromise = /** @type {any} */($Call.ByID(2620001370, link, filePath));
+    return $resultPromise;
+}
+
+/**
  * @returns {Promise<$models.DownloadItem[]> & { cancel(): void }}
  */
 export function GetDownloads() {

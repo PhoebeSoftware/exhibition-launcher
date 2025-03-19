@@ -42,10 +42,15 @@ async function addTorrentByMagnet() {
         console.log(result)
     });
 
-    await torrentWithSelectedFiles.links.forEach((link) => {
-        RealDebridClient.UnrestrictLink(link).then((result) => {
-            console.log(result)
+    let downloadLinks = []
+
+    await torrentWithSelectedFiles.links.forEach((torrentWithSelectedFiles) => {
+        RealDebridClient.UnrestrictLink(torrentWithSelectedFiles).then((unrestrictObject) => {
+            downloadLinks.push(unrestrictObject)
         })
+    })
+
+    await downloadLinks.forEach((unrestrictObject) => {
     })
 
     // RealDebridClient.GetDownloads().then((result) => {

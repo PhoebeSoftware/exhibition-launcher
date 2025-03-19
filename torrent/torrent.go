@@ -48,7 +48,7 @@ func (manager Manager) AddTorrent(magnetLink string) (*torrent.Torrent, error) {
 	fmt.Println("Getting metadata")
 	<-t.GotInfo()
 
-	fmt.Println("Download starting")
+	fmt.Println("DownloadByLink starting")
 	t.DownloadAll()
 
 	manager.games[t.Info().Name] = DownloadData{
