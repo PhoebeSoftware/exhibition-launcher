@@ -33,7 +33,20 @@ async function addTorrentByMagnet() {
         console.log(result)
     });
 
-    RealDebridClient.SelectFiles(torrent);
+    await RealDebridClient.SelectFiles(torrent);
+
+
+    let torrentWithSelectedFiles;
+    await RealDebridClient.GetTorrentInfoById(id).then((result) => {
+        torrentWithSelectedFiles = result
+        console.log(result)
+    });
+
+    await torrentWithSelectedFiles.links.forEach((link) => {
+        RealDebridClient.UnrestrictLink(link).then((result) => {
+            console.log(result)
+        })
+    })
 
     // RealDebridClient.GetDownloads().then((result) => {
     //     console.log(result)

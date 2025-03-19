@@ -524,6 +524,97 @@ export class TrafficInfo {
     }
 }
 
+export class UnrestrictResponse {
+    /**
+     * Creates a new UnrestrictResponse instance.
+     * @param {Partial<UnrestrictResponse>} [$$source = {}] - The source object to create the UnrestrictResponse.
+     */
+    constructor($$source = {}) {
+        if (!("id" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["id"] = "";
+        }
+        if (!("filename" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["filename"] = "";
+        }
+        if (!("mimeType" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["mimeType"] = "";
+        }
+        if (!("filesize" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["filesize"] = 0;
+        }
+        if (!("link" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["link"] = "";
+        }
+        if (!("host" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["host"] = "";
+        }
+        if (!("chunks" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["chunks"] = 0;
+        }
+        if (!("crc" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["crc"] = 0;
+        }
+        if (!("download" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["download"] = "";
+        }
+        if (!("streamable" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["streamable"] = 0;
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new UnrestrictResponse instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {UnrestrictResponse}
+     */
+    static createFrom($$source = {}) {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new UnrestrictResponse(/** @type {Partial<UnrestrictResponse>} */($$parsedSource));
+    }
+}
+
 // Private type creation functions
 const $$createType0 = TorrentFile.createFrom;
 const $$createType1 = $Create.Array($$createType0);

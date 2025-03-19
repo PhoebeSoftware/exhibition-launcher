@@ -98,12 +98,26 @@ export function GetUser() {
 }
 
 /**
+ * SelectFiles This function is supposed to be called after AddTorrentByMagnet() or similar. Because Real debrid needs to know which files to torrent
  * @param {$models.Torrent} torrent
  * @returns {Promise<void> & { cancel(): void }}
  */
 export function SelectFiles(torrent) {
     let $resultPromise = /** @type {any} */($Call.ByID(2036866405, torrent));
     return $resultPromise;
+}
+
+/**
+ * @param {string} link
+ * @returns {Promise<$models.UnrestrictResponse> & { cancel(): void }}
+ */
+export function UnrestrictLink(link) {
+    let $resultPromise = /** @type {any} */($Call.ByID(277125621, link));
+    let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
+        return $$createType11($result);
+    }));
+    $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
+    return $typingPromise;
 }
 
 // Private type creation functions
@@ -118,3 +132,4 @@ const $$createType7 = $models.TrafficInfo.createFrom;
 const $$createType8 = $Create.Map($Create.Any, $$createType7);
 const $$createType9 = $models.RealDebridUser.createFrom;
 const $$createType10 = $Create.Nullable($$createType9);
+const $$createType11 = $models.UnrestrictResponse.createFrom;
