@@ -64,9 +64,21 @@ func GetLibrary() *Library {
 	return &library
 }
 
+func (lib *Library) GetAllGames() []Game {
+	games := make([]Game, 0, len(lib.Games))
+	for _, game := range lib.Games {
+		games = append(games, game)
+	}
+
+	fmt.Println("Getting all games")
+	fmt.Println(games)
+	fmt.Println(lib.Games)
+	return games
+}
+
 func (lib *Library) AddToLibrary(igdbId int) error {
 	// prompt executable location
-	executable, err := dialog.File().Title("Select game executable").Filter("Executable files", "exe", "app").Load()
+	executable, err := dialog.File().Title("Select game executable").Filter("Executable files", "exe", "app", "ink", "bat").Load()
 	if err != nil {
 		return fmt.Errorf("failed to select executable: %w", err)
 	}

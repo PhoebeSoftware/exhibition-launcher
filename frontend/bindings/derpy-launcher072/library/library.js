@@ -6,6 +6,10 @@
 // @ts-ignore: Unused imports
 import {Call as $Call, Create as $Create} from "@wailsio/runtime";
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
+import * as $models from "./models.js";
+
 /**
  * @param {number} igdbId
  * @returns {Promise<void> & { cancel(): void }}
@@ -16,6 +20,18 @@ export function AddToLibrary(igdbId) {
 }
 
 /**
+ * @returns {Promise<$models.Game[]> & { cancel(): void }}
+ */
+export function GetAllGames() {
+    let $resultPromise = /** @type {any} */($Call.ByID(964106974));
+    let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
+        return $$createType1($result);
+    }));
+    $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
+    return $typingPromise;
+}
+
+/**
  * @param {number} igdbId
  * @returns {Promise<boolean> & { cancel(): void }}
  */
@@ -23,3 +39,7 @@ export function StartApp(igdbId) {
     let $resultPromise = /** @type {any} */($Call.ByID(1893788683, igdbId));
     return $resultPromise;
 }
+
+// Private type creation functions
+const $$createType0 = $models.Game.createFrom;
+const $$createType1 = $Create.Array($$createType0);
