@@ -6,4 +6,4 @@ bin
 ./.task
 settings.json
 library.json
-downloads
+downloads.DS_Store 
