@@ -28,7 +28,7 @@ func (settingsManager SettingsManager) SaveSettings() error {
 		return fmt.Errorf("could not save settingsManager: %w", err)
 	}
 
-	jsonData, err := json.MarshalIndent(settingsManager, "", "    ")
+	jsonData, err := json.MarshalIndent(settingsManager.Settings, "", "    ")
 	if _, err := file.Write(jsonData); err != nil {
 		return fmt.Errorf("could not write json data to settingsManager: %w", err)
 	}
@@ -56,7 +56,7 @@ func LoadSettings(path string) (*SettingsManager, error) {
 	defer file.Close()
 
 	decoder := json.NewDecoder(file)
-	err = decoder.Decode(settingsManager)
+	err = decoder.Decode(&settingsManager.Settings)
 	if err != nil {
 		return nil, fmt.Errorf("Could not decode %v: %w", settingsManager.Settings.PathToSettings, err.Error())
 	}
