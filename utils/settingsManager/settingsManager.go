@@ -7,6 +7,10 @@ import (
 	"path/filepath"
 )
 
+type Manager struct {
+	Settings Settings
+}
+
 type Settings struct {
 	PathToSettings string `json:"path_to_settings"`
 	DownloadPath   string `json:"download_path"`
@@ -14,63 +18,67 @@ type Settings struct {
 	DebridToken string `json:"debrid_token"`
 }
 
-func (settings Settings) SaveSettings() error {
+func (settingsManager Manager) GetSettings() Settings {
+	return settingsManager.Settings
+}
+
+func (settingsManager Manager) SaveSettings() error {
 	// Idk random perms idk
-	file, err := os.OpenFile(settings.PathToSettings, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.ModePerm)
+	file, err := os.OpenFile(settingsManager.GetSettings().PathToSettings, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.ModePerm)
 	if err != nil {
-		return fmt.Errorf("could not save settings: %w", err)
+		return fmt.Errorf("could not save settingsManager: %w", err)
 	}
 
-	jsonData, err := json.MarshalIndent(settings, "", "    ")
+	jsonData, err := json.MarshalIndent(settingsManager, "", "    ")
 	if _, err := file.Write(jsonData); err != nil {
-		return fmt.Errorf("could not write json data to settings: %w", err)
+		return fmt.Errorf("could not write json data to settingsManager: %w", err)
 	}
 
 	return nil
 }
 
-func LoadSettings(path string) (*Settings, error) {
-	settings := &Settings{}
-	settings.PathToSettings = path
+func LoadSettings(path string) (*Manager, error) {
+	settingsManager := &Manager{}
+	settingsManager.Settings.PathToSettings = path
 
 	file, err := os.Open(path)
 	if err != nil {
-		settings.DownloadPath = filepath.Join("downloads")
-		err := settings.GenerateSettings()
+		settingsManager.Settings.DownloadPath = filepath.Join("downloads")
+		err := settingsManager.GenerateSettings()
 		if err != nil {
 			return nil, err
 		}
 		file.Close()
 
-		// Reopen file when done generating settings
+		// Reopen file when done generating settingsManager
 		file, err = os.Open(path)
 	}
 
 	defer file.Close()
 
 	decoder := json.NewDecoder(file)
-	err = decoder.Decode(settings)
+	err = decoder.Decode(settingsManager)
 	if err != nil {
-		return nil, fmt.Errorf("Could not decode %v: %w", settings.PathToSettings, err.Error())
+		return nil, fmt.Errorf("Could not decode %v: %w", settingsManager.Settings.PathToSettings, err.Error())
 	}
-	return settings, nil
+	return settingsManager, nil
 }
 
-func (settings *Settings) GenerateSettings() error {
-	settingsFile, err := os.Create(settings.PathToSettings)
+func (settingsManager *Manager) GenerateSettings() error {
+	settingsFile, err := os.Create(settingsManager.Settings.PathToSettings)
 	if err != nil {
 		return err
 	}
 	defer settingsFile.Close()
 
-	err = settings.SaveSettings()
+	err = settingsManager.SaveSettings()
 	if err != nil {
 		return err
 	}
 	
-	settings, err = LoadSettings(settings.PathToSettings)
+	settingsManager, err = LoadSettings(settingsManager.Settings.PathToSettings)
 	if err != nil {
-		return fmt.Errorf("could not load settings: %w", err)
+		return fmt.Errorf("could not load settingsManager: %w", err)
 	}
 	return nil
 }
