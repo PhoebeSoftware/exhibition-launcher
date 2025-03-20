@@ -50,7 +50,7 @@ func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) e
 
 	defer file.Close()
 
-	stat, err := file.Stat();
+	stat, err := file.Stat()
 	if err != nil {
 		return fmt.Errorf("could not get stats from file: %w", err)
 	}
@@ -58,16 +58,30 @@ func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) e
 	rangeHeader := fmt.Sprintf("bytes=%d-", stat.Size())
 	req.Header.Set("Range", rangeHeader)
 
-	resp, err := client.client.Do(req)
+	sizeResp, err := client.client.Do(req)
 	if err != nil {
-		return fmt.Errorf("could not encode link: %w", err)
+		return fmt.Errorf("could not reach real debrid: %w", err)
 	}
+	fmt.Println(sizeResp.ContentLength)
 
-	defer resp.Body.Close()
+	for i := int64(0); i < sizeResp.ContentLength; i += 10000000 {
+		rangeHeader := fmt.Sprintf("bytes=%d-", stat.Size()+i)
+		req.Header.Set("Range", rangeHeader)
+		fmt.Println(i)
 
-	_, err = io.Copy(file, resp.Body)
-	if err != nil {
-		return fmt.Errorf("could not copy files: %w", err)
+		resp, err := client.client.Do(req)
+		if err != nil {
+			return fmt.Errorf("could not encode link: %w", err)
+		}
+
+		defer resp.Body.Close()
+
+		_, err = io.Copy(file, resp.Body)
+		if err != nil {
+			return fmt.Errorf("could not copy files: %w", err)
+		}
+
+		fmt.Println("DONE")
 	}
 
 	fmt.Println("Done with: " + link)
@@ -90,14 +104,12 @@ func (client *RealDebridClient) DownloadByMagnet(magnetLink string, settings set
 	if err != nil {
 		return err
 	}
-	
-	
+
 	// Re fetch torrent because torrent should now have selected files and links
 	torrent, err = client.GetTorrentInfoById(addMagnetResponse.Id)
 	if err != nil {
 		return err
 	}
-
 
 	for _, link := range torrent.Links {
 		unrestrictLink, err := client.UnrestrictLink(link)
@@ -113,6 +125,5 @@ func (client *RealDebridClient) DownloadByMagnet(magnetLink string, settings set
 		}
 	}
 
-	
 	return nil
 }
