@@ -41,7 +41,7 @@ export function AvailableHosts() {
 
 /**
  * @param {string} magnetLink
- * @param {settings$0.Settings | null} settings
+ * @param {settings$0.Settings} settings
  * @returns {Promise<void> & { cancel(): void }}
  */
 export function DownloadByMagnet(magnetLink, settings) {

@@ -57,10 +57,12 @@ func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) e
 		return fmt.Errorf("could not copy files: %w", err)
 	}
 
+	fmt.Println("Done with: " + link)
+
 	return nil
 }
 
-func (client *RealDebridClient) DownloadByMagnet(magnetLink string, settings *settings.Settings) error {
+func (client *RealDebridClient) DownloadByMagnet(magnetLink string, settings settings.Settings) error {
 	addMagnetResponse, err := client.AddTorrentByMagnet(magnetLink)
 	if err != nil {
 		return err
@@ -83,16 +85,16 @@ func (client *RealDebridClient) DownloadByMagnet(magnetLink string, settings *se
 		return err
 	}
 
-	downloadPath := filepath.Join(settings.DownloadPath, "test.zip")
 
 	for _, link := range torrent.Links {
 		unrestrictLink, err := client.UnrestrictLink(link)
+		downloadPath := filepath.Join(settings.DownloadPath, unrestrictLink.Filename)
 		if err != nil {
 			return err
 		}
 		fmt.Println(unrestrictLink.Link)
 
-		err = client.DownloadByRDLink(unrestrictLink.Link, downloadPath)
+		err = client.DownloadByRDLink(unrestrictLink.Download, downloadPath)
 		if err != nil {
 			return err
 		}

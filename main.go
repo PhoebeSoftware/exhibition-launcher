@@ -22,7 +22,7 @@ import (
 var libraryManager *library.Library
 var apiManager *igdb.APIManager
 var torrentManager *torrent.Manager
-var debridManager *realdebrid.RealDebridClient
+var debridClient *realdebrid.RealDebridClient
 //go:embed all:frontend/dist
 var assets embed.FS
 
@@ -71,7 +71,7 @@ func main() {
 			fmt.Println("Debrid does not exist")
 			return
 		}
-		debridManager = realdebrid.NewRealDebridClient(settingsManager.GetSettings().DebridToken)
+		debridClient = realdebrid.NewRealDebridClient(settingsManager.GetSettings().DebridToken)
 	}
 
 	torrentManager = torrent.StartClient(settingsManager.GetSettings().DownloadPath)
@@ -115,8 +115,8 @@ func main() {
 		application.NewService(settingsManager),
 	}
 
-	if debridManager != nil {
-		services = append(services, application.NewService(debridManager))
+	if debridClient != nil {
+		services = append(services, application.NewService(debridClient))
 	}
 
 	appOptions := application.Options{
@@ -141,6 +141,15 @@ func main() {
 	app = application.New(appOptions)
 
 	app.NewWebviewWindowWithOptions(webViewWindowOpt)
+
+	//go func() {
+	//	magnetLink := "magnet:?xt=urn:btih:ac8dc037d282f82efb2864abdd54399029105c0c&dn=%5BGolumpa-Yameii%5D%20Attack%20on%20Titan%20-%20The%20Final%20Season%20%5BEnglish%20Dub%5D%20%5BWEB-DL%20720p%5D%20-%20%28The%20Complete%20S04%29%20-%20Unofficial%20Batch&tr=http%3A%2F%2Fnyaa.tracker.wf%3A7777%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce"
+	//	err = debridClient.DownloadByMagnet(magnetLink, settingsManager.GetSettings())
+	//	if err != nil {
+	//		fmt.Println(err)
+	//		return
+	//	}
+	//}()
 
 	// Run the application. This blocks until the application has been exited.
 	err = app.Run()
