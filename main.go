@@ -65,7 +65,6 @@ func main() {
 
 	libraryManager = library.GetLibrary()
 	apiManager = igdb.NewAPI()
-
 	if settingsManager.GetSettings().UseRealDebrid {
 		if settingsManager.GetSettings().DebridToken == "" {
 			// TO:DO ADD A UI FOR THIS OR SMTH

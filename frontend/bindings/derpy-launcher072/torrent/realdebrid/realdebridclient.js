@@ -40,22 +40,22 @@ export function AvailableHosts() {
 }
 
 /**
- * @param {string} link
- * @param {string} filePath
- * @returns {Promise<void> & { cancel(): void }}
- */
-export function DownloadByLink(link, filePath) {
-    let $resultPromise = /** @type {any} */($Call.ByID(3767891143, link, filePath));
-    return $resultPromise;
-}
-
-/**
  * @param {string} magnetLink
  * @param {settings$0.Settings | null} settings
  * @returns {Promise<void> & { cancel(): void }}
  */
 export function DownloadByMagnet(magnetLink, settings) {
     let $resultPromise = /** @type {any} */($Call.ByID(4183758213, magnetLink, settings));
+    return $resultPromise;
+}
+
+/**
+ * @param {string} link
+ * @param {string} filePath
+ * @returns {Promise<void> & { cancel(): void }}
+ */
+export function DownloadByRDLink(link, filePath) {
+    let $resultPromise = /** @type {any} */($Call.ByID(1695483881, link, filePath));
     return $resultPromise;
 }
 

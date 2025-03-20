@@ -90,12 +90,12 @@ func (client *RealDebridClient) DownloadByMagnet(magnetLink string, settings *se
 		if err != nil {
 			return err
 		}
+		fmt.Println(unrestrictLink.Link)
 
 		err = client.DownloadByRDLink(unrestrictLink.Link, downloadPath)
 		if err != nil {
 			return err
 		}
-		
 	}
 
 	
