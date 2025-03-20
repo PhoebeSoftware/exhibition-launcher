@@ -83,8 +83,8 @@ func main() {
 		Name: "derpyLauncher",
 		Services: []application.Service{
 			application.NewService(torrentManager),
-			application.NewService(apiIManager),
-			application.NewService(globals.LibraryManager),
+			application.NewService(apiManager),
+			application.NewService(libraryManager),
 			application.NewService(&WindowService{}),
 			application.NewService(settingsManager),
 		},
