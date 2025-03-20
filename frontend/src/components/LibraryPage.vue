@@ -17,17 +17,17 @@
       </div>
       <div class="add-game-to-library-wrapper">
         <button id="refresh-page"><i class="fa-solid fa-arrows-rotate"></i></button>
-        <button class="game-add-button" id="Import-from-PC-TT">
+        <button class="game-add-button" id="Import-from-PC-TT" @click="addGame">
           Import from PC<i class="fa-solid fa-desktop"></i>
         </button>
       </div>
     </div>
 
     <div class="game-library-container">
-      <div class="game-library-game-box" v-for="n in 90" :key="n">
+      <div class="game-library-game-box" v-for="game in games" :key="game.igdb_id">
         <div class="game-box-info">
           <div class="text-container">
-            <h1>Game</h1>
+            <h1>{{ game.executable }}</h1>
             <p>Idk vro</p>
           </div>
           <button><i class="fa-solid fa-ellipsis"></i></button>
@@ -35,8 +35,7 @@
       </div>
     </div>
 
-    <div id="discover-content" class="page-content" style="display: none;" v-for="item in items" :key="item.id">{{
-      item.name }}</div>
+    <div id="discover-content" class="page-content" style="display: none;"></div>
 
     <div id="favorites-content" class="page-content" style="display: none;">
       <div class="game-favorites-container">
@@ -47,24 +46,29 @@
 
 
 <script>
-import { GetAllGames } from '../../bindings/derpy-launcher072/library/library';
+import { AddToLibrary, GetAllGames } from '../../bindings/derpy-launcher072/library/library';
 
 export default {
   name: 'LibraryPage',
 
   data() {
     return {
-      items: []
+      games: []
     };
   },
   methods: {
-    addItem(item) {
-      this.items.push(item);
+    addGame() {
+      console.log("adding game");
+      AddToLibrary(69);
     }
   },
   async mounted() {
-    const idk = await GetAllGames();
-    console.log(idk);
+    GetAllGames().then((games) => {
+      Object.values(games).forEach((game) => {
+        console.log(game);
+        this.games.push(game);
+      });
+    });
   }
 };
 </script>

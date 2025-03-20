@@ -26,6 +26,13 @@ export class ApiGame {
              */
             this["name"] = "";
         }
+        if (!("summary" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["summary"] = "";
+        }
         if (!("cover" in $$source)) {
             /**
              * @member
@@ -45,33 +52,5 @@ export class ApiGame {
     static createFrom($$source = {}) {
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         return new ApiGame(/** @type {Partial<ApiGame>} */($$parsedSource));
-    }
-}
-
-export class Image {
-    /**
-     * Creates a new Image instance.
-     * @param {Partial<Image>} [$$source = {}] - The source object to create the Image.
-     */
-    constructor($$source = {}) {
-        if (!("url" in $$source)) {
-            /**
-             * @member
-             * @type {string}
-             */
-            this["url"] = "";
-        }
-
-        Object.assign(this, $$source);
-    }
-
-    /**
-     * Creates a new Image instance from a string or object.
-     * @param {any} [$$source = {}]
-     * @returns {Image}
-     */
-    static createFrom($$source = {}) {
-        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
-        return new Image(/** @type {Partial<Image>} */($$parsedSource));
     }
 }

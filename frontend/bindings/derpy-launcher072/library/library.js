@@ -20,7 +20,7 @@ export function AddToLibrary(igdbId) {
 }
 
 /**
- * @returns {Promise<$models.Game[]> & { cancel(): void }}
+ * @returns {Promise<{ [_: `${number}`]: $models.Game }> & { cancel(): void }}
  */
 export function GetAllGames() {
     let $resultPromise = /** @type {any} */($Call.ByID(964106974));
@@ -42,4 +42,4 @@ export function StartApp(igdbId) {
 
 // Private type creation functions
 const $$createType0 = $models.Game.createFrom;
-const $$createType1 = $Create.Array($$createType0);
+const $$createType1 = $Create.Map($Create.Any, $$createType0);

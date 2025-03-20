@@ -11,9 +11,10 @@ import (
 )
 
 type ApiGame struct {
-	Id    int    `json:"id"`
-	Name  string `json:"name"`
-	Cover int    `json:"cover"`
+	Id          int    `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"summary"`
+	Cover       int    `json:"cover"`
 }
 
 type Image struct {
@@ -38,23 +39,21 @@ func NewAPI() *APIManager {
 	return &APIManager{client: &http.Client{}}
 }
 
-func (*APIManager) GetCover(cover int) []Image {
-	client := &http.Client{}
-
+func (a *APIManager) GetCover(cover int) []string {
 	header := fmt.Sprintf(`fields url; where id = %d;`, cover)
 
 	request, err := http.NewRequest("POST", "https://api.igdb.com/v4/covers/", bytes.NewBuffer([]byte(header)))
 	if err != nil {
 		fmt.Println(err)
-		return []Image{}
+		return []string{}
 	}
 
 	SetupHeader(request)
 
-	response, err := client.Do(request)
+	response, err := a.client.Do(request)
 	if err != nil {
 		fmt.Println(err)
-		return []Image{}
+		return []string{}
 	}
 	defer response.Body.Close()
 
@@ -62,32 +61,63 @@ func (*APIManager) GetCover(cover int) []Image {
 	jsonErr := json.NewDecoder(response.Body).Decode(&images)
 	if jsonErr != nil {
 		fmt.Println(err)
-		return []Image{}
+		return []string{}
 	}
 
-	return images
+	urls := make([]string, len(images))
+	for i, img := range images {
+		urls[i] = img.Link
+	}
+
+	return urls
 }
 
-func (*APIManager) GetGames(header string) []ApiGame {
-	client := &http.Client{}
+func (a *APIManager) GetGameData(id int) ApiGame {
+	header := fmt.Sprintf(`fields id, name, summary, cover; where id = %d;`, id)
 
 	request, err := http.NewRequest("POST", "https://api.igdb.com/v4/games/", bytes.NewBuffer([]byte(header)))
 	if err != nil {
-		return nil
+		return ApiGame{}
 	}
 
 	SetupHeader(request)
 
-	response, err := client.Do(request)
+	response, err := a.client.Do(request)
 	if err != nil {
-		return nil
+		return ApiGame{}
+	}
+	defer response.Body.Close()
+
+	var game ApiGame
+	jsonErr := json.NewDecoder(response.Body).Decode(&game)
+	if jsonErr != nil {
+		return ApiGame{}
+	}
+
+	fmt.Println(game)
+	return game
+}
+
+func (a *APIManager) GetGames(query string) []ApiGame {
+	header := fmt.Sprintf(`fields id, name, summary, cover; search "%s";`, query)
+
+	request, err := http.NewRequest("POST", "https://api.igdb.com/v4/games/", bytes.NewBuffer([]byte(header)))
+	if err != nil {
+		return []ApiGame{}
+	}
+
+	SetupHeader(request)
+
+	response, err := a.client.Do(request)
+	if err != nil {
+		return []ApiGame{}
 	}
 	defer response.Body.Close()
 
 	var games []ApiGame
 	jsonErr := json.NewDecoder(response.Body).Decode(&games)
 	if jsonErr != nil {
-		return nil
+		return []ApiGame{}
 	}
 
 	fmt.Println(games)
