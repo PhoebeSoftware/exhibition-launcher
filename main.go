@@ -54,7 +54,7 @@ func (w *WindowService) Close() {
 // logs any error that might occur.
 func main() {
 	// 🐐routine
-	settings, err := settings.LoadSettings(filepath.Join("settings.json"))
+	settingsManager, err := settings.LoadSettings(filepath.Join("settings.json"))
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -62,9 +62,9 @@ func main() {
 
 	libraryManager = library.GetLibrary()
 	apiManager = igdb.NewAPI()
-	torrentManager = torrent.StartClient(settings.DownloadPath)
+	torrentManager = torrent.StartClient(settingsManager.GetSettings().PathToSettings)
 
-	fmt.Println(settings)
+	fmt.Println(settingsManager)
 
 	//go func() {
 	//	results := torrent.Scrape_1337x("goat simulator 3")
@@ -86,6 +86,7 @@ func main() {
 			application.NewService(apiIManager),
 			application.NewService(globals.LibraryManager),
 			application.NewService(&WindowService{}),
+			application.NewService(settingsManager),
 		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
