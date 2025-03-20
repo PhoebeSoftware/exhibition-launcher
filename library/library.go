@@ -1,6 +1,7 @@
 package library
 
 import (
+	"derpy-launcher072/igdb"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -26,26 +27,36 @@ type Game struct {
 }
 
 type Library struct {
-	Games map[int]Game `json:"games"`
+	Games      map[int]Game `json:"games"`
+	APIManager *igdb.APIManager
 }
 
 // geeft library.json als Library struct vol met data
-func GetLibrary() *Library {
+func GetLibrary(apiManager *igdb.APIManager) *Library {
 	file, err := os.OpenFile(filepath.Join(".", "library.json"), os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		log.Printf("Error opening/creating library.json: %v", err)
-		return &Library{Games: make(map[int]Game)}
+		return &Library{
+			Games:      make(map[int]Game),
+			APIManager: apiManager,
+		}
 	}
 	defer file.Close()
 
 	bytes, err := io.ReadAll(file)
 	if err != nil {
 		log.Printf("Error reading library.json: %v", err)
-		return &Library{Games: make(map[int]Game)}
+		return &Library{
+			Games:      make(map[int]Game),
+			APIManager: apiManager,
+		}
 	}
 
 	if len(bytes) == 0 {
-		emptyLib := &Library{Games: make(map[int]Game)}
+		emptyLib := &Library{
+			Games:      make(map[int]Game),
+			APIManager: apiManager,
+		}
 		jsonData, err := json.MarshalIndent(emptyLib, "", "    ")
 		if err != nil {
 			log.Printf("Error marshaling empty library: %v", err)
@@ -60,9 +71,13 @@ func GetLibrary() *Library {
 	var library Library
 	if err := json.Unmarshal(bytes, &library); err != nil {
 		log.Printf("Error unmarshalling library.json: %v", err)
-		return &Library{Games: make(map[int]Game)}
+		return &Library{
+			Games:      make(map[int]Game),
+			APIManager: apiManager,
+		}
 	}
 
+	library.APIManager = apiManager
 	return &library
 }
 
@@ -77,9 +92,19 @@ func (lib *Library) AddToLibrary(igdbId int) error {
 		return fmt.Errorf("failed to select executable: %w", err)
 	}
 
+	// game data
+	gameData := lib.APIManager.GetGameData(igdbId)
+	fmt.Println("Game data:")
+	fmt.Println(gameData)
+	if gameData.Name == "" {
+		return fmt.Errorf("failed to get game data")
+	}
+
 	// Append the new game
 	lib.Games[igdbId] = Game{
 		IGDBID:      igdbId,
+		Name:        gameData.Name,
+		Description: gameData.Description,
 		PlayTime:    0,
 		Achievments: []int{},
 		Executable:  executable,

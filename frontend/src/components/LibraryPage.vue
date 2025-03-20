@@ -29,8 +29,8 @@
         <div class="game-library-game-box" v-for="game in games" :key="game.igdb_id" @click="openGameStore(game.igdb_id)">
           <div class="game-box-info">
             <div class="text-container">
-              <h1>{{ game.executable }}</h1>
-              <p>Idk vro</p>
+              <h1>{{ game.name }}</h1>
+              <p>{{ game.executable }}</p>
             </div>
             <button><i class="fa-solid fa-ellipsis"></i></button>
           </div>
@@ -56,6 +56,7 @@
 </template>
 
 <script>
+import { GetGames } from '../../bindings/derpy-launcher072/igdb/apimanager';
 import { AddToLibrary, GetAllGames } from '../../bindings/derpy-launcher072/library/library';
 
 export default {
@@ -70,7 +71,7 @@ export default {
   },
   methods: {
     addGame() {
-      AddToLibrary(69);
+      AddToLibrary(119133).catch(console.warn); // ELDEN RING ID
     },
 
     openGameStore(gameId) {
@@ -84,6 +85,10 @@ export default {
     }
   },
   async mounted() {
+    GetGames("Elden Ring").then((games) => {
+      console.log(games);
+    });
+
     GetAllGames().then((games) => {
       Object.values(games).forEach((game) => {
         console.log(game);

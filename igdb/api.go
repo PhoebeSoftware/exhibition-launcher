@@ -26,6 +26,9 @@ type APIManager struct {
 }
 
 func SetupHeader(request *http.Request) {
+	fmt.Println(os.Getenv("IGDB_CLIENT"))
+	fmt.Println(os.Getenv("IGDB_AUTH"))
+
 	request.Header.Set("Client-ID", os.Getenv("IGDB_CLIENT"))
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", os.Getenv("IGDB_AUTH")))
 }
@@ -88,14 +91,17 @@ func (a *APIManager) GetGameData(id int) ApiGame {
 	}
 	defer response.Body.Close()
 
-	var game ApiGame
+	var game []ApiGame
 	jsonErr := json.NewDecoder(response.Body).Decode(&game)
 	if jsonErr != nil {
 		return ApiGame{}
 	}
 
 	fmt.Println(game)
-	return game
+	if len(game) == 0 {
+		return ApiGame{}
+	}
+	return game[0]
 }
 
 func (a *APIManager) GetGames(query string) []ApiGame {

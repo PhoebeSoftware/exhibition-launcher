@@ -60,8 +60,8 @@ func main() {
 		return
 	}
 
-	libraryManager = library.GetLibrary()
 	apiManager = igdb.NewAPI()
+	libraryManager = library.GetLibrary(apiManager)
 	torrentManager = torrent.StartClient(settingsManager.GetSettings().PathToSettings)
 
 	fmt.Println(settingsManager)
