@@ -19,6 +19,20 @@ export class Game {
              */
             this["igdb_id"] = 0;
         }
+        if (!("name" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["name"] = "";
+        }
+        if (!("description" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["description"] = "";
+        }
         if (!("playtime" in $$source)) {
             /**
              * @member
@@ -64,10 +78,10 @@ export class Game {
      * @returns {Game}
      */
     static createFrom($$source = {}) {
-        const $$createField2_0 = $$createType0;
+        const $$createField4_0 = $$createType0;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("achievments" in $$parsedSource) {
-            $$parsedSource["achievments"] = $$createField2_0($$parsedSource["achievments"]);
+            $$parsedSource["achievments"] = $$createField4_0($$parsedSource["achievments"]);
         }
         return new Game(/** @type {Partial<Game>} */($$parsedSource));
     }

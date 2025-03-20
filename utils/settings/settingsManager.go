@@ -29,7 +29,7 @@ func (settingsManager SettingsManager) SaveSettings() error {
 		return fmt.Errorf("could not save settings: %w", err)
 	}
 
-	jsonData, err := json.MarshalIndent(settingsManager, "", "    ")
+	jsonData, err := json.MarshalIndent(settingsManager.Settings, "", "    ")
 	if _, err := file.Write(jsonData); err != nil {
 		return fmt.Errorf("could not write json data to settings: %w", err)
 	}

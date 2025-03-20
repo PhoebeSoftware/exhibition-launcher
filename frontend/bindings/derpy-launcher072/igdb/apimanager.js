@@ -12,10 +12,23 @@ import * as $models from "./models.js";
 
 /**
  * @param {number} cover
- * @returns {Promise<$models.Image[]> & { cancel(): void }}
+ * @returns {Promise<string[]> & { cancel(): void }}
  */
 export function GetCover(cover) {
     let $resultPromise = /** @type {any} */($Call.ByID(2756693912, cover));
+    let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
+        return $$createType0($result);
+    }));
+    $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
+    return $typingPromise;
+}
+
+/**
+ * @param {number} id
+ * @returns {Promise<$models.ApiGame> & { cancel(): void }}
+ */
+export function GetGameData(id) {
+    let $resultPromise = /** @type {any} */($Call.ByID(511432535, id));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
         return $$createType1($result);
     }));
@@ -24,20 +37,19 @@ export function GetCover(cover) {
 }
 
 /**
- * @param {string} header
+ * @param {string} query
  * @returns {Promise<$models.ApiGame[]> & { cancel(): void }}
  */
-export function GetGames(header) {
-    let $resultPromise = /** @type {any} */($Call.ByID(195213204, header));
+export function GetGames(query) {
+    let $resultPromise = /** @type {any} */($Call.ByID(195213204, query));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
-        return $$createType3($result);
+        return $$createType2($result);
     }));
     $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
     return $typingPromise;
 }
 
 // Private type creation functions
-const $$createType0 = $models.Image.createFrom;
-const $$createType1 = $Create.Array($$createType0);
-const $$createType2 = $models.ApiGame.createFrom;
-const $$createType3 = $Create.Array($$createType2);
+const $$createType0 = $Create.Array($Create.Any);
+const $$createType1 = $models.ApiGame.createFrom;
+const $$createType2 = $Create.Array($$createType1);

@@ -15,6 +15,8 @@ import (
 
 type Game struct {
 	IGDBID      int    `json:"igdb_id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 	PlayTime    int    `json:"playtime"`
 	Achievments []int  `json:"achievments"`
 	Executable  string `json:"executable"`
@@ -28,7 +30,7 @@ type Library struct {
 
 // geeft library.json als Library struct vol met data
 func GetLibrary() *Library {
-	file, err := os.OpenFile(filepath.Join(".", "downloads"), os.O_RDWR|os.O_CREATE, 0644)
+	file, err := os.OpenFile(filepath.Join(".", "library.json"), os.O_RDWR|os.O_CREATE, 0644)
 	if err != nil {
 		log.Printf("Error opening/creating library.json: %v", err)
 		return &Library{Games: make(map[int]Game)}
@@ -63,16 +65,8 @@ func GetLibrary() *Library {
 	return &library
 }
 
-func (lib *Library) GetAllGames() []Game {
-	games := make([]Game, 0, len(lib.Games))
-	for _, game := range lib.Games {
-		games = append(games, game)
-	}
-
-	fmt.Println("Getting all games")
-	fmt.Println(games)
-	fmt.Println(lib.Games)
-	return games
+func (lib *Library) GetAllGames() map[int]Game {
+	return lib.Games
 }
 
 func (lib *Library) AddToLibrary(igdbId int) error {

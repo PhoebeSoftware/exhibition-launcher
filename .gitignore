@@ -6,5 +6,10 @@ bin
 ./.task
 settings.json
 library.json
+<<<<<<< HEAD
+downloads.DS_Store 
+=======
 downloads
 .task
+>>>>>>> 4cdea43135b85969df715b836539772949464291
+.DS_Store 
