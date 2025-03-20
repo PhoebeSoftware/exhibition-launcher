@@ -8,7 +8,7 @@ import {Call as $Call, Create as $Create} from "@wailsio/runtime";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
-import * as settingsManager$0 from "../../utils/settingsManager/models.js";
+import * as settings$0 from "../../utils/settings/models.js";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
@@ -51,7 +51,7 @@ export function DownloadByLink(link, filePath) {
 
 /**
  * @param {string} magnetLink
- * @param {settingsManager$0.Settings | null} settings
+ * @param {settings$0.Settings | null} settings
  * @returns {Promise<void> & { cancel(): void }}
  */
 export function DownloadByMagnet(magnetLink, settings) {

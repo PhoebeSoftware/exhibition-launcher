@@ -1,15 +1,13 @@
 <template>
     <div class="page">
-      <h1>Explore</h1>
-      <p>Discover new content here.</p>
-      <button @click="addTorrentByMagnet()">Add torrent by magnet</button>
+        <h1>Explore</h1>
+        <p>Discover new content here.</p>
+        <button @click="addTorrentByMagnet()">Add torrent by magnet</button>
     </div>
 
 </template>
 
 <script setup>
-import {RealDebridClient} from "../../bindings/derpy-launcher072/torrent/realdebrid/index.js";
-import {Settings} from "../../bindings/derpy-launcher072/utils/settingsManager/index.js";
 
 async function addTorrentByMagnet() {
     // RealDebridClient.GetTrafic().then((result) => {
@@ -23,42 +21,42 @@ async function addTorrentByMagnet() {
 
     //await RealDebridClient.DownloadByMagnet(magnetLink, Settings.)
 
-    console.log(Settings.PathToSettings)
+    console.log()
 
 
-/*    await RealDebridClient.AddTorrentByMagnet(magnetLink).then((result) => {
-            id = result.id
+    /*    await RealDebridClient.AddTorrentByMagnet(magnetLink).then((result) => {
+                id = result.id
+                console.log(result)
+            })
+
+        console.log(id)
+
+        let torrent;
+
+        await RealDebridClient.GetTorrentInfoById(id).then((result) => {
+            torrent = result
             console.log(result)
+        });
+
+        await RealDebridClient.SelectFiles(torrent);
+
+
+        let torrentWithSelectedFiles;
+        await RealDebridClient.GetTorrentInfoById(id).then((result) => {
+            torrentWithSelectedFiles = result
+            console.log(result)
+        });
+
+        let downloadLinks = []
+
+        await torrentWithSelectedFiles.links.forEach((torrentWithSelectedFiles) => {
+            RealDebridClient.UnrestrictLink(torrentWithSelectedFiles).then((unrestrictObject) => {
+                downloadLinks.push(unrestrictObject)
+            })
         })
 
-    console.log(id)
-
-    let torrent;
-
-    await RealDebridClient.GetTorrentInfoById(id).then((result) => {
-        torrent = result
-        console.log(result)
-    });
-
-    await RealDebridClient.SelectFiles(torrent);
-
-
-    let torrentWithSelectedFiles;
-    await RealDebridClient.GetTorrentInfoById(id).then((result) => {
-        torrentWithSelectedFiles = result
-        console.log(result)
-    });
-
-    let downloadLinks = []
-
-    await torrentWithSelectedFiles.links.forEach((torrentWithSelectedFiles) => {
-        RealDebridClient.UnrestrictLink(torrentWithSelectedFiles).then((unrestrictObject) => {
-            downloadLinks.push(unrestrictObject)
-        })
-    })
-
-    await downloadLinks.forEach((unrestrictObject) => {
-    })*/
+        await downloadLinks.forEach((unrestrictObject) => {
+        })*/
 
     // RealDebridClient.GetDownloads().then((result) => {
     //     console.log(result)

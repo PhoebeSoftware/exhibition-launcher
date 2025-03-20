@@ -33,6 +33,13 @@ export class Settings {
              */
             this["use_real_debrid"] = false;
         }
+        if (!("debrid_token" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["debrid_token"] = "";
+        }
 
         Object.assign(this, $$source);
     }

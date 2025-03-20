@@ -5,7 +5,7 @@ import (
 	"derpy-launcher072/library"
 	"derpy-launcher072/torrent"
 	"derpy-launcher072/torrent/realdebrid"
-	"derpy-launcher072/utils/settingsManager"
+	"derpy-launcher072/utils/settings"
 	"embed"
 	"fmt"
 	"log"
@@ -57,7 +57,7 @@ func (w *WindowService) Close() {
 // logs any error that might occur.
 func main() {
 	// 🐐routine
-	settings, err := settingsManager.LoadSettings(filepath.Join("settings.json"))
+	settingsManager, err := settings.LoadSettings(filepath.Join("settings.json"))
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -66,16 +66,16 @@ func main() {
 	libraryManager = library.GetLibrary()
 	apiManager = igdb.NewAPI()
 
-	if settings.UseRealDebrid {
-		if settings.DebridToken == "" {
+	if settingsManager.GetSettings().UseRealDebrid {
+		if settingsManager.GetSettings().DebridToken == "" {
 			// TO:DO ADD A UI FOR THIS OR SMTH
 			fmt.Println("Debrid does not exist")
 			return
 		}
-		debridManager = realdebrid.NewRealDebridClient(settings.DebridToken)
+		debridManager = realdebrid.NewRealDebridClient(settingsManager.GetSettings().DebridToken)
 	}
 
-	torrentManager = torrent.StartClient(settings.DownloadPath)
+	torrentManager = torrent.StartClient(settingsManager.GetSettings().DownloadPath)
 
 	//go func() {
 	//	results := torrent.Scrape_1337x("goat simulator 3")
@@ -113,7 +113,7 @@ func main() {
 		application.NewService(apiManager),
 		application.NewService(libraryManager),
 		application.NewService(&WindowService{}),
-		application.NewService(settings),
+		application.NewService(settingsManager),
 	}
 
 	if debridManager != nil {

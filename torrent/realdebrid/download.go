@@ -1,7 +1,7 @@
 package realdebrid
 
 import (
-	"derpy-launcher072/utils/settingsManager"
+	"derpy-launcher072/utils/settings"
 	"fmt"
 	"io"
 	"net/http"
@@ -60,7 +60,7 @@ func (client *RealDebridClient) DownloadByLink(link string, filePath string) err
 	return nil
 }
 
-func (client *RealDebridClient) DownloadByMagnet(magnetLink string, settings *settingsManager.Settings) error {
+func (client *RealDebridClient) DownloadByMagnet(magnetLink string, settings *settings.Settings) error {
 	addMagnetResponse, err := client.AddTorrentByMagnet(magnetLink)
 	if err != nil {
 		return err

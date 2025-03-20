@@ -1,4 +1,4 @@
-package settingsManager
+package settings
 
 import (
 	"encoding/json"
@@ -26,12 +26,12 @@ func (settingsManager Manager) SaveSettings() error {
 	// Idk random perms idk
 	file, err := os.OpenFile(settingsManager.GetSettings().PathToSettings, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.ModePerm)
 	if err != nil {
-		return fmt.Errorf("could not save settingsManager: %w", err)
+		return fmt.Errorf("could not save settings: %w", err)
 	}
 
 	jsonData, err := json.MarshalIndent(settingsManager, "", "    ")
 	if _, err := file.Write(jsonData); err != nil {
-		return fmt.Errorf("could not write json data to settingsManager: %w", err)
+		return fmt.Errorf("could not write json data to settings: %w", err)
 	}
 
 	return nil
@@ -50,7 +50,7 @@ func LoadSettings(path string) (*Manager, error) {
 		}
 		file.Close()
 
-		// Reopen file when done generating settingsManager
+		// Reopen file when done generating settings
 		file, err = os.Open(path)
 	}
 
@@ -78,7 +78,7 @@ func (settingsManager *Manager) GenerateSettings() error {
 	
 	settingsManager, err = LoadSettings(settingsManager.Settings.PathToSettings)
 	if err != nil {
-		return fmt.Errorf("could not load settingsManager: %w", err)
+		return fmt.Errorf("could not load settings: %w", err)
 	}
 	return nil
 }
