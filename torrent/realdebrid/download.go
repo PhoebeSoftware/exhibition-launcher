@@ -37,7 +37,7 @@ func (client *RealDebridClient) GetDownloads() ([]DownloadItem, error) {
 	return result, nil
 }
 
-func (client *RealDebridClient) DownloadByLink(link string, filePath string) error {
+func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) error {
 	file, err := os.Create(filePath)
 	if err != nil {
 		return fmt.Errorf("could not create file: %w", err)
@@ -91,7 +91,7 @@ func (client *RealDebridClient) DownloadByMagnet(magnetLink string, settings *se
 			return err
 		}
 
-		err = client.DownloadByLink(unrestrictLink.Link, downloadPath)
+		err = client.DownloadByRDLink(unrestrictLink.Link, downloadPath)
 		if err != nil {
 			return err
 		}

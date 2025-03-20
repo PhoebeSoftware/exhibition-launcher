@@ -9,7 +9,7 @@
 
 <script setup>
 
-import {Manager} from "../../bindings/derpy-launcher072/utils/settings/index.js";
+import {Manager, SettingsManager} from "../../bindings/derpy-launcher072/utils/settings/index.js";
 
 async function addTorrentByMagnet() {
     // RealDebridClient.GetTrafic().then((result) => {
