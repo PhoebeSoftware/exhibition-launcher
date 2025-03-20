@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-type Manager struct {
+type SettingsManager struct {
 	Settings Settings
 }
 
@@ -17,11 +17,11 @@ type Settings struct {
 	UseRealDebrid bool `json:"use_real_debrid"`
 }
 
-func (settingsManager Manager) GetSettings() Settings {
+func (settingsManager SettingsManager) GetSettings() Settings {
 	return settingsManager.Settings
 }
 
-func (settingsManager Manager) SaveSettings() error {
+func (settingsManager SettingsManager) SaveSettings() error {
 	// Idk random perms idk
 	file, err := os.OpenFile(settingsManager.GetSettings().PathToSettings, os.O_CREATE|os.O_WRONLY|os.O_APPEND, os.ModePerm)
 	if err != nil {
@@ -36,8 +36,8 @@ func (settingsManager Manager) SaveSettings() error {
 	return nil
 }
 
-func LoadSettings(path string) (*Manager, error) {
-	settingsManager := &Manager{}
+func LoadSettings(path string) (*SettingsManager, error) {
+	settingsManager := &SettingsManager{}
 	settingsManager.Settings.PathToSettings = path
 
 	file, err := os.Open(path)
@@ -63,7 +63,7 @@ func LoadSettings(path string) (*Manager, error) {
 	return settingsManager, nil
 }
 
-func (settingsManager *Manager) GenerateSettings() error {
+func (settingsManager *SettingsManager) GenerateSettings() error {
 	settingsFile, err := os.Create(settingsManager.Settings.PathToSettings)
 	if err != nil {
 		return err
