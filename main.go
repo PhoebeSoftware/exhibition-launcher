@@ -23,7 +23,6 @@ var libraryManager *library.Library
 var apiManager *igdb.APIManager
 var torrentManager *torrent.Manager
 var debridManager *realdebrid.RealDebridClient
-
 //go:embed all:frontend/dist
 var assets embed.FS
 
@@ -114,6 +113,7 @@ func main() {
 		application.NewService(apiManager),
 		application.NewService(libraryManager),
 		application.NewService(&WindowService{}),
+		application.NewService(settings),
 	}
 
 	if debridManager != nil {

@@ -8,6 +8,10 @@ import {Call as $Call, Create as $Create} from "@wailsio/runtime";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
+import * as settingsManager$0 from "../../utils/settingsManager/models.js";
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
 /**
@@ -40,8 +44,18 @@ export function AvailableHosts() {
  * @param {string} filePath
  * @returns {Promise<void> & { cancel(): void }}
  */
-export function Download(link, filePath) {
-    let $resultPromise = /** @type {any} */($Call.ByID(2620001370, link, filePath));
+export function DownloadByLink(link, filePath) {
+    let $resultPromise = /** @type {any} */($Call.ByID(3767891143, link, filePath));
+    return $resultPromise;
+}
+
+/**
+ * @param {string} magnetLink
+ * @param {settingsManager$0.Settings | null} settings
+ * @returns {Promise<void> & { cancel(): void }}
+ */
+export function DownloadByMagnet(magnetLink, settings) {
+    let $resultPromise = /** @type {any} */($Call.ByID(4183758213, magnetLink, settings));
     return $resultPromise;
 }
 
