@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type DownloadItem struct {
@@ -38,14 +39,26 @@ func (client *RealDebridClient) GetDownloads() ([]DownloadItem, error) {
 }
 
 func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) error {
-	file, err := os.Create(filePath)
+	req, err := http.NewRequest(http.MethodGet, link, nil)
+
+	startTime := time.Now()
+
+	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return fmt.Errorf("could not create file: %w", err)
 	}
 
 	defer file.Close()
 
-	resp, err := client.client.Get(link)
+	stat, err := file.Stat();
+	if err != nil {
+		return fmt.Errorf("could not get stats from file: %w", err)
+	}
+
+	rangeHeader := fmt.Sprintf("bytes=%d-", stat.Size())
+	req.Header.Set("Range", rangeHeader)
+
+	resp, err := client.client.Do(req)
 	if err != nil {
 		return fmt.Errorf("could not encode link: %w", err)
 	}
@@ -58,7 +71,7 @@ func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) e
 	}
 
 	fmt.Println("Done with: " + link)
-
+	fmt.Println("Took: " + time.Since(startTime).String())
 	return nil
 }
 
