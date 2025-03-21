@@ -62,17 +62,29 @@ func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) e
 	if err != nil {
 		return fmt.Errorf("could not reach real debrid: %w", err)
 	}
+
+	defer sizeResp.Body.Close()
+
 	fmt.Println(sizeResp.ContentLength)
+	sizeOfChunk := int64(10000000)
 
-	for i := int64(0); i < sizeResp.ContentLength; i += 10000000 {
-		rangeHeader := fmt.Sprintf("bytes=%d-", stat.Size()+i)
+	for i := int64(0); i < sizeResp.ContentLength; i += sizeOfChunk {
+		rangeStart := stat.Size() + i
+		rangeEnd := stat.Size() + i + sizeOfChunk
+		if sizeResp.ContentLength < rangeEnd {
+			rangeEnd = sizeResp.ContentLength
+		}
+		fmt.Printf("rangeStart: %v\n", rangeStart)
+		fmt.Printf("rangeEnd: %v\n", rangeEnd)
+
+		rangeHeader := fmt.Sprintf("bytes=%d-%d", rangeStart, rangeEnd)
 		req.Header.Set("Range", rangeHeader)
-		fmt.Println(i)
-
 		resp, err := client.client.Do(req)
 		if err != nil {
 			return fmt.Errorf("could not encode link: %w", err)
 		}
+
+		fmt.Println(req)
 
 		defer resp.Body.Close()
 
