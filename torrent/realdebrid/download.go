@@ -64,15 +64,15 @@ func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) e
 	}
 
 	defer sizeResp.Body.Close()
+	sizeOfChunk := int64(10000000)
 
 	fmt.Println(sizeResp.ContentLength)
-	sizeOfChunk := int64(10000000)
 
 	for i := int64(0); i < sizeResp.ContentLength; i += sizeOfChunk {
 		rangeStart := stat.Size() + i
-		rangeEnd := stat.Size() + i + sizeOfChunk
-		if sizeResp.ContentLength < rangeEnd {
-			rangeEnd = sizeResp.ContentLength
+		rangeEnd := rangeStart + sizeOfChunk - 1
+		if rangeEnd >= sizeResp.ContentLength {
+			rangeEnd = sizeResp.ContentLength - 1
 		}
 		fmt.Printf("rangeStart: %v\n", rangeStart)
 		fmt.Printf("rangeEnd: %v\n", rangeEnd)
@@ -83,8 +83,6 @@ func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) e
 		if err != nil {
 			return fmt.Errorf("could not encode link: %w", err)
 		}
-
-		fmt.Println(req)
 
 		defer resp.Body.Close()
 
