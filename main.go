@@ -63,7 +63,7 @@ func main() {
 		return
 	}
 
-	libraryManager = library.GetLibrary()
+	libraryManager = library.GetLibrary(apiManager)
 	apiManager = igdb.NewAPI()
 	if settingsManager.GetSettings().UseRealDebrid {
 		if settingsManager.GetSettings().DebridToken == "" {
