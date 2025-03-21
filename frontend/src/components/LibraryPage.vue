@@ -1,51 +1,62 @@
 <template>
   <div class="page">
-    <div class="Library-settings-container">
-      <div class="Library-settings-wrapper">
-        <span>Sort by:</span>
-        <button id="sort-library-by">Time played <i class="fa-solid fa-chevron-down"></i></button>
+    <!-- Library Page -->
+    <div v-if="currentPage === 'library'">
+      <div class="Library-settings-container">
+        <div class="Library-settings-wrapper">
+          <span>Sort by:</span>
+          <button id="sort-library-by">Time played <i class="fa-solid fa-chevron-down"></i></button>
+        </div>
+        <div class="Library-favorites-container">
+          <button id="all-button" class="active">
+            All
+            <div class="active-indicator-horizontal"></div>
+          </button>
+          <button id="favorites-button">
+            Favorites
+            <div class="active-indicator-horizontal"></div>
+          </button>
+        </div>
+        <div class="add-game-to-library-wrapper">
+          <button id="refresh-page"><i class="fa-solid fa-arrows-rotate"></i></button>
+          <button class="game-add-button" id="Import-from-PC-TT" @click="addGame">
+            Import from PC<i class="fa-solid fa-desktop"></i>
+          </button>
+        </div>
       </div>
-      <div class="Library-favorites-container">
-        <button id="all-button" class="active">
-          All
-          <div class="active-indicator-horizontal"></div>
-        </button>
-        <button id="favorites-button">
-          Favorites
-          <div class="active-indicator-horizontal"></div>
-        </button>
-      </div>
-      <div class="add-game-to-library-wrapper">
-        <button id="refresh-page"><i class="fa-solid fa-arrows-rotate"></i></button>
-        <button class="game-add-button" id="Import-from-PC-TT" @click="addGame">
-          Import from PC<i class="fa-solid fa-desktop"></i>
-        </button>
-      </div>
-    </div>
 
-    <div class="game-library-container">
-      <div class="game-library-game-box" v-for="game in games" :key="game.igdb_id">
-        <div class="game-box-info">
-          <div class="text-container">
-            <h1>{{ game.executable }}</h1>
-            <p>Idk vro</p>
+      <div class="game-library-container">
+        <div class="game-library-game-box" v-for="game in games" :key="game.igdb_id" @click="openGameStore(game.igdb_id)">
+          <div class="game-box-info">
+            <div class="text-container">
+              <h1>{{ game.name }}</h1>
+              <p>{{ game.executable }}</p>
+            </div>
+            <button><i class="fa-solid fa-ellipsis"></i></button>
           </div>
-          <button><i class="fa-solid fa-ellipsis"></i></button>
         </div>
       </div>
     </div>
 
-    <div id="discover-content" class="page-content" style="display: none;"></div>
-
-    <div id="favorites-content" class="page-content" style="display: none;">
-      <div class="game-favorites-container">
+    <!-- Simple Game Store Page -->
+    <div v-if="currentPage === 'store'" class="game-store-page">
+      <div class="game-store-header">
+        <button class="back-button" @click="returnToLibrary">
+          <i class="fa-solid fa-arrow-left"></i> Back to Library
+        </button>
+      </div>
+      
+      <div class="game-store-content">
+        <h1>Game Store Page</h1>
+        <p>This is a placeholder for game #{{ selectedGameId }}</p>
+        <p>Store page content will be implemented later</p>
       </div>
     </div>
   </div>
 </template>
 
-
 <script>
+import { GetGames } from '../../bindings/derpy-launcher072/igdb/apimanager';
 import { AddToLibrary, GetAllGames } from '../../bindings/derpy-launcher072/library/library';
 
 export default {
@@ -53,16 +64,31 @@ export default {
 
   data() {
     return {
-      games: []
+      games: [],
+      currentPage: 'library',
+      selectedGameId: null
     };
   },
   methods: {
     addGame() {
-      console.log("adding game");
-      AddToLibrary(69);
+      AddToLibrary(119133).catch(console.warn); // ELDEN RING ID
+    },
+
+    openGameStore(gameId) {
+      this.selectedGameId = gameId;
+      this.currentPage = 'store';
+      console.log(`Opening store page for game ${gameId}`);
+    },
+    
+    returnToLibrary() {
+      this.currentPage = 'library';
     }
   },
   async mounted() {
+    GetGames("Elden Ring").then((games) => {
+      console.log(games);
+    });
+
     GetAllGames().then((games) => {
       Object.values(games).forEach((game) => {
         console.log(game);
@@ -262,5 +288,37 @@ export default {
   border: none;
   background: none;
   cursor: pointer;
+}
+
+/* New store page styles */
+.game-store-page {
+  width: 100%;
+  height: 100%;
+}
+
+.game-store-header {
+  margin-bottom: 20px;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: var(--secondary-text-color);
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 15px;
+  background-color: var(--hover-background-color);
+  border: 1px solid var(--outline);
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  color: var(--text-color);
+}
+
+.game-store-content {
+  padding: 20px;
+  background-color: var(--hover-background-color);
+  border-radius: 15px;
 }
 </style>
