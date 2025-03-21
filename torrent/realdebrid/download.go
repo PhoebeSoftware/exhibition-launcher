@@ -37,7 +37,6 @@ func (client *RealDebridClient) GetDownloads() ([]DownloadItem, error) {
 
 	return result, nil
 }
-
 func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) error {
 	req, err := http.NewRequest(http.MethodGet, link, nil)
 
@@ -58,18 +57,21 @@ func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) e
 	rangeHeader := fmt.Sprintf("bytes=%d-", stat.Size())
 	req.Header.Set("Range", rangeHeader)
 
+	// A early request to fetch the size of the file so we loop through
 	sizeResp, err := client.client.Do(req)
 	if err != nil {
 		return fmt.Errorf("could not reach real debrid: %w", err)
 	}
 
 	defer sizeResp.Body.Close()
+	// 10mb
 	sizeOfChunk := int64(10000000)
 
 	fmt.Println(sizeResp.ContentLength)
 
 	for i := int64(0); i < sizeResp.ContentLength; i += sizeOfChunk {
 		rangeStart := stat.Size() + i
+		// -1 cuz otherwise u will install 1 extra byte every loop
 		rangeEnd := rangeStart + sizeOfChunk - 1
 		if rangeEnd >= sizeResp.ContentLength {
 			rangeEnd = sizeResp.ContentLength - 1
