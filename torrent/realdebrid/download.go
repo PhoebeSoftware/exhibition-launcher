@@ -38,8 +38,6 @@ func (client *RealDebridClient) GetDownloads() ([]DownloadItem, error) {
 	return result, nil
 }
 func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) error {
-	req, err := http.NewRequest(http.MethodGet, link, nil)
-
 	startTime := time.Now()
 
 	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0644)
@@ -54,30 +52,39 @@ func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) e
 		return fmt.Errorf("could not get stats from file: %w", err)
 	}
 
-	rangeHeader := fmt.Sprintf("bytes=%d-", stat.Size())
-	req.Header.Set("Range", rangeHeader)
+	req, err := http.NewRequest(http.MethodGet, link, nil)
+	if err != nil {
+		return fmt.Errorf("could not create request: %w", err)
+	}
 
 	// A early request to fetch the size of the file so we loop through
-	sizeResp, err := client.client.Do(req)
+	resp, err := client.client.Do(req)
 	if err != nil {
 		return fmt.Errorf("could not reach real debrid: %w", err)
 	}
 
-	defer sizeResp.Body.Close()
+	defer resp.Body.Close()
+
+	totalSize := resp.ContentLength
 	// 10mb
 	sizeOfChunk := int64(10000000)
 
-	fmt.Println(sizeResp.ContentLength)
+	fmt.Printf("Total file size: %d bytes\n", totalSize)
 
-	for i := int64(0); i < sizeResp.ContentLength; i += sizeOfChunk {
-		rangeStart := stat.Size() + i
+	for i := stat.Size(); i < totalSize; i += sizeOfChunk {
+		rangeStart := i
 		// -1 cuz otherwise u will install 1 extra byte every loop
 		rangeEnd := rangeStart + sizeOfChunk - 1
-		if rangeEnd >= sizeResp.ContentLength {
-			rangeEnd = sizeResp.ContentLength - 1
+		if rangeEnd >= totalSize {
+			rangeEnd = totalSize - 1
 		}
 		fmt.Printf("rangeStart: %v\n", rangeStart)
 		fmt.Printf("rangeEnd: %v\n", rangeEnd)
+
+		req, err := http.NewRequest(http.MethodGet, link, nil)
+		if err != nil {
+			return fmt.Errorf("could not create request: %w", err)
+		}
 
 		rangeHeader := fmt.Sprintf("bytes=%d-%d", rangeStart, rangeEnd)
 		req.Header.Set("Range", rangeHeader)
@@ -88,12 +95,17 @@ func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) e
 
 		defer resp.Body.Close()
 
-		_, err = io.Copy(file, resp.Body)
+		body, err := io.ReadAll(resp.Body)
+		offset := rangeStart
+		fmt.Printf("Offset: %v\n", offset)
+		_, err = file.WriteAt(body, offset)
 		if err != nil {
 			return fmt.Errorf("could not copy files: %w", err)
 		}
+		//_, err = io.Copy(file, resp.Body)
 
 		fmt.Println("DONE")
+		fmt.Printf("Downloaded %d/%d bytes\n", rangeEnd+1, totalSize)
 	}
 
 	fmt.Println("Done with: " + link)
