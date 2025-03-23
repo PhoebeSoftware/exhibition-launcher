@@ -22,7 +22,7 @@ async function addTorrentByMagnet() {
     //     console.log(result)
     // });
     let id;
-    let magnetLink = "magnet:?xt=urn:btih:7CA678ADFD25AA3697E8E7FB5C1ABA4CDB70F843&dn=Shingeki+no+Kyojin+%28Attack+on+Titan%29+%28Season+4+Part+2%29+%5B1080p%5D%5BHEVC+x265+10bit%5D%5BMulti-Subs%5D+-+Judas&tr=http%3A%2F%2Fnyaa.tracker.wf%3A7777%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=http%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Fopentracker.i2p.rocks%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fcoppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce"
+    let magnetLink = "magnet:?xt=urn:btih:ETIZG6JR5OHURVXIVZIPYMPQ3EZO3AGA&dn=kali-linux-2025.1a-installer-arm64.iso&xl=3758403584&tr=http%3A%2F%2Ftracker.kali.org%3A6969%2Fannounce"
 
     let settings = await Settings.GetSettings()
     try {
