@@ -1,6 +1,7 @@
 package realdebrid
 
 import (
+	"derpy-launcher072/utils"
 	"fmt"
 	"io"
 	"net/http"
@@ -134,15 +135,30 @@ func (client *RealDebridClient) DownloadByMagnet(magnetLink string, path string)
 		return err
 	}
 
+	var unrestrictResponseList []UnrestrictResponse
+
 	for _, link := range torrent.Links {
-		unrestrictLink, err := client.UnrestrictLink(link)
-		downloadPath := filepath.Join(path, unrestrictLink.Filename)
+		unrestrictResponse, err := client.UnrestrictLink(link)
 		if err != nil {
 			return err
 		}
-		fmt.Println(unrestrictLink.Link)
+		unrestrictResponseList = append(unrestrictResponseList, unrestrictResponse)
+	}
 
-		err = client.DownloadByRDLink(unrestrictLink.Download, downloadPath)
+	disk := utils.DiskUsage(path)
+	totalSize, err := client.GetDiskSizeOfAllLinks(unrestrictResponseList)
+	if err != nil {
+		return err
+	}
+
+	if int64(disk.Free) < totalSize {
+		return ErrorNotEnoughDiskSpace
+	}
+
+	for _, unrestrictResponse := range unrestrictResponseList {
+		downloadPath := filepath.Join(path, unrestrictResponse.Filename)
+		fmt.Println(unrestrictResponse.Link)
+		err = client.DownloadByRDLink(unrestrictResponse.Download, downloadPath)
 		if err != nil {
 			return err
 		}

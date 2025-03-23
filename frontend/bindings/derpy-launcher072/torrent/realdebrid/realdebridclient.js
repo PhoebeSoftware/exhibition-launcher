@@ -56,6 +56,15 @@ export function DownloadByRDLink(link, filePath) {
 }
 
 /**
+ * @param {$models.UnrestrictResponse[]} unrestrictResponses
+ * @returns {Promise<number> & { cancel(): void }}
+ */
+export function GetDiskSizeOfAllLinks(unrestrictResponses) {
+    let $resultPromise = /** @type {any} */($Call.ByID(2173057463, unrestrictResponses));
+    return $resultPromise;
+}
+
+/**
  * @returns {Promise<$models.DownloadItem[]> & { cancel(): void }}
  */
 export function GetDownloads() {

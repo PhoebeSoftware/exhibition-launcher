@@ -20,6 +20,8 @@ var (
 	Error403             = errors.New("Forbidden")
 	Error404             = errors.New("Not Found")
 	Error500             = errors.New("Internal Server Error")
+
+	ErrorNotEnoughDiskSpace = errors.New("Not enough diskspace")
 )
 
 type RealDebridClient struct {
