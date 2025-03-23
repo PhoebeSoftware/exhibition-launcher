@@ -2,6 +2,7 @@ package utils
 
 import (
 	"syscall"
+	"unsafe"
 )
 
 type DiskStatus struct {
@@ -12,13 +13,26 @@ type DiskStatus struct {
 
 // disk usage of path/disk
 func DiskUsage(path string) (disk DiskStatus) {
-	fs := syscall.Statfs_t{}
-	err := syscall.Statfs(path, &fs)
-	if err != nil {
+	kernel32 := syscall.NewLazyDLL("kernel32.dll")
+	getDiskFreeSpaceEx := kernel32.NewProc("GetDiskFreeSpaceExW")
+
+	lpFreeBytesAvailable := uint64(0)
+	lpTotalNumberOfBytes := uint64(0)
+	lpTotalNumberOfFreeBytes := uint64(0)
+
+	pathPtr, _ := syscall.UTF16PtrFromString(path)
+	ret, _, _ := getDiskFreeSpaceEx.Call(
+		uintptr(unsafe.Pointer(pathPtr)),
+		uintptr(unsafe.Pointer(&lpFreeBytesAvailable)),
+		uintptr(unsafe.Pointer(&lpTotalNumberOfBytes)),
+		uintptr(unsafe.Pointer(&lpTotalNumberOfFreeBytes)),
+	)
+	if ret == 0 {
 		return
 	}
-	disk.All = fs.Blocks * uint64(fs.Bsize)
-	disk.Free = fs.Bfree * uint64(fs.Bsize)
+
+	disk.All = lpTotalNumberOfBytes
+	disk.Free = lpTotalNumberOfFreeBytes
 	disk.Used = disk.All - disk.Free
 	return
 }
