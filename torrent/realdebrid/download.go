@@ -104,8 +104,9 @@ func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) e
 		}
 		//_, err = io.Copy(file, resp.Body)
 
-		fmt.Println("DONE")
-		fmt.Printf("Downloaded %d/%d bytes\n", rangeEnd+1, totalSize)
+		percentDone := float64(rangeEnd+1) / float64(totalSize) * 100
+
+		fmt.Printf("Downloaded (%.2f%%)\n", percentDone)
 	}
 
 	fmt.Println("Done with: " + link)
