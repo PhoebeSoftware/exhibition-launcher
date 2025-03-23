@@ -1,7 +1,6 @@
 package realdebrid
 
 import (
-	"derpy-launcher072/utils/settings"
 	"fmt"
 	"io"
 	"net/http"
@@ -113,7 +112,7 @@ func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) e
 	return nil
 }
 
-func (client *RealDebridClient) DownloadByMagnet(magnetLink string, settings settings.Settings) error {
+func (client *RealDebridClient) DownloadByMagnet(magnetLink string, path string) error {
 	addMagnetResponse, err := client.AddTorrentByMagnet(magnetLink)
 	if err != nil {
 		return err
@@ -137,7 +136,7 @@ func (client *RealDebridClient) DownloadByMagnet(magnetLink string, settings set
 
 	for _, link := range torrent.Links {
 		unrestrictLink, err := client.UnrestrictLink(link)
-		downloadPath := filepath.Join(settings.DownloadPath, unrestrictLink.Filename)
+		downloadPath := filepath.Join(path, unrestrictLink.Filename)
 		if err != nil {
 			return err
 		}

@@ -10,7 +10,9 @@
 <script setup>
 
 import {RealDebridClient} from "../../bindings/derpy-launcher072/torrent/realdebrid/index.js";
-import {SettingsManager} from "../../bindings/derpy-launcher072/utils/settings/index.js";
+import {GetSettings} from "../../bindings/derpy-launcher072/utils/jsonUtils/jsonModels/settings.js";
+import {JsonManager} from "../../bindings/derpy-launcher072/utils/jsonUtils/index.js";
+import {Settings} from "../../bindings/derpy-launcher072/utils/jsonUtils/jsonModels/index.js";
 
 async function addTorrentByMagnet() {
     // RealDebridClient.GetTrafic().then((result) => {
@@ -22,9 +24,9 @@ async function addTorrentByMagnet() {
     let id;
     let magnetLink = "magnet:?xt=urn:btih:BED99329D89D10663336AE1D76ACAFF5EFE27EAA&dn=Bleach%3A+Rebirth+of+Souls+-+Ultimate+Edition+%28v1.03+%2B+All+DLCs+%2B+MULTi15%29+%28Fast+Install%29+%5BDODI+Repack%5D&tr=udp%3A%2F%2F9.rarbg.to%3A2870%2Fannounce&tr=udp%3A%2F%2Feddie4.nl%3A6969%2Fannounce&tr=udp%3A%2F%2Fthetracker.org%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337&tr=udp%3A%2F%2F9.rarbg.com%3A2710%2Fannounce&tr=udp%3A%2F%2Fexplodie.org%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker1.wasabii.com.tw%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Ftracker.cypherpunks.ru%3A6969%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=http%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Fopentracker.i2p.rocks%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fcoppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce"
 
-    let settings = await SettingsManager.GetSettings()
+    let settings = await Settings.GetSettings()
 
-    await RealDebridClient.DownloadByMagnet(magnetLink, settings);
+    await RealDebridClient.DownloadByMagnet(magnetLink, settings.download_path);
 
     //await RealDebridClient.DownloadByMagnet(magnetLink, Settings.)
 

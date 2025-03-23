@@ -14,7 +14,7 @@ import * as $models from "./models.js";
  * @returns {Promise<void> & { cancel(): void }}
  */
 export function DefaultValues() {
-    let $resultPromise = /** @type {any} */($Call.ByID(1455711314));
+    let $resultPromise = /** @type {any} */($Call.ByID(1580752900));
     return $resultPromise;
 }
 
@@ -22,7 +22,7 @@ export function DefaultValues() {
  * @returns {Promise<$models.Settings> & { cancel(): void }}
  */
 export function GetSettings() {
-    let $resultPromise = /** @type {any} */($Call.ByID(1059935048));
+    let $resultPromise = /** @type {any} */($Call.ByID(1624526890));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
         return $$createType0($result);
     }));
