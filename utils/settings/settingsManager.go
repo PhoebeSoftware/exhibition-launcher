@@ -12,9 +12,10 @@ type SettingsManager struct {
 }
 
 type Settings struct {
-	PathToSettings string `json:"path_to_settings"`
-	DownloadPath   string `json:"download_path"`
-	UseRealDebrid bool `json:"use_real_debrid"`
+	PathToSettings string   `json:"path_to_settings"`
+	DownloadPath   string   `json:"download_path"`
+	UseRealDebrid  bool     `json:"use_real_debrid"`
+	GameSources    []string `json:"game_sources"`
 }
 
 func (settingsManager SettingsManager) GetSettings() Settings {
@@ -74,7 +75,7 @@ func (settingsManager *SettingsManager) GenerateSettings() error {
 	if err != nil {
 		return err
 	}
-	
+
 	settingsManager, err = LoadSettings(settingsManager.Settings.PathToSettings)
 	if err != nil {
 		return fmt.Errorf("could not load settingsManager: %w", err)

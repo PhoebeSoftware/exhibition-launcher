@@ -33,6 +33,13 @@ export class Settings {
              */
             this["use_real_debrid"] = false;
         }
+        if (!("game_sources" in $$source)) {
+            /**
+             * @member
+             * @type {string[]}
+             */
+            this["game_sources"] = [];
+        }
 
         Object.assign(this, $$source);
     }
@@ -43,7 +50,14 @@ export class Settings {
      * @returns {Settings}
      */
     static createFrom($$source = {}) {
+        const $$createField3_0 = $$createType0;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("game_sources" in $$parsedSource) {
+            $$parsedSource["game_sources"] = $$createField3_0($$parsedSource["game_sources"]);
+        }
         return new Settings(/** @type {Partial<Settings>} */($$parsedSource));
     }
 }
+
+// Private type creation functions
+const $$createType0 = $Create.Array($Create.Any);

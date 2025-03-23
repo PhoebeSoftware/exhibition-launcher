@@ -64,7 +64,10 @@ func main() {
 	libraryManager = library.GetLibrary(apiManager)
 	torrentManager = torrent.StartClient(settingsManager.GetSettings().PathToSettings)
 
-	fmt.Println(settingsManager)
+	for _, source := range settingsManager.GetSettings().GameSources {
+		sourceData := torrentManager.GetSource(source)
+		fmt.Printf("[%s] Found %d games\n", sourceData.SourceName, len(sourceData.Downloads))
+	}
 
 	//go func() {
 	//	results := torrent.Scrape_1337x("goat simulator 3")
