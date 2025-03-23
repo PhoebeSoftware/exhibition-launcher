@@ -5,7 +5,7 @@ import (
 	"derpy-launcher072/library"
 	"derpy-launcher072/torrent"
 	"derpy-launcher072/utils/jsonUtils"
-	"derpy-launcher072/utils/jsonUtils/models"
+	"derpy-launcher072/utils/jsonUtils/jsonModels"
 	"embed"
 	"fmt"
 	"log"
@@ -55,7 +55,7 @@ func (w *WindowService) Close() {
 // logs any error that might occur.
 func main() {
 	// 🐐routine
-	settings := &models.Settings{}
+	settings := &jsonModels.Settings{}
 	settingsManager, err := jsonUtils.NewJsonManager(filepath.Join("settings1.json"), settings)
 	if err != nil {
 		fmt.Println(err)

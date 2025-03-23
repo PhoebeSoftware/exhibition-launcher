@@ -1,4 +1,4 @@
-package models
+package jsonModels
 
 import "path/filepath"
 
