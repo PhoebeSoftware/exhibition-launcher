@@ -4,7 +4,8 @@ import (
 	"derpy-launcher072/igdb"
 	"derpy-launcher072/library"
 	"derpy-launcher072/torrent"
-	"derpy-launcher072/utils/settings"
+	"derpy-launcher072/utils/jsonUtils"
+	"derpy-launcher072/utils/jsonUtils/jsonModels"
 	"embed"
 	"fmt"
 	"log"
@@ -54,7 +55,8 @@ func (w *WindowService) Close() {
 // logs any error that might occur.
 func main() {
 	// 🐐routine
-	settingsManager, err := settings.LoadSettings(filepath.Join("settings.json"))
+	settings := &jsonModels.Settings{}
+	settingsManager, err := jsonUtils.NewJsonManager(filepath.Join("settings.json"), settings)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -62,12 +64,14 @@ func main() {
 
 	apiManager = igdb.NewAPI()
 	libraryManager = library.GetLibrary(apiManager)
-	torrentManager = torrent.StartClient(settingsManager.GetSettings().PathToSettings)
+	torrentManager = torrent.StartClient(settings.DownloadPath)
 
-	for _, source := range settingsManager.GetSettings().GameSources {
+	for _, source := range settings.GameSources {
 		sourceData := torrentManager.GetSource(source)
 		fmt.Printf("[%s] Found %d games\n", sourceData.SourceName, len(sourceData.Downloads))
 	}
+
+	fmt.Println(settingsManager)
 
 	//go func() {
 	//	results := torrent.Scrape_1337x("goat simulator 3")
@@ -89,7 +93,7 @@ func main() {
 			application.NewService(apiManager),
 			application.NewService(libraryManager),
 			application.NewService(&WindowService{}),
-			application.NewService(settingsManager),
+			application.NewService(settings),
 		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),

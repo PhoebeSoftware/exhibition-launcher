@@ -12,13 +12,6 @@ export class Settings {
      * @param {Partial<Settings>} [$$source = {}] - The source object to create the Settings.
      */
     constructor($$source = {}) {
-        if (!("path_to_settings" in $$source)) {
-            /**
-             * @member
-             * @type {string}
-             */
-            this["path_to_settings"] = "";
-        }
         if (!("download_path" in $$source)) {
             /**
              * @member
@@ -50,10 +43,10 @@ export class Settings {
      * @returns {Settings}
      */
     static createFrom($$source = {}) {
-        const $$createField3_0 = $$createType0;
+        const $$createField2_0 = $$createType0;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("game_sources" in $$parsedSource) {
-            $$parsedSource["game_sources"] = $$createField3_0($$parsedSource["game_sources"]);
+            $$parsedSource["game_sources"] = $$createField2_0($$parsedSource["game_sources"]);
         }
         return new Settings(/** @type {Partial<Settings>} */($$parsedSource));
     }
