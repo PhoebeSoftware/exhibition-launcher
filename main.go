@@ -76,7 +76,7 @@ func main() {
 		debridClient = realdebrid.NewRealDebridClient(settings.DebridToken)
 	}
 
-	torrentManager = torrent.StartClient(settings.DownloadPath)
+	//torrentManager = torrent.StartClient(settings.DownloadPath)
 
 	//go func() {
 	//	results := torrent.Scrape_1337x("goat simulator 3")
@@ -110,7 +110,7 @@ func main() {
 
 
 	services := []application.Service{
-		application.NewService(torrentManager),
+		//application.NewService(torrentManager),
 		application.NewService(apiManager),
 		application.NewService(libraryManager),
 		application.NewService(&WindowService{}),

@@ -3,10 +3,13 @@ package realdebrid
 import (
 	"derpy-launcher072/utils"
 	"fmt"
+	"github.com/schollz/progressbar/v3"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
+	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -71,45 +74,114 @@ func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) e
 
 	fmt.Printf("Total file size: %d bytes\n", totalSize)
 
+
+	var wg sync.WaitGroup
+	var fileMutex sync.Mutex
+	var downloadedBytes = stat.Size()
+
+	numWorkers := 5
+	stopCh := make(chan interface{})
+	errCh := make(chan error, 10)
+	chunks := make(chan [2]int64, numWorkers)
+
+	worker := func() {
+		defer wg.Done()
+		for {
+			select {
+			case <-stopCh:
+				return
+			case chunk, ok := <-chunks:
+				if !ok {
+					return
+				}
+				rangeStart, rangeEnd := chunk[0], chunk[1]
+				req, err := http.NewRequest(http.MethodGet, link, nil)
+				if err != nil {
+					errCh <- fmt.Errorf("could not create request: %w", err)
+					close(stopCh)
+					return
+				}
+
+				rangeHeader := fmt.Sprintf("bytes=%d-%d", rangeStart, rangeEnd)
+				req.Header.Set("Range", rangeHeader)
+				resp, err := client.client.Do(req)
+				if err != nil {
+					errCh <- fmt.Errorf("could not encode link: %w", err)
+					close(stopCh)
+					return
+				}
+
+				defer resp.Body.Close()
+
+				body, err := io.ReadAll(resp.Body)
+				if err != nil {
+					errCh <- fmt.Errorf("could not read request: %w", err)
+					close(stopCh)
+					return
+				}
+
+				fileMutex.Lock()
+				_, err = file.WriteAt(body, rangeStart)
+				fileMutex.Unlock()
+				if err != nil {
+					errCh <- fmt.Errorf("could not copy files: %w", err)
+					return
+				}
+
+				atomic.AddInt64(&downloadedBytes, int64(len(body)))
+			}
+		}
+	}
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		bar := progressbar.Default(100)
+		for {
+			select {
+			case <-stopCh:
+				bar.Finish()
+				return
+			default:
+				percent := float64(atomic.LoadInt64(&downloadedBytes)) / float64(totalSize) * 100
+				err := bar.Set(int(percent))
+				if err != nil {
+					return
+				}
+
+				time.Sleep(1 * time.Millisecond)
+			}
+		}
+	}()
+
+	for i := 0; i < numWorkers; i++ {
+		wg.Add(1)
+		go worker()
+	}
+
 	for i := stat.Size(); i < totalSize; i += sizeOfChunk {
 		rangeStart := i
-		// -1 cuz otherwise u will install 1 extra byte every loop
-		rangeEnd := rangeStart + sizeOfChunk - 1
+		rangeEnd := rangeStart + sizeOfChunk + 1
 		if rangeEnd >= totalSize {
 			rangeEnd = totalSize - 1
 		}
-		fmt.Printf("rangeStart: %v\n", rangeStart)
-		fmt.Printf("rangeEnd: %v\n", rangeEnd)
-
-		req, err := http.NewRequest(http.MethodGet, link, nil)
-		if err != nil {
-			return fmt.Errorf("could not create request: %w", err)
-		}
-
-		rangeHeader := fmt.Sprintf("bytes=%d-%d", rangeStart, rangeEnd)
-		req.Header.Set("Range", rangeHeader)
-		resp, err := client.client.Do(req)
-		if err != nil {
-			return fmt.Errorf("could not encode link: %w", err)
-		}
-
-		defer resp.Body.Close()
-
-		body, err := io.ReadAll(resp.Body)
-		offset := rangeStart
-		fmt.Printf("Offset: %v\n", offset)
-		_, err = file.WriteAt(body, offset)
-		if err != nil {
-			return fmt.Errorf("could not copy files: %w", err)
-		}
-		//_, err = io.Copy(file, resp.Body)
-
-		percentDone := float64(rangeEnd+1) / float64(totalSize) * 100
-
-		fmt.Printf("Downloaded (%.2f%%)\n", percentDone)
+		chunks <- [2]int64{rangeStart, rangeEnd}
 	}
 
-	fmt.Println("Done with: " + link)
+	close(chunks)
+
+	wg.Wait()
+
+	close(errCh)
+
+	close(stopCh)
+	<- done
+
+	for err := range errCh {
+		return err
+	}
+
+	fmt.Println("\nDone with: " + filePath)
 	fmt.Println("Took: " + time.Since(startTime).String())
 	return nil
 }
