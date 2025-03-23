@@ -13,8 +13,8 @@ import * as $models from "./models.js";
 /**
  * @returns {Promise<void> & { cancel(): void }}
  */
-export function GenerateSettings() {
-    let $resultPromise = /** @type {any} */($Call.ByID(2304209143));
+export function DefaultValues() {
+    let $resultPromise = /** @type {any} */($Call.ByID(1455711314));
     return $resultPromise;
 }
 
@@ -22,20 +22,12 @@ export function GenerateSettings() {
  * @returns {Promise<$models.Settings> & { cancel(): void }}
  */
 export function GetSettings() {
-    let $resultPromise = /** @type {any} */($Call.ByID(4104139690));
+    let $resultPromise = /** @type {any} */($Call.ByID(1059935048));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
         return $$createType0($result);
     }));
     $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
     return $typingPromise;
-}
-
-/**
- * @returns {Promise<void> & { cancel(): void }}
- */
-export function SaveSettings() {
-    let $resultPromise = /** @type {any} */($Call.ByID(488144021));
-    return $resultPromise;
 }
 
 // Private type creation functions
