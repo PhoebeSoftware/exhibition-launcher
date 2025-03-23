@@ -4,7 +4,8 @@ import (
 	"derpy-launcher072/igdb"
 	"derpy-launcher072/library"
 	"derpy-launcher072/torrent"
-	"derpy-launcher072/utils/settings"
+	"derpy-launcher072/utils/jsonUtils"
+	"derpy-launcher072/utils/jsonUtils/models"
 	"embed"
 	"fmt"
 	"log"
@@ -54,7 +55,8 @@ func (w *WindowService) Close() {
 // logs any error that might occur.
 func main() {
 	// 🐐routine
-	settingsManager, err := settings.LoadSettings(filepath.Join("settings.json"))
+	settings := &models.Settings{}
+	settingsManager, err := jsonUtils.NewJsonManager(filepath.Join("settings1.json"), settings)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -62,7 +64,7 @@ func main() {
 
 	apiManager = igdb.NewAPI()
 	libraryManager = library.GetLibrary(apiManager)
-	torrentManager = torrent.StartClient(settingsManager.GetSettings().PathToSettings)
+	torrentManager = torrent.StartClient(settings.DownloadPath)
 
 	fmt.Println(settingsManager)
 
@@ -86,7 +88,7 @@ func main() {
 			application.NewService(apiManager),
 			application.NewService(libraryManager),
 			application.NewService(&WindowService{}),
-			application.NewService(settingsManager),
+			application.NewService(settings),
 		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),

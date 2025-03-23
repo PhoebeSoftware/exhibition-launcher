@@ -12,13 +12,6 @@ export class Settings {
      * @param {Partial<Settings>} [$$source = {}] - The source object to create the Settings.
      */
     constructor($$source = {}) {
-        if (!("path_to_settings" in $$source)) {
-            /**
-             * @member
-             * @type {string}
-             */
-            this["path_to_settings"] = "";
-        }
         if (!("download_path" in $$source)) {
             /**
              * @member
