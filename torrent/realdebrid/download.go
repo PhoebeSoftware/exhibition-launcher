@@ -78,7 +78,7 @@ func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) e
 	var fileMutex sync.Mutex
 	var downloadedBytes = stat.Size()
 
-	numWorkers := 5
+	numWorkers := 2
 	stopCh := make(chan interface{})
 	errCh := make(chan error, 10)
 	chunks := make(chan [2]int64, numWorkers)
@@ -124,6 +124,7 @@ func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) e
 				fileMutex.Unlock()
 				if err != nil {
 					errCh <- fmt.Errorf("could not copy files: %w", err)
+					close(stopCh)
 					return
 				}
 
@@ -214,6 +215,15 @@ func (client *RealDebridClient) DownloadByMagnet(magnetLink string, path string)
 		if err != nil {
 			return err
 		}
+		check, err := client.UnrestrictCheck(link)
+		if err != nil {
+			return err
+		}
+
+		if check != true {
+			return Error503
+		}
+
 		unrestrictResponseList = append(unrestrictResponseList, unrestrictResponse)
 	}
 

@@ -36,3 +36,32 @@ func (client *RealDebridClient) UnrestrictLink(link string) (UnrestrictResponse,
 
 	return result, nil
 }
+
+type CheckResponse struct {
+	Host      string `json:"host"`
+	Link      string `json:"link"`
+	Filename  string `json:"filename"`
+	Filesize  int    `json:"filesize"`
+	Supported int    `json:"supported"`
+}
+
+func (client *RealDebridClient) UnrestrictCheck(link string) (bool, error) {
+	params := url.Values{}
+	params.Add("link", link)
+
+	req, err := client.newRequest(http.MethodPost, "/unrestrict/check", nil, params)
+	if err != nil {
+		return false, fmt.Errorf("could not encode link: %w", err)
+	}
+
+	resp, err := client.client.Do(req)
+	if err != nil {
+		return false, fmt.Errorf("could not post link: %w", err)
+	}
+
+	if resp.StatusCode == 503 {
+		return false, nil
+	}
+
+	return true, nil
+}

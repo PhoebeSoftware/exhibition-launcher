@@ -138,6 +138,15 @@ export function SelectFiles(torrent) {
 
 /**
  * @param {string} link
+ * @returns {Promise<boolean> & { cancel(): void }}
+ */
+export function UnrestrictCheck(link) {
+    let $resultPromise = /** @type {any} */($Call.ByID(1189658243, link));
+    return $resultPromise;
+}
+
+/**
+ * @param {string} link
  * @returns {Promise<$models.UnrestrictResponse> & { cancel(): void }}
  */
 export function UnrestrictLink(link) {

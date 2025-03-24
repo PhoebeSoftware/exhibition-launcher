@@ -22,6 +22,7 @@ var (
 	Error500             = errors.New("Internal Server Error")
 
 	ErrorNotEnoughDiskSpace = errors.New("Not enough diskspace")
+	Error503                = errors.New("File unavailable")
 )
 
 type RealDebridClient struct {
@@ -72,8 +73,8 @@ func (client *RealDebridClient) newRequest(method, path string, headers http.Hea
 
 func (client *RealDebridClient) do(req *http.Request, v interface{}) error {
 	var (
-		err error
-		resp *http.Response
+		err     error
+		resp    *http.Response
 		retries = 3
 	)
 
@@ -118,7 +119,7 @@ func (client *RealDebridClient) do(req *http.Request, v interface{}) error {
 	return err
 }
 
-func shouldRetry(err error,resp *http.Response) bool {
+func shouldRetry(err error, resp *http.Response) bool {
 	if err != nil {
 		return true
 	}
