@@ -4,7 +4,9 @@ import (
 	"derpy-launcher072/utils"
 	"fmt"
 	"github.com/schollz/progressbar/v3"
+	"github.com/wailsapp/wails/v3/pkg/application"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -24,6 +26,8 @@ type DownloadItem struct {
 	Download  string
 	Generated string
 }
+
+var app = application.Get()
 
 func (client *RealDebridClient) GetDownloads() ([]DownloadItem, error) {
 
@@ -67,6 +71,10 @@ func (client *RealDebridClient) DownloadDirectLink(link string, filePath string)
 	}
 
 	defer resp.Body.Close()
+	if stat.Size() == resp.ContentLength {
+		log.Printf("%v is already installed\n", filePath)
+		return nil
+	}
 
 	totalSize := resp.ContentLength
 	// 10mb
@@ -210,7 +218,6 @@ func (client *RealDebridClient) DownloadByMagnet(magnetLink string, path string)
 
 	var unrestrictResponseList []UnrestrictResponse
 
-
 	for _, link := range torrent.Links {
 		unrestrictResponse, err := client.UnrestrictLink(link)
 		if err != nil {
@@ -231,7 +238,7 @@ func (client *RealDebridClient) DownloadByMagnet(magnetLink string, path string)
 	if len(unrestrictResponseList) <= 0 {
 		return ErrorNoLinksFound
 	}
-	
+
 	disk := utils.DiskUsage(path)
 	totalSize, err := client.GetDiskSizeOfAllLinks(unrestrictResponseList)
 	if err != nil {
