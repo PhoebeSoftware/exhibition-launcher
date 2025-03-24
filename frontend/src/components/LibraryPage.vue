@@ -29,8 +29,8 @@
         <div class="game-library-game-box" v-for="game in games" :key="game.igdb_id" @click="openGameStore(game.igdb_id)">
           <div class="game-box-info">
             <div class="text-container">
-              <h1>{{ game.name }}</h1>
-              <p>{{ game.executable }}</p>
+              <h1>{{ game.name || "bruh" }}</h1>
+              <p>{{ game.executable || "bruh" }}</p>
             </div>
             <button><i class="fa-solid fa-ellipsis"></i></button>
           </div>
@@ -45,7 +45,7 @@
           <i class="fa-solid fa-arrow-left"></i> Back to Library
         </button>
       </div>
-      
+
       <div class="game-store-content">
         <h1>Game Store Page</h1>
         <p>This is a placeholder for game #{{ selectedGameId }}</p>
@@ -56,8 +56,8 @@
 </template>
 
 <script>
-import { GetGames } from '../../bindings/derpy-launcher072/igdb/apimanager';
-import { AddToLibrary, GetAllGames } from '../../bindings/derpy-launcher072/library/library';
+import { APIManager } from '../../bindings/derpy-launcher072/igdb';
+import { Library } from '../../bindings/derpy-launcher072/library';
 
 export default {
   name: 'LibraryPage',
@@ -71,7 +71,7 @@ export default {
   },
   methods: {
     addGame() {
-      AddToLibrary(119133).catch(console.warn); // ELDEN RING ID
+      Library.AddToLibrary(119133).catch(console.warn); // ELDEN RING ID
     },
 
     openGameStore(gameId) {
@@ -79,17 +79,20 @@ export default {
       this.currentPage = 'store';
       console.log(`Opening store page for game ${gameId}`);
     },
-    
+
     returnToLibrary() {
       this.currentPage = 'library';
     }
   },
   async mounted() {
-    GetGames("Elden Ring").then((games) => {
+    APIManager.GetGames("Elden Ring").then((games) => {
       console.log(games);
+      GetCover(games[0].cover).then((cover) => {
+        console.log(cover);
+      });
     });
 
-    GetAllGames().then((games) => {
+    Library.GetAllGames().then((games) => {
       Object.values(games).forEach((game) => {
         console.log(game);
         this.games.push(game);
