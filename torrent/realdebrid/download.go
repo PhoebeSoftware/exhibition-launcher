@@ -239,6 +239,11 @@ func (client *RealDebridClient) DownloadByMagnet(magnetLink string, path string)
 		return ErrorNoLinksFound
 	}
 
+	err = os.MkdirAll(path, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
 	disk := utils.DiskUsage(path)
 	totalSize, err := client.GetDiskSizeOfAllLinks(unrestrictResponseList)
 	if err != nil {

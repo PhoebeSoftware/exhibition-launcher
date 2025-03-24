@@ -5,6 +5,7 @@ import (
 	"derpy-launcher072/library"
 	"derpy-launcher072/torrent"
 	"derpy-launcher072/torrent/realdebrid"
+	"derpy-launcher072/utils"
 	"derpy-launcher072/utils/jsonUtils"
 	"derpy-launcher072/utils/jsonUtils/jsonModels"
 	"embed"
@@ -116,6 +117,7 @@ func main() {
 		application.NewService(&WindowService{}),
 		application.NewService(settings),
 		application.NewService(settingsManager),
+		application.NewService(&utils.PathUtil{}),
 	}
 
 	if debridClient != nil {
