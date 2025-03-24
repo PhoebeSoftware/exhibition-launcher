@@ -40,7 +40,7 @@ func (client *RealDebridClient) GetDownloads() ([]DownloadItem, error) {
 
 	return result, nil
 }
-func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) error {
+func (client *RealDebridClient) DownloadDirectLink(link string, filePath string) error {
 	startTime := time.Now()
 
 	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0644)
@@ -244,7 +244,7 @@ func (client *RealDebridClient) DownloadByMagnet(magnetLink string, path string)
 	for _, unrestrictResponse := range unrestrictResponseList {
 		downloadPath := filepath.Join(path, unrestrictResponse.Filename)
 		fmt.Println(unrestrictResponse.Link)
-		err = client.DownloadByRDLink(unrestrictResponse.Download, downloadPath)
+		err = client.DownloadDirectLink(unrestrictResponse.Download, downloadPath)
 		if err != nil {
 			return err
 		}
