@@ -23,6 +23,7 @@ var (
 
 	ErrorNotEnoughDiskSpace = errors.New("Not enough diskspace")
 	Error503                = errors.New("File unavailable")
+	ErrorNoLinksFound = errors.New("Real debrid has no links on this torrent, try again later")
 )
 
 type RealDebridClient struct {

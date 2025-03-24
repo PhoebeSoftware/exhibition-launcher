@@ -211,7 +211,7 @@ func (client *RealDebridClient) DownloadByMagnet(magnetLink string, path string)
 	var unrestrictResponseList []UnrestrictResponse
 
 	if len(unrestrictResponseList) <= 0 {
-		return fmt.Errorf("No links found")
+		return ErrorNoLinksFound
 	}
 
 	for _, link := range torrent.Links {
