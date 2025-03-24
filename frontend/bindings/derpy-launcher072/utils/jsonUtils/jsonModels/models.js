@@ -6,19 +6,12 @@
 // @ts-ignore: Unused imports
 import {Create as $Create} from "@wailsio/runtime";
 
-export class Settings {
+export class RealDebridSettings {
     /**
-     * Creates a new Settings instance.
-     * @param {Partial<Settings>} [$$source = {}] - The source object to create the Settings.
+     * Creates a new RealDebridSettings instance.
+     * @param {Partial<RealDebridSettings>} [$$source = {}] - The source object to create the RealDebridSettings.
      */
     constructor($$source = {}) {
-        if (!("download_path" in $$source)) {
-            /**
-             * @member
-             * @type {string}
-             */
-            this["download_path"] = "";
-        }
         if (!("use_real_debrid" in $$source)) {
             /**
              * @member
@@ -38,12 +31,54 @@ export class Settings {
     }
 
     /**
+     * Creates a new RealDebridSettings instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {RealDebridSettings}
+     */
+    static createFrom($$source = {}) {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new RealDebridSettings(/** @type {Partial<RealDebridSettings>} */($$parsedSource));
+    }
+}
+
+export class Settings {
+    /**
+     * Creates a new Settings instance.
+     * @param {Partial<Settings>} [$$source = {}] - The source object to create the Settings.
+     */
+    constructor($$source = {}) {
+        if (!("download_path" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["download_path"] = "";
+        }
+        if (!("real_debrid_settings" in $$source)) {
+            /**
+             * @member
+             * @type {RealDebridSettings}
+             */
+            this["real_debrid_settings"] = (new RealDebridSettings());
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
      * Creates a new Settings instance from a string or object.
      * @param {any} [$$source = {}]
      * @returns {Settings}
      */
     static createFrom($$source = {}) {
+        const $$createField1_0 = $$createType0;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("real_debrid_settings" in $$parsedSource) {
+            $$parsedSource["real_debrid_settings"] = $$createField1_0($$parsedSource["real_debrid_settings"]);
+        }
         return new Settings(/** @type {Partial<Settings>} */($$parsedSource));
     }
 }
+
+// Private type creation functions
+const $$createType0 = RealDebridSettings.createFrom;

@@ -9,6 +9,7 @@ import (
 	"derpy-launcher072/utils/jsonUtils"
 	"derpy-launcher072/utils/jsonUtils/jsonModels"
 	"embed"
+	"errors"
 	"fmt"
 	"log"
 	"path/filepath"
@@ -54,6 +55,10 @@ func (w *WindowService) Close() {
 	app.CurrentWindow().Close()
 }
 
+var (
+	ErrorTokenIsEmpty = errors.New("Real-debrid token is empty")
+)
+
 // main function serves as the application's entry point. It initializes the application, creates a window,
 // and starts a goroutine that emits a time-based event every second. It subsequently runs the application and
 // logs any error that might occur.
@@ -68,13 +73,13 @@ func main() {
 
 	libraryManager = library.GetLibrary(apiManager)
 	apiManager = igdb.NewAPI()
-	if settings.UseRealDebrid {
-		if settings.DebridToken == "" {
+	if settings.RealDebridSettings.UseRealDebrid {
+		if settings.RealDebridSettings.DebridToken == "" {
 			// TO:DO ADD A UI FOR THIS OR SMTH
-			fmt.Println("Debrid does not exist")
+			fmt.Println(ErrorTokenIsEmpty)
 			return
 		}
-		debridClient = realdebrid.NewRealDebridClient(settings.DebridToken)
+		debridClient = realdebrid.NewRealDebridClient(settings.RealDebridSettings.DebridToken)
 	}
 
 	//torrentManager = torrent.StartClient(settings.DownloadPath)

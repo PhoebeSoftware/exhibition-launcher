@@ -19,6 +19,11 @@ async function addTorrentByMagnet() {
 
     let settings = await Settings.GetSettings()
     let path = await PathUtil.Join(settings.download_path, "Hollow Knight")
+
+    if (!settings.real_debrid_settings.use_real_debrid) {
+        return
+    }
+
     RealDebridClient.DownloadByMagnet(magnetLinkHollowKnight, path).catch((err) => {
         console.log(err)
     });
