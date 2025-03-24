@@ -22,7 +22,7 @@ async function addTorrentByMagnet() {
     //     console.log(result)
     // });
     let id;
-    let magnetLink = "magnet:?xt=urn:btih:ETIZG6JR5OHURVXIVZIPYMPQ3EZO3AGA&dn=kali-linux-2025.1a-installer-arm64.iso&xl=3758403584&tr=http%3A%2F%2Ftracker.kali.org%3A6969%2Fannounce"
+    let magnetLink = "magnet:?xt=urn:btih:ac8dc037d282f82efb2864abdd54399029105c0c&dn=%5BGolumpa-Yameii%5D%20Attack%20on%20Titan%20-%20The%20Final%20Season%20%5BEnglish%20Dub%5D%20%5BWEB-DL%20720p%5D%20-%20%28The%20Complete%20S04%29%20-%20Unofficial%20Batch&tr=http%3A%2F%2Fnyaa.tracker.wf%3A7777%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce"
 
     let settings = await Settings.GetSettings()
     try {

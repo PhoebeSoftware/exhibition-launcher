@@ -74,7 +74,6 @@ func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) e
 
 	fmt.Printf("Total file size: %d bytes\n", totalSize)
 
-
 	var wg sync.WaitGroup
 	var fileMutex sync.Mutex
 	var downloadedBytes = stat.Size()
@@ -136,20 +135,20 @@ func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) e
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
-		bar := progressbar.Default(100)
+		bar := progressbar.DefaultBytes(resp.ContentLength, "downloading")
 		for {
 			select {
 			case <-stopCh:
 				bar.Finish()
 				return
 			default:
-				percent := float64(atomic.LoadInt64(&downloadedBytes)) / float64(totalSize) * 100
-				err := bar.Set(int(percent))
+				//percent := float64(atomic.LoadInt64(&downloadedBytes)) / float64(totalSize) * 100
+				err := bar.Set(int(atomic.LoadInt64(&downloadedBytes)))
 				if err != nil {
 					return
 				}
 
-				time.Sleep(1 * time.Millisecond)
+				time.Sleep(10 * time.Millisecond)
 			}
 		}
 	}()
@@ -175,7 +174,7 @@ func (client *RealDebridClient) DownloadByRDLink(link string, filePath string) e
 	close(errCh)
 
 	close(stopCh)
-	<- done
+	<-done
 
 	for err := range errCh {
 		return err
