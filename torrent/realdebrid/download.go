@@ -210,9 +210,6 @@ func (client *RealDebridClient) DownloadByMagnet(magnetLink string, path string)
 
 	var unrestrictResponseList []UnrestrictResponse
 
-	if len(unrestrictResponseList) <= 0 {
-		return ErrorNoLinksFound
-	}
 
 	for _, link := range torrent.Links {
 		unrestrictResponse, err := client.UnrestrictLink(link)
@@ -231,6 +228,10 @@ func (client *RealDebridClient) DownloadByMagnet(magnetLink string, path string)
 		unrestrictResponseList = append(unrestrictResponseList, unrestrictResponse)
 	}
 
+	if len(unrestrictResponseList) <= 0 {
+		return ErrorNoLinksFound
+	}
+	
 	disk := utils.DiskUsage(path)
 	totalSize, err := client.GetDiskSizeOfAllLinks(unrestrictResponseList)
 	if err != nil {

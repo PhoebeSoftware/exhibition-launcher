@@ -50,8 +50,8 @@ export function DownloadByMagnet(magnetLink, path) {
  * @param {string} filePath
  * @returns {Promise<void> & { cancel(): void }}
  */
-export function DownloadByRDLink(link, filePath) {
-    let $resultPromise = /** @type {any} */($Call.ByID(1695483881, link, filePath));
+export function DownloadDirectLink(link, filePath) {
+    let $resultPromise = /** @type {any} */($Call.ByID(1361205039, link, filePath));
     return $resultPromise;
 }
 

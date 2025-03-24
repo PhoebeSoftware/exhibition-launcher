@@ -6,5 +6,3 @@ import * as JsonManager from "./jsonmanager.js";
 export {
     JsonManager
 };
-
-export * from "./models.js";
