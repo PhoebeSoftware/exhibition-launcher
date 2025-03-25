@@ -1,5 +1,8 @@
 # Exhibition Launcher
-A 🔥 game launcher with builtin torrent client
+A 🔥 game launcher with builtin torrent client. In development!
+
+# Preview (Development)
+![Screenshot of game launcher](assets/img.png)
 
 ## Features
 - Import games from pc
