@@ -28,7 +28,7 @@
             <div class="game-library-container">
                 <div class="game-library-game-box" v-for="game in games" :key="game.igdb_id"
                      @click="openGameStore(game.igdb_id)"
-                     :style="{ backgroundImage: `url(https://${game.MainCover})`}">
+                     :style="{ backgroundImage: `url(${game.MainCover})`}">
                     <div class="game-box-info">
                         <div class="text-container">
                             <h1>{{ game.name }}</h1>

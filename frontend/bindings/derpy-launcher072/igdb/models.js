@@ -40,12 +40,12 @@ export class ApiGame {
              */
             this["cover"] = 0;
         }
-        if (!("Covers" in $$source)) {
+        if (!("MainCover" in $$source)) {
             /**
              * @member
-             * @type {string[]}
+             * @type {string}
              */
-            this["Covers"] = [];
+            this["MainCover"] = "";
         }
 
         Object.assign(this, $$source);
@@ -57,14 +57,7 @@ export class ApiGame {
      * @returns {ApiGame}
      */
     static createFrom($$source = {}) {
-        const $$createField4_0 = $$createType0;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
-        if ("Covers" in $$parsedSource) {
-            $$parsedSource["Covers"] = $$createField4_0($$parsedSource["Covers"]);
-        }
         return new ApiGame(/** @type {Partial<ApiGame>} */($$parsedSource));
     }
 }
-
-// Private type creation functions
-const $$createType0 = $Create.Array($Create.Any);
