@@ -6,6 +6,41 @@
 // @ts-ignore: Unused imports
 import {Create as $Create} from "@wailsio/runtime";
 
+export class RealDebridSettings {
+    /**
+     * Creates a new RealDebridSettings instance.
+     * @param {Partial<RealDebridSettings>} [$$source = {}] - The source object to create the RealDebridSettings.
+     */
+    constructor($$source = {}) {
+        if (!("use_real_debrid" in $$source)) {
+            /**
+             * @member
+             * @type {boolean}
+             */
+            this["use_real_debrid"] = false;
+        }
+        if (!("debrid_token" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["debrid_token"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new RealDebridSettings instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {RealDebridSettings}
+     */
+    static createFrom($$source = {}) {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new RealDebridSettings(/** @type {Partial<RealDebridSettings>} */($$parsedSource));
+    }
+}
+
 export class Settings {
     /**
      * Creates a new Settings instance.
@@ -19,19 +54,12 @@ export class Settings {
              */
             this["download_path"] = "";
         }
-        if (!("use_real_debrid" in $$source)) {
+        if (!("real_debrid_settings" in $$source)) {
             /**
              * @member
-             * @type {boolean}
+             * @type {RealDebridSettings}
              */
-            this["use_real_debrid"] = false;
-        }
-        if (!("game_sources" in $$source)) {
-            /**
-             * @member
-             * @type {string[]}
-             */
-            this["game_sources"] = [];
+            this["real_debrid_settings"] = (new RealDebridSettings());
         }
 
         Object.assign(this, $$source);
@@ -43,14 +71,14 @@ export class Settings {
      * @returns {Settings}
      */
     static createFrom($$source = {}) {
-        const $$createField2_0 = $$createType0;
+        const $$createField1_0 = $$createType0;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
-        if ("game_sources" in $$parsedSource) {
-            $$parsedSource["game_sources"] = $$createField2_0($$parsedSource["game_sources"]);
+        if ("real_debrid_settings" in $$parsedSource) {
+            $$parsedSource["real_debrid_settings"] = $$createField1_0($$parsedSource["real_debrid_settings"]);
         }
         return new Settings(/** @type {Partial<Settings>} */($$parsedSource));
     }
 }
 
 // Private type creation functions
-const $$createType0 = $Create.Array($Create.Any);
+const $$createType0 = RealDebridSettings.createFrom;

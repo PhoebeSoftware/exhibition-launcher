@@ -4,9 +4,12 @@ import (
 	"derpy-launcher072/igdb"
 	"derpy-launcher072/library"
 	"derpy-launcher072/torrent"
+	"derpy-launcher072/torrent/realdebrid"
+	"derpy-launcher072/utils"
 	"derpy-launcher072/utils/jsonUtils"
 	"derpy-launcher072/utils/jsonUtils/jsonModels"
 	"embed"
+	"errors"
 	"fmt"
 	"log"
 	"path/filepath"
@@ -22,33 +25,39 @@ import (
 var libraryManager *library.Library
 var apiManager *igdb.APIManager
 var torrentManager *torrent.Manager
-
-var app *application.App
-
+var debridClient *realdebrid.RealDebridClient
 //go:embed all:frontend/dist
 var assets embed.FS
 
 type WindowService struct{}
 
+var app *application.App
+
 func (w *WindowService) Minimize() {
-	if app.CurrentWindow().IsMinimised() {
-		app.CurrentWindow().UnMinimise()
+	win := app.CurrentWindow()
+	if win.IsMinimised() {
+		win.UnMinimise()
 	} else {
-		app.CurrentWindow().Minimise()
+		win.Minimise()
 	}
 }
 
 func (w *WindowService) Maximize() {
-	if app.CurrentWindow().IsMaximised() {
-		app.CurrentWindow().UnMaximise()
+	win := app.CurrentWindow()
+	if win.IsMaximised() {
+		win.UnMaximise()
 	} else {
-		app.CurrentWindow().Maximise()
+		win.Maximise()
 	}
 }
 
 func (w *WindowService) Close() {
 	app.CurrentWindow().Close()
 }
+
+var (
+	ErrorTokenIsEmpty = errors.New("Real-debrid token is empty")
+)
 
 // main function serves as the application's entry point. It initializes the application, creates a window,
 // and starts a goroutine that emits a time-based event every second. It subsequently runs the application and
@@ -62,16 +71,18 @@ func main() {
 		return
 	}
 
-	apiManager = igdb.NewAPI()
 	libraryManager = library.GetLibrary(apiManager)
-	torrentManager = torrent.StartClient(settings.DownloadPath)
-
-	for _, source := range settings.GameSources {
-		sourceData := torrentManager.GetSource(source)
-		fmt.Printf("[%s] Found %d games\n", sourceData.SourceName, len(sourceData.Downloads))
+	apiManager = igdb.NewAPI()
+	if settings.RealDebridSettings.UseRealDebrid {
+		if settings.RealDebridSettings.DebridToken == "" {
+			// TO:DO ADD A UI FOR THIS OR SMTH
+			fmt.Println(ErrorTokenIsEmpty)
+			return
+		}
+		debridClient = realdebrid.NewRealDebridClient(settings.RealDebridSettings.DebridToken)
 	}
 
-	fmt.Println(settingsManager)
+	//torrentManager = torrent.StartClient(settings.DownloadPath)
 
 	//go func() {
 	//	results := torrent.Scrape_1337x("goat simulator 3")
@@ -86,24 +97,8 @@ func main() {
 	// 'Assets' configures the asset server with the 'FS' variable pointing to the frontend files.
 	// 'Bind' is a list of Go struct instances. The frontend has access to the methods of these instances.
 	// 'Mac' options tailor the application when running an macOS.
-	app = application.New(application.Options{
-		Name: "derpyLauncher",
-		Services: []application.Service{
-			application.NewService(torrentManager),
-			application.NewService(apiManager),
-			application.NewService(libraryManager),
-			application.NewService(&WindowService{}),
-			application.NewService(settings),
-		},
-		Assets: application.AssetOptions{
-			Handler: application.AssetFileServerFS(assets),
-		},
-		Mac: application.MacOptions{
-			ApplicationShouldTerminateAfterLastWindowClosed: true,
-		},
-	})
 
-	opt := application.WebviewWindowOptions{
+	webViewWindowOpt := application.WebviewWindowOptions{
 		Title:     "derpyLauncher",
 		Width:     1200,
 		Height:    900,
@@ -119,23 +114,52 @@ func main() {
 		URL:              "/",
 	}
 
-	// Create a new window with the necessary options.
-	// 'Title' is the title of the window.
-	// 'Mac' options tailor the window when running on macOS.
-	// 'BackgroundColour' is the background colour of the window.
-	// 'URL' is the URL that will be loaded into the webview.
-	if runtime.GOOS == "darwin" {
-		opt.Frameless = false
 
-		opt.MinimiseButtonState = application.ButtonHidden
-		opt.MaximiseButtonState = application.ButtonHidden
-		opt.CloseButtonState = application.ButtonHidden
+	services := []application.Service{
+		//application.NewService(torrentManager),
+		application.NewService(apiManager),
+		application.NewService(libraryManager),
+		application.NewService(&WindowService{}),
+		application.NewService(settings),
+		application.NewService(settingsManager),
+		application.NewService(&utils.PathUtil{}),
 	}
-	app.NewWebviewWindowWithOptions(opt)
 
-	// Run the application. This blocks until the application has been exited.
+	if debridClient != nil {
+		services = append(services, application.NewService(debridClient))
+	}
+
+	appOptions := application.Options{
+		Name: "derp-launcher072",
+		Services: services,
+		Assets: application.AssetOptions{
+			Handler: application.AssetFileServerFS(assets),
+		},
+		Mac: application.MacOptions{
+			ApplicationShouldTerminateAfterLastWindowClosed: true,
+		},
+	}
+	// If macos turn off frameless so minimizing works
+	if runtime.GOOS == "darwin" {
+		webViewWindowOpt.Frameless = false
+
+		webViewWindowOpt.MinimiseButtonState = application.ButtonHidden
+		webViewWindowOpt.MaximiseButtonState = application.ButtonHidden
+		webViewWindowOpt.CloseButtonState = application.ButtonHidden
+	}
+
+	//go func() {
+	//	err := debridClient.DownloadByMagnet("magnet:?xt=urn:btih:EEEF75F8C7AD79818C54C618E1A7937CD76B59C4&dn=Sony+Vegas+Pro+v11.0.510+64+bit+%28patch+keygen+DI%29+%5BChingLiu%5D&tr=http%3A%2F%2Fpow7.com%2Fannounce&tr=http%3A%2F%2Fpubt.net%3A2710%2Fannounce&tr=http%3A%2F%2Ft1.pow7.com%2Fannounce&tr=http%3A%2F%2Ftracker.torrentbay.to%3A6969%2Fannounce&tr=http%3A%2F%2Ftracker.torrent.to%3A2710%2Fannounce&tr=http%3A%2F%2Ftracker.publicbt.com%2Fannounce&tr=udp%3A%2F%2Ftracker.1337x.org%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.istole.it%3A80%2Fannounce&tr=http%3A%2F%2Ftracker.publicbt.com%3A80%2Fannounce&tr=http%3A%2F%2Fa.tracker.prq.to%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=http%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Fopentracker.i2p.rocks%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fcoppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce", settings.DownloadPath)
+	//	if err != nil {
+	//		fmt.Println(err)
+	//		return
+	//	}
+	//}()
+
+	app = application.New(appOptions)
+	app.NewWebviewWindowWithOptions(webViewWindowOpt)
+
 	err = app.Run()
-	// If an error occurred while running the application, log it and exit.
 	if err != nil {
 		log.Fatal(err)
 	}

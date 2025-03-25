@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/sqweek/dialog"
-	_ "github.com/sqweek/dialog"
 )
 
 type Game struct {
