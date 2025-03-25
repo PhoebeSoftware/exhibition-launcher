@@ -115,7 +115,7 @@ func main() {
 	// 'Mac' options tailor the application when running an macOS.
 
 	webViewWindowOpt := application.WebviewWindowOptions{
-		Title:     "derpyLauncher",
+		Title:     "Exhibition Launcher",
 		Width:     1200,
 		Height:    900,
 		MinHeight: 700,
@@ -146,7 +146,7 @@ func main() {
 	}
 
 	appOptions := application.Options{
-		Name: "derp-launcher072",
+		Name: "Exhibition Launcher",
 		Services: services,
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
