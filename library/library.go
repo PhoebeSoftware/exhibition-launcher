@@ -15,14 +15,16 @@ import (
 )
 
 type Game struct {
-	IGDBID      int    `json:"igdb_id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	PlayTime    int    `json:"playtime"`
-	Achievments []int  `json:"achievments"`
-	Executable  string `json:"executable"`
-	Running     bool   `json:"running"`
-	Favorite    bool   `json:"favorite"`
+	IGDBID      int      `json:"igdb_id"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	PlayTime    int      `json:"playtime"`
+	Achievments []int    `json:"achievments"`
+	Executable  string   `json:"executable"`
+	Running     bool     `json:"running"`
+	Favorite    bool     `json:"favorite"`
+	Covers      []string `json:"covers"`
+	MainCover string
 }
 
 type Library struct {

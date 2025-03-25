@@ -82,6 +82,22 @@ func main() {
 		debridClient = realdebrid.NewRealDebridClient(settings.RealDebridSettings.DebridToken)
 	}
 
+	var gamesWithCover = map[int]library.Game{}
+
+	for id, game := range libraryManager.Games {
+		apiGame := apiManager.GetGameData(game.IGDBID)
+		game.Covers = apiGame.Covers
+		game.MainCover = apiGame.Covers[0]
+		gamesWithCover[id] = game
+
+	}
+
+	libraryManager.Games = gamesWithCover
+
+	for _, game := range libraryManager.Games {
+		fmt.Println(game.Covers)
+	}
+
 	//torrentManager = torrent.StartClient(settings.DownloadPath)
 
 	//go func() {

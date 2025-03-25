@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
@@ -14,7 +15,8 @@ type ApiGame struct {
 	Id          int    `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"summary"`
-	Cover       int    `json:"cover"`
+	CoverID     int    `json:"cover"`
+	Covers      []string
 }
 
 type Image struct {
@@ -66,7 +68,9 @@ func (a *APIManager) GetCover(cover int) []string {
 
 	urls := make([]string, len(images))
 	for i, img := range images {
-		urls[i] = img.Link
+		linkWithoutSlashStart := strings.Trim(img.Link, "//")
+		fmt.Println(linkWithoutSlashStart)
+		urls[i] = linkWithoutSlashStart
 	}
 
 	return urls
@@ -88,16 +92,19 @@ func (a *APIManager) GetGameData(id int) ApiGame {
 	}
 	defer response.Body.Close()
 
-	var game []ApiGame
-	jsonErr := json.NewDecoder(response.Body).Decode(&game)
+	var gameList []ApiGame
+	jsonErr := json.NewDecoder(response.Body).Decode(&gameList)
 	if jsonErr != nil {
 		return ApiGame{}
 	}
 
-	if len(game) == 0 {
+	if len(gameList) == 0 {
 		return ApiGame{}
 	}
-	return game[0]
+	firstGame := gameList[0]
+	firstGame.Covers = a.GetCover(firstGame.Id)
+
+	return firstGame
 }
 
 func (a *APIManager) GetGames(query string) []ApiGame {
