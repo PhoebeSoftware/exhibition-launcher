@@ -10,6 +10,10 @@ import {Call as $Call, Create as $Create} from "@wailsio/runtime";
 // @ts-ignore: Unused imports
 import * as torrent$0 from "../../github.com/anacrolix/torrent/models.js";
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
+import * as $models from "./models.js";
+
 /**
  * add download
  * start ook torrent meteen
@@ -25,6 +29,20 @@ export function AddTorrent(magnetLink) {
     return $typingPromise;
 }
 
+/**
+ * @param {string} link
+ * @returns {Promise<$models.Source> & { cancel(): void }}
+ */
+export function GetSource(link) {
+    let $resultPromise = /** @type {any} */($Call.ByID(3587831512, link));
+    let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
+        return $$createType2($result);
+    }));
+    $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
+    return $typingPromise;
+}
+
 // Private type creation functions
 const $$createType0 = torrent$0.Torrent.createFrom;
 const $$createType1 = $Create.Nullable($$createType0);
+const $$createType2 = $models.Source.createFrom;

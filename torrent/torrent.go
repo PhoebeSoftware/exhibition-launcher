@@ -2,6 +2,7 @@ package torrent
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 
@@ -13,10 +14,10 @@ type DownloadData struct {
 	Progress int
 	Speed    int
 }
-
 type Manager struct {
-	client *torrent.Client
-	games  map[string]DownloadData
+	client     *torrent.Client
+	games      map[string]DownloadData
+	httpClient *http.Client
 }
 
 // start client en geef manager zodat je makkelijk kan bedienen zawg
@@ -26,7 +27,7 @@ func StartClient(path string) *Manager {
 		fmt.Println("Error creating downloads directory")
 	}
 
-	clientConfig := torrent.NewDefaultClientConfig();
+	clientConfig := torrent.NewDefaultClientConfig()
 	clientConfig.DataDir = path
 	client, err := torrent.NewClient(clientConfig)
 
@@ -34,7 +35,11 @@ func StartClient(path string) *Manager {
 		fmt.Println("Error starting torrent client")
 	}
 
-	return &Manager{client: client, games: make(map[string]DownloadData)}
+	return &Manager{
+		client:     client,
+		games:      make(map[string]DownloadData),
+		httpClient: &http.Client{},
+	}
 }
 
 // add download
