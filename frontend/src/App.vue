@@ -51,6 +51,7 @@ body {
 
 #app {
   height: 100%;
+  background-color: rgb(25, 24, 24);
   width: 100%;
 }
 
