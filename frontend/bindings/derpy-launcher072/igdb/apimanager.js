@@ -14,8 +14,8 @@ import * as $models from "./models.js";
  * @param {number} coverID
  * @returns {Promise<string> & { cancel(): void }}
  */
-export function GetCovers(coverID) {
-    let $resultPromise = /** @type {any} */($Call.ByID(2493796081, coverID));
+export function GetCover(coverID) {
+    let $resultPromise = /** @type {any} */($Call.ByID(2756693912, coverID));
     return $resultPromise;
 }
 

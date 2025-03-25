@@ -59,6 +59,7 @@
 
 <script>
 import {Library} from '../../bindings/derpy-launcher072/library';
+import router from "@/router.js";
 
 export default {
     name: 'LibraryPage',
@@ -73,6 +74,7 @@ export default {
     methods: {
         addGame() {
             Library.AddToLibrary(119133).catch(console.warn); // ELDEN RING ID
+            this.router.go()
         },
 
         openGameStore(gameId) {

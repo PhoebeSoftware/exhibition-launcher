@@ -41,7 +41,7 @@ func NewAPI() *APIManager {
 	return &APIManager{client: &http.Client{}}
 }
 
-func (a *APIManager) GetCovers(coverID int) (string, error) {
+func (a *APIManager) GetCover(coverID int) (string, error) {
 	header := fmt.Sprintf(`fields image_id; where id = %d;`, coverID)
 	var result string
 
@@ -104,7 +104,7 @@ func (a *APIManager) GetGameData(id int) (ApiGame, error) {
 	}
 
 	firstGameData := gameDataList[0]
-	imageUrl, err := a.GetCovers(firstGameData.CoverID)
+	imageUrl, err := a.GetCover(firstGameData.CoverID)
 	if err != nil {
 		// return game without cover
 		return firstGameData, err
