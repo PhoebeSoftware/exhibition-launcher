@@ -83,7 +83,8 @@ func main() {
 		debridClient = realdebrid.NewRealDebridClient(settings.RealDebridSettings.DebridToken)
 	}
 
-	for id, game := range libraryManager.Games {
+	// This code is for refetching covers and banners but it will slow down startup
+/*	for id, game := range libraryManager.Games {
 		gameData, err := apiManager.GetGameData(game.IGDBID)
 		if err != nil {
 			fmt.Println("Error fetching data for game:", game.IGDBID, err)
@@ -94,7 +95,7 @@ func main() {
 		game.MainCover = gameData.MainCover
 		libraryManager.Games[id] = game
 	}
-
+*/
 	//torrentManager = torrent.StartClient(settings.DownloadPath)
 
 	//go func() {
