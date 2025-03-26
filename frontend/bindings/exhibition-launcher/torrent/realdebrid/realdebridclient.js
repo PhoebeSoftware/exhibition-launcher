@@ -15,7 +15,7 @@ import * as $models from "./models.js";
  * @returns {Promise<$models.AddMagnetResponse> & { cancel(): void }}
  */
 export function AddTorrentByMagnet(magnetLink) {
-    let $resultPromise = /** @type {any} */($Call.ByID(4152170002, magnetLink));
+    let $resultPromise = /** @type {any} */($Call.ByID(3871769746, magnetLink));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
         return $$createType0($result);
     }));
@@ -27,7 +27,7 @@ export function AddTorrentByMagnet(magnetLink) {
  * @returns {Promise<$models.AvailableHost[]> & { cancel(): void }}
  */
 export function AvailableHosts() {
-    let $resultPromise = /** @type {any} */($Call.ByID(3101348416));
+    let $resultPromise = /** @type {any} */($Call.ByID(2761054400));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
         return $$createType2($result);
     }));
@@ -41,7 +41,7 @@ export function AvailableHosts() {
  * @returns {Promise<void> & { cancel(): void }}
  */
 export function DownloadByMagnet(magnetLink, path) {
-    let $resultPromise = /** @type {any} */($Call.ByID(4183758213, magnetLink, path));
+    let $resultPromise = /** @type {any} */($Call.ByID(717111301, magnetLink, path));
     return $resultPromise;
 }
 
@@ -51,7 +51,7 @@ export function DownloadByMagnet(magnetLink, path) {
  * @returns {Promise<void> & { cancel(): void }}
  */
 export function DownloadDirectLink(link, filePath) {
-    let $resultPromise = /** @type {any} */($Call.ByID(1361205039, link, filePath));
+    let $resultPromise = /** @type {any} */($Call.ByID(1080804783, link, filePath));
     return $resultPromise;
 }
 
@@ -60,7 +60,7 @@ export function DownloadDirectLink(link, filePath) {
  * @returns {Promise<number> & { cancel(): void }}
  */
 export function GetDiskSizeOfAllLinks(unrestrictResponses) {
-    let $resultPromise = /** @type {any} */($Call.ByID(2173057463, unrestrictResponses));
+    let $resultPromise = /** @type {any} */($Call.ByID(994908471, unrestrictResponses));
     return $resultPromise;
 }
 
@@ -68,7 +68,7 @@ export function GetDiskSizeOfAllLinks(unrestrictResponses) {
  * @returns {Promise<$models.DownloadItem[]> & { cancel(): void }}
  */
 export function GetDownloads() {
-    let $resultPromise = /** @type {any} */($Call.ByID(229522759));
+    let $resultPromise = /** @type {any} */($Call.ByID(4283940807));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
         return $$createType4($result);
     }));
@@ -80,7 +80,7 @@ export function GetDownloads() {
  * @returns {Promise<$models.Torrent[]> & { cancel(): void }}
  */
 export function GetTorents() {
-    let $resultPromise = /** @type {any} */($Call.ByID(327308577));
+    let $resultPromise = /** @type {any} */($Call.ByID(4269175713));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
         return $$createType6($result);
     }));
@@ -93,7 +93,7 @@ export function GetTorents() {
  * @returns {Promise<$models.Torrent> & { cancel(): void }}
  */
 export function GetTorrentInfoById(id) {
-    let $resultPromise = /** @type {any} */($Call.ByID(2745584388, id));
+    let $resultPromise = /** @type {any} */($Call.ByID(2465184132, id));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
         return $$createType5($result);
     }));
@@ -105,7 +105,7 @@ export function GetTorrentInfoById(id) {
  * @returns {Promise<{ [_: string]: $models.TrafficInfo }> & { cancel(): void }}
  */
 export function GetTraffic() {
-    let $resultPromise = /** @type {any} */($Call.ByID(3157381907));
+    let $resultPromise = /** @type {any} */($Call.ByID(2804281747));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
         return $$createType8($result);
     }));
@@ -118,7 +118,7 @@ export function GetTraffic() {
  * @returns {Promise<$models.RealDebridUser | null> & { cancel(): void }}
  */
 export function GetUser() {
-    let $resultPromise = /** @type {any} */($Call.ByID(1276040153));
+    let $resultPromise = /** @type {any} */($Call.ByID(1335467865));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
         return $$createType10($result);
     }));
@@ -132,7 +132,7 @@ export function GetUser() {
  * @returns {Promise<void> & { cancel(): void }}
  */
 export function SelectFiles(torrent) {
-    let $resultPromise = /** @type {any} */($Call.ByID(2036866405, torrent));
+    let $resultPromise = /** @type {any} */($Call.ByID(3618906341, torrent));
     return $resultPromise;
 }
 
@@ -141,7 +141,7 @@ export function SelectFiles(torrent) {
  * @returns {Promise<boolean> & { cancel(): void }}
  */
 export function UnrestrictCheck(link) {
-    let $resultPromise = /** @type {any} */($Call.ByID(1189658243, link));
+    let $resultPromise = /** @type {any} */($Call.ByID(3637606915, link));
     return $resultPromise;
 }
 
@@ -150,7 +150,7 @@ export function UnrestrictCheck(link) {
  * @returns {Promise<$models.UnrestrictResponse> & { cancel(): void }}
  */
 export function UnrestrictLink(link) {
-    let $resultPromise = /** @type {any} */($Call.ByID(277125621, link));
+    let $resultPromise = /** @type {any} */($Call.ByID(4231798901, link));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
         return $$createType11($result);
     }));

@@ -15,7 +15,8 @@ type ApiGame struct {
 	Name        string `json:"name"`
 	Description string `json:"summary"`
 	CoverID     int    `json:"cover"`
-	MainCover string
+	MainCover   string
+	ArtworkIDList []int `json:"artworks"`
 }
 
 type APIManager struct {
@@ -41,44 +42,8 @@ func NewAPI() *APIManager {
 	return &APIManager{client: &http.Client{}}
 }
 
-func (a *APIManager) GetCover(coverID int) (string, error) {
-	header := fmt.Sprintf(`fields image_id; where id = %d;`, coverID)
-	var result string
-
-	request, err := http.NewRequest("POST", "https://api.igdb.com/v4/covers/", bytes.NewBuffer([]byte(header)))
-	if err != nil {
-		return result, err
-	}
-
-	SetupHeader(request)
-
-	response, err := a.client.Do(request)
-	if err != nil {
-		return result, err
-	}
-	defer response.Body.Close()
-
-	var images []struct {
-		ImageID string `json:"image_id"`
-	}
-
-	jsonErr := json.NewDecoder(response.Body).Decode(&images)
-	if jsonErr != nil {
-		return result, err
-	}
-
-	if len(images) == 0 {
-		fmt.Printf("No covers found with ID %d\n", coverID)
-		return "", nil
-	}
-	imageID := images[0].ImageID
-
-	imageURL := fmt.Sprintf("https://images.igdb.com/igdb/image/upload/t_cover_big/%s.jpg", imageID)
-	return imageURL, nil
-}
-
 func (a *APIManager) GetGameData(id int) (ApiGame, error) {
-	header := fmt.Sprintf(`fields id, name, summary, cover; where id = %d;`, id)
+	header := fmt.Sprintf(`fields id, name, summary, cover, artworks; where id = %d;`, id)
 
 	request, err := http.NewRequest("POST", "https://api.igdb.com/v4/games/", bytes.NewBuffer([]byte(header)))
 	if err != nil {

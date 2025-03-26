@@ -1,7 +1,7 @@
 package realdebrid
 
 import (
-	"derpy-launcher072/utils"
+	"exhibition-launcher/utils"
 	"fmt"
 	"github.com/schollz/progressbar/v3"
 	"github.com/wailsapp/wails/v3/pkg/application"

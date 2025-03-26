@@ -11,6 +11,6 @@ import {Call as $Call, Create as $Create} from "@wailsio/runtime";
  * @returns {Promise<string> & { cancel(): void }}
  */
 export function Join(...path) {
-    let $resultPromise = /** @type {any} */($Call.ByID(2583737200, path));
+    let $resultPromise = /** @type {any} */($Call.ByID(331722480, path));
     return $resultPromise;
 }

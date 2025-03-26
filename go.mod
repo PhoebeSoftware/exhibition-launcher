@@ -1,4 +1,4 @@
-module derpy-launcher072
+module exhibition-launcher
 
 go 1.23.0
 

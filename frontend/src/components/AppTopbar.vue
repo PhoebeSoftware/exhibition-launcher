@@ -20,7 +20,8 @@
 </template>
 
 <script>
-import { Close, Maximize, Minimize } from '../../bindings/derpy-launcher072/windowservice';
+
+import {Close, Maximize, Minimize} from "../../bindings/exhibition-launcher/windowservice.js";
 
 export default {
     name: 'AppTopbar',

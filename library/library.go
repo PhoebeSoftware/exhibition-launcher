@@ -1,8 +1,8 @@
 package library
 
 import (
-	"derpy-launcher072/igdb"
 	"encoding/json"
+	"exhibition-launcher/igdb"
 	"fmt"
 	"io"
 	"log"

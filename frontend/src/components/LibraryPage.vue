@@ -58,8 +58,8 @@
 </template>
 
 <script>
-import {Library} from '../../bindings/derpy-launcher072/library';
 import router from "@/router.js";
+import {Library} from "../../bindings/exhibition-launcher/library/index.js";
 
 export default {
     name: 'LibraryPage',

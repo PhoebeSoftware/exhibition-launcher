@@ -11,11 +11,19 @@ import {Call as $Call, Create as $Create} from "@wailsio/runtime";
 import * as $models from "./models.js";
 
 /**
+ * @returns {Promise<void> & { cancel(): void }}
+ */
+export function GetArtwork() {
+    let $resultPromise = /** @type {any} */($Call.ByID(1948019575));
+    return $resultPromise;
+}
+
+/**
  * @param {number} coverID
  * @returns {Promise<string> & { cancel(): void }}
  */
 export function GetCover(coverID) {
-    let $resultPromise = /** @type {any} */($Call.ByID(2756693912, coverID));
+    let $resultPromise = /** @type {any} */($Call.ByID(396091928, coverID));
     return $resultPromise;
 }
 
@@ -24,7 +32,7 @@ export function GetCover(coverID) {
  * @returns {Promise<$models.ApiGame> & { cancel(): void }}
  */
 export function GetGameData(id) {
-    let $resultPromise = /** @type {any} */($Call.ByID(511432535, id));
+    let $resultPromise = /** @type {any} */($Call.ByID(3048522455, id));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
         return $$createType0($result);
     }));
@@ -37,7 +45,7 @@ export function GetGameData(id) {
  * @returns {Promise<$models.ApiGame[]> & { cancel(): void }}
  */
 export function GetGames(query) {
-    let $resultPromise = /** @type {any} */($Call.ByID(195213204, query));
+    let $resultPromise = /** @type {any} */($Call.ByID(2129578516, query));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
         return $$createType1($result);
     }));

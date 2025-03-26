@@ -1,15 +1,15 @@
 package main
 
 import (
-	"derpy-launcher072/igdb"
-	"derpy-launcher072/library"
-	"derpy-launcher072/torrent"
-	"derpy-launcher072/torrent/realdebrid"
-	"derpy-launcher072/utils"
-	"derpy-launcher072/utils/jsonUtils"
-	"derpy-launcher072/utils/jsonUtils/jsonModels"
 	"embed"
 	"errors"
+	"exhibition-launcher/igdb"
+	"exhibition-launcher/library"
+	"exhibition-launcher/torrent"
+	"exhibition-launcher/torrent/realdebrid"
+	"exhibition-launcher/utils"
+	"exhibition-launcher/utils/jsonUtils"
+	"exhibition-launcher/utils/jsonUtils/jsonModels"
 	"fmt"
 	"log"
 	"path/filepath"
@@ -26,6 +26,7 @@ var libraryManager *library.Library
 var apiManager *igdb.APIManager
 var torrentManager *torrent.Manager
 var debridClient *realdebrid.RealDebridClient
+
 //go:embed all:frontend/dist
 var assets embed.FS
 
@@ -125,7 +126,6 @@ func main() {
 		URL:              "/",
 	}
 
-
 	services := []application.Service{
 		//application.NewService(torrentManager),
 		application.NewService(apiManager),
@@ -141,7 +141,7 @@ func main() {
 	}
 
 	appOptions := application.Options{
-		Name: "Exhibition Launcher",
+		Name:     "Exhibition Launcher",
 		Services: services,
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),

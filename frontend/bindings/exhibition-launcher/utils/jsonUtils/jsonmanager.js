@@ -10,7 +10,7 @@ import {Call as $Call, Create as $Create} from "@wailsio/runtime";
  * @returns {Promise<void> & { cancel(): void }}
  */
 export function Load() {
-    let $resultPromise = /** @type {any} */($Call.ByID(4000447524));
+    let $resultPromise = /** @type {any} */($Call.ByID(2292047524));
     return $resultPromise;
 }
 
@@ -18,6 +18,6 @@ export function Load() {
  * @returns {Promise<void> & { cancel(): void }}
  */
 export function Save() {
-    let $resultPromise = /** @type {any} */($Call.ByID(2430730821));
+    let $resultPromise = /** @type {any} */($Call.ByID(722330821));
     return $resultPromise;
 }

@@ -9,9 +9,10 @@
 
 <script setup>
 
-import {RealDebridClient} from "../../bindings/derpy-launcher072/torrent/realdebrid/index.js";
-import {Settings} from "../../bindings/derpy-launcher072/utils/jsonUtils/jsonModels/index.js";
-import {PathUtil} from "../../bindings/derpy-launcher072/utils/index.js";
+
+import {Settings} from "../../bindings/exhibition-launcher/utils/jsonUtils/jsonModels/index.js";
+import {PathUtil} from "../../bindings/exhibition-launcher/utils/index.js";
+import {RealDebridClient} from "../../bindings/exhibition-launcher/torrent/realdebrid/index.js";
 
 async function addTorrentByMagnet() {
     let magnetLinkHollowKnight = "magnet:?xt=urn:btih:D738F320446AEB504C80904F670B0615D04D5C6C&dn=Hollow+Knight+%28v1.5.68.11808+%2B+2+Bonus+OSTs%2C+MULTi10%29+%5BFitGirl+Repack%2C+Selective+Download+-+from+814+MB%5D&tr=udp%3A%2F%2F46.148.18.250%3A2710&tr=udp%3A%2F%2Fopentor.org%3A2710&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=http%3A%2F%2Ftracker.dler.org%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2F9.rarbg.me%3A2730%2Fannounce&tr=udp%3A%2F%2F9.rarbg.to%3A2770%2Fannounce&tr=udp%3A%2F%2Ftracker.pirateparty.gr%3A6969%2Fannounce&tr=http%3A%2F%2Fretracker.local%2Fannounce&tr=http%3A%2F%2Fretracker.ip.ncnet.ru%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&tr=udp%3A%2F%2Fipv4.tracker.harry.lu%3A80%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fcoppersurfer.tk%3A6969%2Fannounce"

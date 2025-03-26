@@ -11,35 +11,24 @@ import {Call as $Call, Create as $Create} from "@wailsio/runtime";
 import * as $models from "./models.js";
 
 /**
- * @param {number} igdbId
  * @returns {Promise<void> & { cancel(): void }}
  */
-export function AddToLibrary(igdbId) {
-    let $resultPromise = /** @type {any} */($Call.ByID(174990277, igdbId));
+export function DefaultValues() {
+    let $resultPromise = /** @type {any} */($Call.ByID(1276170116));
     return $resultPromise;
 }
 
 /**
- * @returns {Promise<{ [_: `${number}`]: $models.Game }> & { cancel(): void }}
+ * @returns {Promise<$models.Settings> & { cancel(): void }}
  */
-export function GetAllGames() {
-    let $resultPromise = /** @type {any} */($Call.ByID(964106974));
+export function GetSettings() {
+    let $resultPromise = /** @type {any} */($Call.ByID(3206566826));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
-        return $$createType1($result);
+        return $$createType0($result);
     }));
     $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
     return $typingPromise;
 }
 
-/**
- * @param {number} igdbId
- * @returns {Promise<boolean> & { cancel(): void }}
- */
-export function StartApp(igdbId) {
-    let $resultPromise = /** @type {any} */($Call.ByID(1893788683, igdbId));
-    return $resultPromise;
-}
-
 // Private type creation functions
-const $$createType0 = $models.Game.createFrom;
-const $$createType1 = $Create.Map($Create.Any, $$createType0);
+const $$createType0 = $models.Settings.createFrom;
