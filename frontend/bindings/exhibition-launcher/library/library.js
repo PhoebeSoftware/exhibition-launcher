@@ -12,11 +12,15 @@ import * as $models from "./models.js";
 
 /**
  * @param {number} igdbId
- * @returns {Promise<void> & { cancel(): void }}
+ * @returns {Promise<$models.Game> & { cancel(): void }}
  */
 export function AddToLibrary(igdbId) {
     let $resultPromise = /** @type {any} */($Call.ByID(2567495237, igdbId));
-    return $resultPromise;
+    let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
+        return $$createType0($result);
+    }));
+    $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
+    return $typingPromise;
 }
 
 /**

@@ -63,6 +63,7 @@
 <script>
 import router from "@/router.js";
 import {Library} from "../../bindings/exhibition-launcher/library/index.js";
+import {onMounted} from "vue";
 
 export default {
     name: 'LibraryPage',
@@ -75,9 +76,9 @@ export default {
         };
     },
     methods: {
-        addGame() {
-            Library.AddToLibrary(119133).catch(console.warn); // ELDEN RING ID
-            this.router.go()
+        async addGame() {
+            let newGame = await Library.AddToLibrary(119133).catch(console.warn); // ELDEN RING ID
+            this.games.push(newGame)
         },
 
         openGameStore(game) {

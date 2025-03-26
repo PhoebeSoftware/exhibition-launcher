@@ -86,26 +86,27 @@ func (lib *Library) GetAllGames() map[int]Game {
 	return lib.Games
 }
 
-func (lib *Library) AddToLibrary(igdbId int) error {
+func (lib *Library) AddToLibrary(igdbId int) (Game, error) {
 	// prompt executable location
+	var game Game
 	executable, err := dialog.File().Title("Select game executable").Filter("Executable files", "exe", "app", "ink", "bat").Load()
 	if err != nil {
-		return fmt.Errorf("failed to select executable: %w", err)
+		return game, fmt.Errorf("failed to select executable: %w", err)
 	}
 
 	// game data
 	gameData, err := lib.APIManager.GetGameData(igdbId)
 	if err != nil {
-		return err
+		return game, err
 	}
 	fmt.Println("Game data:")
 	fmt.Println(gameData)
 	if gameData.Name == "" {
-		return fmt.Errorf("failed to get game data")
+		return game, fmt.Errorf("failed to get game data")
 	}
 
 	// Append the new game
-	game := Game{
+	game = Game{
 		IGDBID:      igdbId,
 		Name:        gameData.Name,
 		Description: gameData.Description,
@@ -122,16 +123,16 @@ func (lib *Library) AddToLibrary(igdbId int) error {
 	// Marshal the entire library to JSON
 	jsonData, err := json.Marshal(lib)
 	if err != nil {
-		return fmt.Errorf("failed to marshal library: %w", err)
+		return game, fmt.Errorf("failed to marshal library: %w", err)
 	}
 
 	// Write to file
 	err = os.WriteFile("library.json", jsonData, 0644)
 	if err != nil {
-		return fmt.Errorf("failed to write library file: %w", err)
+		return game, fmt.Errorf("failed to write library file: %w", err)
 	}
 
-	return nil
+	return game, nil
 }
 
 func (lib *Library) StartApp(igdbId int) bool {
