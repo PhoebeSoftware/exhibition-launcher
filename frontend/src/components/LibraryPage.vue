@@ -73,7 +73,7 @@ export default {
     },
     methods: {
         addGame() {
-            Library.AddToLibrary(119133).catch(console.warn); // ELDEN RING ID
+            Library.AddToLibrary(11544).catch(console.warn); // ELDEN RING ID
             this.router.go()
         },
 
