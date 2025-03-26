@@ -27,7 +27,7 @@
 
             <div class="game-library-container">
                 <div class="game-library-game-box" v-for="game in games" :key="game.igdb_id"
-                     @click="openGameStore(game)"
+                     @click="openGamePage(game)"
                      :style="{ backgroundImage: `url(${game.MainCover})`}">
                     <div class="game-box-info">
                         <div class="text-container">
@@ -55,6 +55,44 @@
                     <p>This is a placeholder for game #{{ selectedGame.igdb_id }}</p>
                     <p>Store page content will be implemented later</p>
                 </div>
+            </div>
+        </div>
+
+        <!-- Game Page -->
+        <div v-if="currentPage === 'game'" class="game-page">
+            <div class="game-page-image-container" :style="{ backgroundImage: `url(${selectedGame.Banners[0]})` }">
+                <div class="game-user-stats">
+                    <div class="game-user-stats-left">
+                        <button @click="launchGame">
+                            <i class="fa-solid fa-play"></i>PLAY
+                        </button>
+                        <div class="last-played-wrapper">
+                            <h1>Last played</h1>
+                            <p>{{ selectedGame.lastPlayed || 'Never' }}</p>
+                        </div>
+                        <div class="play-time-wrapper">
+                            <h1>Play time</h1>
+                            <p>{{ selectedGame.playTime || '0 hours' }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="game-options-wrapper">
+                        <button @click="openGameSettings">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
+    
+                        <button @click="toggleFavorite">
+                            <i :class="selectedGame.isFavorite ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="game-page-content">
+                <button class="back-button" @click="returnToLibrary">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Library
+                </button>
+                <!-- Add more game details here as needed -->
             </div>
         </div>
     </div>
@@ -88,6 +126,30 @@ export default {
             game.Banners.forEach((banner) => {
                 console.log(banner)
             })
+        },
+
+        openGamePage(game) {
+            this.selectedGame = game;
+            this.currentPage = 'game';
+            console.log(`Opening game page for game ${game.igdb_id}`);
+        },
+
+        launchGame() {
+            // Implement game launch logic
+            console.log(`Launching game ${this.selectedGame.igdb_id}`);
+        },
+
+        openGameSettings() {
+            // Implement game settings logic
+            console.log(`Opening settings for game ${this.selectedGame.igdb_id}`);
+        },
+
+        toggleFavorite() {
+            // Toggle favorite status
+            if (this.selectedGame) {
+                this.selectedGame.isFavorite = !this.selectedGame.isFavorite;
+                console.log(`Favorite status for game ${this.selectedGame.igdb_id}: ${this.selectedGame.isFavorite}`);
+            }
         },
 
         returnToLibrary() {
@@ -239,9 +301,9 @@ export default {
     position: relative;
     cursor: pointer;
     transition: transform 0.3s ease;
-    background-position: center; /* Center the image */
-    background-repeat: no-repeat; /* Do not repeat the image */
-    background-size: cover; /* Resize the background image to cover the entire container */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .game-library-game-box[style*="display: none"] {
@@ -299,7 +361,7 @@ export default {
     cursor: pointer;
 }
 
-/* New store page styles */
+/* Game Store Page Styles */
 .game-store-page {
     width: 100%;
     height: 100%;
@@ -307,6 +369,118 @@ export default {
 
 .game-store-header {
     margin-bottom: 20px;
+}
+
+.game-store-content {
+    padding: 20px;
+    background-color: var(--hover-background-color);
+    border-radius: 15px;
+}
+
+.game-store-banner {
+    height: 520px;
+    width: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Game Page Styles */
+.game-page {
+    position: relative;
+    width: 100%;
+    background-color: var(--background-color);
+}
+
+.game-page-content {
+    padding: 20px;
+}
+
+.game-page-image-container {
+    width: 100%;
+    height: 300px;
+    background-color: rgb(35, 35, 35);
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+    display: flex;
+    align-items: end;
+}
+
+.game-user-stats {
+    position: sticky;
+    top: 100px;
+    width: 100%;
+    backdrop-filter: blur(10px);
+    background: linear-gradient(
+        to bottom, 
+        rgba(25, 25, 25, 0.6) 0%,
+        rgba(25, 25, 25, 0.8) 50%,
+        rgba(25, 25, 25, 1) 100%
+    );
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start; 
+    justify-content: space-between;
+    padding: 10px 20px;
+    gap: 10px;
+}
+
+.game-user-stats p {
+    color: var(--secondary-text-color);
+}
+
+.last-played-wrapper {
+    display: flex;
+    flex-direction: column;
+    color: var(--text-color);
+    font-size: 12px;
+}
+
+.play-time-wrapper {
+    font-size: 12px;
+    display: flex;
+    flex-direction: column; 
+    color: var(--text-color);
+}
+
+.game-user-stats-left {
+    display: flex;
+    gap: 20px;
+    flex-direction: row;
+    align-items: center;
+}
+
+.game-user-stats-left button {
+    cursor: pointer;
+    padding: 15px 40px;
+    border: 0;
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 10px;
+}
+
+.game-options-wrapper {
+    display: flex;
+    gap: 10px;
+}
+
+.game-options-wrapper button {
+    background: none;
+    border: none;
+    color: var(--secondary-text-color);
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 15px;
+    background-color: var(--hover-background-color);
+    border: 1px solid var(--outline);
+    transition: all 0.2s ease;
+}
+
+.game-options-wrapper button:hover {
+    color: var(--text-color);
 }
 
 .back-button {
@@ -323,18 +497,5 @@ export default {
 
 .back-button:hover {
     color: var(--text-color);
-}
-
-.game-store-content {
-    padding: 20px;
-    background-color: var(--hover-background-color);
-    border-radius: 15px;
-}
-.game-store-banner {
-    height: 520px;
-    width: 100%;
-    background-position: center; /* Center the image */
-    background-repeat: no-repeat; /* Do not repeat the image */
-    background-size: cover; /* Resize the background image to cover the entire container */
 }
 </style>
