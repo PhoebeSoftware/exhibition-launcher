@@ -75,12 +75,12 @@ export class Game {
              */
             this["MainCover"] = "";
         }
-        if (!("Banner" in $$source)) {
+        if (!("Banners" in $$source)) {
             /**
              * @member
-             * @type {string}
+             * @type {string[]}
              */
-            this["Banner"] = "";
+            this["Banners"] = [];
         }
 
         Object.assign(this, $$source);
@@ -93,9 +93,13 @@ export class Game {
      */
     static createFrom($$source = {}) {
         const $$createField4_0 = $$createType0;
+        const $$createField9_0 = $$createType1;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("achievments" in $$parsedSource) {
             $$parsedSource["achievments"] = $$createField4_0($$parsedSource["achievments"]);
+        }
+        if ("Banners" in $$parsedSource) {
+            $$parsedSource["Banners"] = $$createField9_0($$parsedSource["Banners"]);
         }
         return new Game(/** @type {Partial<Game>} */($$parsedSource));
     }
@@ -103,3 +107,4 @@ export class Game {
 
 // Private type creation functions
 const $$createType0 = $Create.Array($Create.Any);
+const $$createType1 = $Create.Array($Create.Any);

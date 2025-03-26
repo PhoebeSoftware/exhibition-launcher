@@ -39,6 +39,6 @@ func (a *APIManager) GetCover(coverID int) (string, error) {
 	}
 	imageID := images[0].ImageID
 
-	imageURL := fmt.Sprintf("https://images.igdb.com/igdb/image/upload/t_cover_big/%s.jpg", imageID)
-	return imageURL, nil
+	result = fmt.Sprintf("https://images.igdb.com/igdb/image/upload/t_cover_big/%s.jpg", imageID)
+	return result, nil
 }

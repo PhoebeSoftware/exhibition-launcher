@@ -11,12 +11,16 @@ import {Call as $Call, Create as $Create} from "@wailsio/runtime";
 import * as $models from "./models.js";
 
 /**
- * @param {number} artworkID
- * @returns {Promise<string> & { cancel(): void }}
+ * @param {number[]} artworkIDs
+ * @returns {Promise<string[]> & { cancel(): void }}
  */
-export function GetArtworkURL(artworkID) {
-    let $resultPromise = /** @type {any} */($Call.ByID(680117968, artworkID));
-    return $resultPromise;
+export function GetArtworkURLs(artworkIDs) {
+    let $resultPromise = /** @type {any} */($Call.ByID(1944302233, artworkIDs));
+    let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
+        return $$createType0($result);
+    }));
+    $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
+    return $typingPromise;
 }
 
 /**
@@ -35,7 +39,7 @@ export function GetCover(coverID) {
 export function GetGameData(id) {
     let $resultPromise = /** @type {any} */($Call.ByID(3048522455, id));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
-        return $$createType0($result);
+        return $$createType1($result);
     }));
     $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
     return $typingPromise;
@@ -48,12 +52,13 @@ export function GetGameData(id) {
 export function GetGames(query) {
     let $resultPromise = /** @type {any} */($Call.ByID(2129578516, query));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
-        return $$createType1($result);
+        return $$createType2($result);
     }));
     $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
     return $typingPromise;
 }
 
 // Private type creation functions
-const $$createType0 = $models.ApiGame.createFrom;
-const $$createType1 = $Create.Array($$createType0);
+const $$createType0 = $Create.Array($Create.Any);
+const $$createType1 = $models.ApiGame.createFrom;
+const $$createType2 = $Create.Array($$createType1);

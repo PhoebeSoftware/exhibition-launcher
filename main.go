@@ -90,6 +90,7 @@ func main() {
 			continue
 		}
 
+		game.Banners = gameData.Banners
 		game.MainCover = gameData.MainCover
 		libraryManager.Games[id] = game
 	}

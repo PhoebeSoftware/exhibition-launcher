@@ -50,9 +50,11 @@
 
             <div class="game-store-content">
                 <h1>Game Store Page</h1>
-                <div class="game-store-banner" :style="{ backgroundImage: `url(${selectedGame.Banner})`}"></div>
-                <p>This is a placeholder for game #{{ selectedGame.igdb_id }}</p>
-                <p>Store page content will be implemented later</p>
+                <div v-for="banner in selectedGame.Banners">
+                    <div class="game-store-banner" :style="{ backgroundImage: `url(${banner})`}"></div>
+                    <p>This is a placeholder for game #{{ selectedGame.igdb_id }}</p>
+                    <p>Store page content will be implemented later</p>
+                </div>
             </div>
         </div>
     </div>
@@ -74,7 +76,7 @@ export default {
     },
     methods: {
         addGame() {
-            Library.AddToLibrary(125174).catch(console.warn); // ELDEN RING ID
+            Library.AddToLibrary(119133).catch(console.warn); // ELDEN RING ID
             this.router.go()
         },
 
@@ -82,6 +84,9 @@ export default {
             this.selectedGame = game;
             this.currentPage = 'store';
             console.log(`Opening store page for game ${game.igdb_id}`);
+            game.Banners.forEach((banner) => {
+                console.log(banner)
+            })
         },
 
         returnToLibrary() {

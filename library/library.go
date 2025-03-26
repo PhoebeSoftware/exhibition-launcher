@@ -24,7 +24,7 @@ type Game struct {
 	Running     bool   `json:"running"`
 	Favorite    bool   `json:"favorite"`
 	MainCover   string
-	Banner      string
+	Banners      []string
 }
 
 type Library struct {
@@ -115,7 +115,7 @@ func (lib *Library) AddToLibrary(igdbId int) error {
 		Running:     false,
 		Favorite:    false,
 		MainCover:   gameData.MainCover,
-		Banner: gameData.Banner,
+		Banners: gameData.Banners,
 	}
 	lib.Games[igdbId] = game
 
