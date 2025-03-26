@@ -17,6 +17,7 @@ type ApiGame struct {
 	CoverID     int    `json:"cover"`
 	MainCover   string
 	ArtworkIDList []int `json:"artworks"`
+	Banner string
 }
 
 type APIManager struct {
@@ -69,12 +70,18 @@ func (a *APIManager) GetGameData(id int) (ApiGame, error) {
 	}
 
 	firstGameData := gameDataList[0]
-	imageUrl, err := a.GetCover(firstGameData.CoverID)
+	coverImageUrl, err := a.GetCover(firstGameData.CoverID)
 	if err != nil {
 		// return game without cover
 		return firstGameData, err
 	}
-	firstGameData.MainCover = imageUrl
+	firstGameData.MainCover = coverImageUrl
+	bannerImageUrl, err := a.GetArtworkURL(firstGameData.ArtworkIDList[0])
+	if err != nil {
+		// return game without cover
+		return firstGameData, err
+	}
+	firstGameData.Banner = bannerImageUrl
 
 	return firstGameData, nil
 }

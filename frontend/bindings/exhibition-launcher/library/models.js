@@ -75,6 +75,13 @@ export class Game {
              */
             this["MainCover"] = "";
         }
+        if (!("Banner" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["Banner"] = "";
+        }
 
         Object.assign(this, $$source);
     }

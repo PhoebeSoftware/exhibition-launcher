@@ -54,6 +54,13 @@ export class ApiGame {
              */
             this["artworks"] = [];
         }
+        if (!("Banner" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["Banner"] = "";
+        }
 
         Object.assign(this, $$source);
     }

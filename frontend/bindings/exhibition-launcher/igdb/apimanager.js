@@ -11,10 +11,11 @@ import {Call as $Call, Create as $Create} from "@wailsio/runtime";
 import * as $models from "./models.js";
 
 /**
- * @returns {Promise<void> & { cancel(): void }}
+ * @param {number} artworkID
+ * @returns {Promise<string> & { cancel(): void }}
  */
-export function GetArtwork() {
-    let $resultPromise = /** @type {any} */($Call.ByID(1948019575));
+export function GetArtworkURL(artworkID) {
+    let $resultPromise = /** @type {any} */($Call.ByID(680117968, artworkID));
     return $resultPromise;
 }
 

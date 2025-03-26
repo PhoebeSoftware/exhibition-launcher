@@ -27,7 +27,7 @@
 
             <div class="game-library-container">
                 <div class="game-library-game-box" v-for="game in games" :key="game.igdb_id"
-                     @click="openGameStore(game.igdb_id)"
+                     @click="openGameStore(game)"
                      :style="{ backgroundImage: `url(${game.MainCover})`}">
                     <div class="game-box-info">
                         <div class="text-container">
@@ -50,7 +50,8 @@
 
             <div class="game-store-content">
                 <h1>Game Store Page</h1>
-                <p>This is a placeholder for game #{{ selectedGameId }}</p>
+                <div class="game-store-banner" :style="{ backgroundImage: `url(${selectedGame.Banner})`}"></div>
+                <p>This is a placeholder for game #{{ selectedGame.igdb_id }}</p>
                 <p>Store page content will be implemented later</p>
             </div>
         </div>
@@ -68,19 +69,19 @@ export default {
         return {
             games: [],
             currentPage: 'library',
-            selectedGameId: null
+            selectedGame: null
         };
     },
     methods: {
         addGame() {
-            Library.AddToLibrary(11544).catch(console.warn); // ELDEN RING ID
+            Library.AddToLibrary(125174).catch(console.warn); // ELDEN RING ID
             this.router.go()
         },
 
-        openGameStore(gameId) {
-            this.selectedGameId = gameId;
+        openGameStore(game) {
+            this.selectedGame = game;
             this.currentPage = 'store';
-            console.log(`Opening store page for game ${gameId}`);
+            console.log(`Opening store page for game ${game.igdb_id}`);
         },
 
         returnToLibrary() {
@@ -322,5 +323,12 @@ export default {
     padding: 20px;
     background-color: var(--hover-background-color);
     border-radius: 15px;
+}
+.game-store-banner {
+    height: 520px;
+    width: 100%;
+    background-position: center; /* Center the image */
+    background-repeat: no-repeat; /* Do not repeat the image */
+    background-size: cover; /* Resize the background image to cover the entire container */
 }
 </style>
