@@ -63,7 +63,7 @@
             <div class="game-page-image-container" :style="{ backgroundImage: `url(${selectedGame.Banners[0]})` }">
                 <div class="game-user-stats">
                     <div class="game-user-stats-left">
-                        <button @click="launchGame">
+                        <button @click="launchGame(selectedGame)">
                             <i class="fa-solid fa-play"></i>PLAY
                         </button>
                         <div class="last-played-wrapper">
@@ -134,9 +134,11 @@ export default {
             console.log(`Opening game page for game ${game.igdb_id}`);
         },
 
-        launchGame() {
+        launchGame(game) {
             // Implement game launch logic
-            console.log(`Launching game ${this.selectedGame.igdb_id}`);
+            Library.StartApp(game.igdb_id).catch((err) => {
+                console.log(err)
+            })
         },
 
         openGameSettings() {

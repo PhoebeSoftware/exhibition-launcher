@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	"github.com/sqweek/dialog"
@@ -135,12 +136,19 @@ func (lib *Library) AddToLibrary(igdbId int) (Game, error) {
 	return game, nil
 }
 
-func (lib *Library) StartApp(igdbId int) bool {
+func (lib *Library) StartApp(igdbId int) error {
 	game := lib.Games[igdbId]
-
-	cmd := exec.Command(game.Executable)
+	var cmd *exec.Cmd
+	if runtime.GOOS == "darwin" {
+		cmd = exec.Command("open", game.Executable)
+	} else {
+		cmd = exec.Command(game.Executable)
+	}
 	cmd.Dir = filepath.Dir(game.Executable)
-	cmd.Start()
+	err := cmd.Start()
+	if err != nil {
+		return err
+	}
 
 	fmt.Printf("Started game with PID: %d\n", cmd.Process.Pid)
 
@@ -171,5 +179,5 @@ func (lib *Library) StartApp(igdbId int) bool {
 		}
 	}()
 
-	return true
+	return nil
 }

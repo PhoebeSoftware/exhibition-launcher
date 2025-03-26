@@ -37,7 +37,7 @@ export function GetAllGames() {
 
 /**
  * @param {number} igdbId
- * @returns {Promise<boolean> & { cancel(): void }}
+ * @returns {Promise<void> & { cancel(): void }}
  */
 export function StartApp(igdbId) {
     let $resultPromise = /** @type {any} */($Call.ByID(3828153995, igdbId));
