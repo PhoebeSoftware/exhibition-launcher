@@ -60,7 +60,8 @@
 
         <!-- Game Page -->
         <div v-if="currentPage === 'game'" class="game-page">
-            <div class="game-page-image-container" :style="{ backgroundImage: `url(${selectedGame.artwork_url_list[0]})` }">
+            <div class="game-page-image-container"
+                 :style="{ backgroundImage: `url(${getBackgroundImage()})` }">
                 <div class="game-user-stats">
                     <div class="game-user-stats-left">
                         <button @click="launchGame(selectedGame)">
@@ -114,6 +115,15 @@ export default {
         };
     },
     methods: {
+        getBackgroundImage() {
+            if (this.selectedGame.artwork_url_list && this.selectedGame.artwork_url_list.length > 0) {
+                return this.selectedGame.artwork_url_list[0];
+            } else if (this.selectedGame.screenshot_url_list && this.selectedGame.screenshot_url_list.length > 0) {
+                return this.selectedGame.screenshot_url_list[0];
+            } else {
+                return this.selectedGame.CoverURL;
+            }
+        },
         async addGame() {
             let newGame = await Library.AddToLibrary(119277).catch((err) => {
                 console.warn(err)
