@@ -61,6 +61,20 @@ export class ApiGame {
              */
             this["Banners"] = [];
         }
+        if (!("screenshots" in $$source)) {
+            /**
+             * @member
+             * @type {Image[]}
+             */
+            this["screenshots"] = [];
+        }
+        if (!("ScreenshotLinkList" in $$source)) {
+            /**
+             * @member
+             * @type {string[]}
+             */
+            this["ScreenshotLinkList"] = [];
+        }
 
         Object.assign(this, $$source);
     }
@@ -73,6 +87,8 @@ export class ApiGame {
     static createFrom($$source = {}) {
         const $$createField5_0 = $$createType0;
         const $$createField6_0 = $$createType1;
+        const $$createField7_0 = $$createType3;
+        const $$createField8_0 = $$createType1;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("artworks" in $$parsedSource) {
             $$parsedSource["artworks"] = $$createField5_0($$parsedSource["artworks"]);
@@ -80,10 +96,46 @@ export class ApiGame {
         if ("Banners" in $$parsedSource) {
             $$parsedSource["Banners"] = $$createField6_0($$parsedSource["Banners"]);
         }
+        if ("screenshots" in $$parsedSource) {
+            $$parsedSource["screenshots"] = $$createField7_0($$parsedSource["screenshots"]);
+        }
+        if ("ScreenshotLinkList" in $$parsedSource) {
+            $$parsedSource["ScreenshotLinkList"] = $$createField8_0($$parsedSource["ScreenshotLinkList"]);
+        }
         return new ApiGame(/** @type {Partial<ApiGame>} */($$parsedSource));
+    }
+}
+
+export class Image {
+    /**
+     * Creates a new Image instance.
+     * @param {Partial<Image>} [$$source = {}] - The source object to create the Image.
+     */
+    constructor($$source = {}) {
+        if (!("image_id" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["image_id"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new Image instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {Image}
+     */
+    static createFrom($$source = {}) {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new Image(/** @type {Partial<Image>} */($$parsedSource));
     }
 }
 
 // Private type creation functions
 const $$createType0 = $Create.Array($Create.Any);
 const $$createType1 = $Create.Array($Create.Any);
+const $$createType2 = Image.createFrom;
+const $$createType3 = $Create.Array($$createType2);

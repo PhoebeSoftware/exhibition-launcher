@@ -84,18 +84,19 @@ func main() {
 	}
 
 	// This code is for refetching covers and banners but it will slow down startup
-/*	for id, game := range libraryManager.Games {
+	for id, game := range libraryManager.Games {
 		gameData, err := apiManager.GetGameData(game.IGDBID)
 		if err != nil {
 			fmt.Println("Error fetching data for game:", game.IGDBID, err)
 			continue
 		}
 
-		game.Banners = gameData.Banners
 		game.MainCover = gameData.MainCover
+		game.ArtworkLinkList = gameData.ArtworkLinkList
+		game.ScreenshotLinkList = gameData.ScreenshotLinkList
 		libraryManager.Games[id] = game
 	}
-*/
+
 	//torrentManager = torrent.StartClient(settings.DownloadPath)
 
 	//go func() {

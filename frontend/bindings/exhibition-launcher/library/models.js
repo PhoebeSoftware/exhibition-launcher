@@ -82,6 +82,13 @@ export class Game {
              */
             this["Banners"] = [];
         }
+        if (!("ScreenshotLinkList" in $$source)) {
+            /**
+             * @member
+             * @type {string[]}
+             */
+            this["ScreenshotLinkList"] = [];
+        }
 
         Object.assign(this, $$source);
     }
@@ -94,12 +101,16 @@ export class Game {
     static createFrom($$source = {}) {
         const $$createField4_0 = $$createType0;
         const $$createField9_0 = $$createType1;
+        const $$createField10_0 = $$createType1;
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         if ("achievments" in $$parsedSource) {
             $$parsedSource["achievments"] = $$createField4_0($$parsedSource["achievments"]);
         }
         if ("Banners" in $$parsedSource) {
             $$parsedSource["Banners"] = $$createField9_0($$parsedSource["Banners"]);
+        }
+        if ("ScreenshotLinkList" in $$parsedSource) {
+            $$parsedSource["ScreenshotLinkList"] = $$createField10_0($$parsedSource["ScreenshotLinkList"]);
         }
         return new Game(/** @type {Partial<Game>} */($$parsedSource));
     }

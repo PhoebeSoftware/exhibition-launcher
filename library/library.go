@@ -24,8 +24,9 @@ type Game struct {
 	Executable  string `json:"executable"`
 	Running     bool   `json:"running"`
 	Favorite    bool   `json:"favorite"`
-	MainCover   string
-	Banners      []string
+	MainCover          string
+	ArtworkLinkList    []string `json:"artwork_link_list"`
+	ScreenshotLinkList []string `json:"screenshot_link_list"`
 }
 
 type Library struct {
@@ -108,16 +109,16 @@ func (lib *Library) AddToLibrary(igdbId int) (Game, error) {
 
 	// Append the new game
 	game = Game{
-		IGDBID:      igdbId,
-		Name:        gameData.Name,
-		Description: gameData.Description,
-		PlayTime:    0,
-		Achievments: []int{},
-		Executable:  executable,
-		Running:     false,
-		Favorite:    false,
-		MainCover:   gameData.MainCover,
-		Banners: gameData.Banners,
+		IGDBID:          igdbId,
+		Name:            gameData.Name,
+		Description:     gameData.Description,
+		PlayTime:        0,
+		Achievments:     []int{},
+		Executable:      executable,
+		Running:         false,
+		Favorite:        false,
+		MainCover:       gameData.MainCover,
+		ArtworkLinkList: gameData.ArtworkLinkList,
 	}
 	lib.Games[igdbId] = game
 
