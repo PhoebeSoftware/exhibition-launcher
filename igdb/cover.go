@@ -37,6 +37,7 @@ func (a *APIManager) GetCover(coverID int) (string, error) {
 		fmt.Printf("No covers found with ID %d\n", coverID)
 		return "", nil
 	}
+	// Grab the image ID of the first image out of the array
 	imageID := images[0].ImageID
 
 	result = fmt.Sprintf("https://images.igdb.com/igdb/image/upload/t_cover_big/%s.jpg", imageID)
