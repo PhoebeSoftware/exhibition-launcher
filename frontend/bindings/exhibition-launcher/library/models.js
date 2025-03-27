@@ -68,26 +68,26 @@ export class Game {
              */
             this["favorite"] = false;
         }
-        if (!("MainCover" in $$source)) {
+        if (!("cover_url" in $$source)) {
             /**
              * @member
              * @type {string}
              */
-            this["MainCover"] = "";
+            this["cover_url"] = "";
         }
-        if (!("Banners" in $$source)) {
+        if (!("artwork_url_list" in $$source)) {
             /**
              * @member
              * @type {string[]}
              */
-            this["Banners"] = [];
+            this["artwork_url_list"] = [];
         }
-        if (!("ScreenshotLinkList" in $$source)) {
+        if (!("screenshot_url_list" in $$source)) {
             /**
              * @member
              * @type {string[]}
              */
-            this["ScreenshotLinkList"] = [];
+            this["screenshot_url_list"] = [];
         }
 
         Object.assign(this, $$source);
@@ -106,11 +106,11 @@ export class Game {
         if ("achievments" in $$parsedSource) {
             $$parsedSource["achievments"] = $$createField4_0($$parsedSource["achievments"]);
         }
-        if ("Banners" in $$parsedSource) {
-            $$parsedSource["Banners"] = $$createField9_0($$parsedSource["Banners"]);
+        if ("artwork_url_list" in $$parsedSource) {
+            $$parsedSource["artwork_url_list"] = $$createField9_0($$parsedSource["artwork_url_list"]);
         }
-        if ("ScreenshotLinkList" in $$parsedSource) {
-            $$parsedSource["ScreenshotLinkList"] = $$createField10_0($$parsedSource["ScreenshotLinkList"]);
+        if ("screenshot_url_list" in $$parsedSource) {
+            $$parsedSource["screenshot_url_list"] = $$createField10_0($$parsedSource["screenshot_url_list"]);
         }
         return new Game(/** @type {Partial<Game>} */($$parsedSource));
     }

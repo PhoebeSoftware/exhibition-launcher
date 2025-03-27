@@ -91,9 +91,13 @@ func main() {
 			continue
 		}
 
-		game.MainCover = gameData.MainCover
-		game.ArtworkLinkList = gameData.ArtworkLinkList
-		game.ScreenshotLinkList = gameData.ScreenshotLinkList
+		game.CoverURL = gameData.CoverURL
+		game.ArtworkUrlList = gameData.ArtworkUrlList
+		game.ScreenshotUrlList = gameData.ScreenshotUrlList
+		fmt.Println("LOOPING TROUGH " + game.Name)
+		for _, screenshotUrl := range game.ScreenshotUrlList {
+			fmt.Println(screenshotUrl)
+		}
 		libraryManager.Games[id] = game
 	}
 

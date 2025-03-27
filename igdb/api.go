@@ -15,15 +15,15 @@ type Image struct {
 }
 
 type ApiGame struct {
-	Id          int    `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"summary"`
-	CoverID     int    `json:"cover"`
-	MainCover   string
-	ArtworkIDList   []int `json:"artworks"`
-	ArtworkLinkList []string
-	Screenshots     []Image `json:"screenshots"`
-	ScreenshotLinkList []string
+	Id                int    `json:"id"`
+	Name              string `json:"name"`
+	Description       string `json:"summary"`
+	Cover             Image  `json:"cover"`
+	CoverURL          string
+	Artworks          []Image `json:"artworks"`
+	ArtworkUrlList    []string
+	Screenshots       []Image `json:"screenshots"`
+	ScreenshotUrlList []string
 }
 
 type APIManager struct {
@@ -50,7 +50,7 @@ func NewAPI() *APIManager {
 }
 
 func (a *APIManager) GetGameData(id int) (ApiGame, error) {
-	header := fmt.Sprintf(`fields id, name, summary, cover, artworks, screenshots.*; where id = %d;`, id)
+	header := fmt.Sprintf(`fields id, name, summary, cover.*, artworks.*, screenshots.*; where id = %d;`, id)
 
 	request, err := http.NewRequest("POST", "https://api.igdb.com/v4/games/", bytes.NewBuffer([]byte(header)))
 	if err != nil {
@@ -76,29 +76,25 @@ func (a *APIManager) GetGameData(id int) (ApiGame, error) {
 	}
 
 	firstGameData := gameDataList[0]
-	coverImageUrl, err := a.GetCover(firstGameData.CoverID)
-	if err != nil {
-		// return game without cover
-		return firstGameData, err
+	fmt.Println(firstGameData.Name+" :", firstGameData.Id)
+	imageID := firstGameData.Cover.ImageID
+	imageURL := fmt.Sprintf("https://images.igdb.com/igdb/image/upload/t_cover_big/%s.jpg", imageID)
+	firstGameData.CoverURL = imageURL
+	fmt.Println("added cover " + imageURL)
+
+	for _, image := range firstGameData.Artworks {
+		imageID := image.ImageID
+		imageURL := fmt.Sprintf("https://images.igdb.com/igdb/image/upload/t_1080p/%s.jpg", imageID)
+		firstGameData.ArtworkUrlList = append(firstGameData.ArtworkUrlList, imageURL)
+		fmt.Println("added artwork " + imageURL)
 	}
-	firstGameData.MainCover = coverImageUrl
-	bannerImageUrls, err := a.GetArtworkURLs(firstGameData.ArtworkIDList)
-	for _, url := range bannerImageUrls {
-		fmt.Println("Link " + url)
-	}
-	if err != nil {
-		// return game without banners
-		return firstGameData, err
-	}
-	firstGameData.ArtworkLinkList = bannerImageUrls
 
 	for _, image := range firstGameData.Screenshots {
 		imageID := image.ImageID
 		imageURL := fmt.Sprintf("https://images.igdb.com/igdb/image/upload/t_1080p/%s.jpg", imageID)
-		firstGameData.ScreenshotLinkList = append(firstGameData.ScreenshotLinkList, imageURL)
-		fmt.Println("added " + imageURL)
+		firstGameData.ScreenshotUrlList = append(firstGameData.ScreenshotUrlList, imageURL)
+		fmt.Println("added screenshot " + imageURL)
 	}
-
 
 	return firstGameData, nil
 }

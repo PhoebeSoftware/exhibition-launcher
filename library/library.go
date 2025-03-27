@@ -16,17 +16,17 @@ import (
 )
 
 type Game struct {
-	IGDBID      int    `json:"igdb_id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	PlayTime    int    `json:"playtime"`
-	Achievments []int  `json:"achievments"`
-	Executable  string `json:"executable"`
-	Running     bool   `json:"running"`
-	Favorite    bool   `json:"favorite"`
-	MainCover          string
-	ArtworkLinkList    []string `json:"artwork_link_list"`
-	ScreenshotLinkList []string `json:"screenshot_link_list"`
+	IGDBID            int      `json:"igdb_id"`
+	Name              string   `json:"name"`
+	Description       string   `json:"description"`
+	PlayTime          int      `json:"playtime"`
+	Achievments       []int    `json:"achievments"`
+	Executable        string   `json:"executable"`
+	Running           bool     `json:"running"`
+	Favorite       bool     `json:"favorite"`
+	CoverURL       string `json:"cover_url"`
+	ArtworkUrlList []string `json:"artwork_url_list"`
+	ScreenshotUrlList []string `json:"screenshot_url_list"`
 }
 
 type Library struct {
@@ -109,16 +109,17 @@ func (lib *Library) AddToLibrary(igdbId int) (Game, error) {
 
 	// Append the new game
 	game = Game{
-		IGDBID:          igdbId,
-		Name:            gameData.Name,
-		Description:     gameData.Description,
-		PlayTime:        0,
-		Achievments:     []int{},
-		Executable:      executable,
-		Running:         false,
-		Favorite:        false,
-		MainCover:       gameData.MainCover,
-		ArtworkLinkList: gameData.ArtworkLinkList,
+		IGDBID:            igdbId,
+		Name:              gameData.Name,
+		Description:       gameData.Description,
+		PlayTime:          0,
+		Achievments:       []int{},
+		Executable:        executable,
+		Running:           false,
+		Favorite:          false,
+		CoverURL:          gameData.CoverURL,
+		ScreenshotUrlList: gameData.ScreenshotUrlList,
+		ArtworkUrlList:    gameData.ArtworkUrlList,
 	}
 	lib.Games[igdbId] = game
 

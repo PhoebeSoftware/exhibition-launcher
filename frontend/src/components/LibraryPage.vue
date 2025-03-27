@@ -28,7 +28,7 @@
             <div class="game-library-container">
                 <div class="game-library-game-box" v-for="game in games" :key="game.igdb_id"
                      @click="openGamePage(game)"
-                     :style="{ backgroundImage: `url(${game.MainCover})`}">
+                     :style="{ backgroundImage: `url(${game.cover_url})`}">
                     <div class="game-box-info">
                         <div class="text-container">
                             <h1>{{ game.name }}</h1>
@@ -50,7 +50,7 @@
 
             <div class="game-store-content">
                 <h1>Game Store Page</h1>
-                <div v-for="banner in selectedGame.Banners">
+                <div v-for="banner in allBanners">
                     <div class="game-store-banner" :style="{ backgroundImage: `url(${banner})`}"></div>
                     <p>This is a placeholder for game #{{ selectedGame.igdb_id }}</p>
                     <p>Store page content will be implemented later</p>
@@ -60,7 +60,7 @@
 
         <!-- Game Page -->
         <div v-if="currentPage === 'game'" class="game-page">
-            <div class="game-page-image-container" :style="{ backgroundImage: `url(${selectedGame.Banners[0]})` }">
+            <div class="game-page-image-container" :style="{ backgroundImage: `url(${selectedGame.artwork_url_list[0]})` }">
                 <div class="game-user-stats">
                     <div class="game-user-stats-left">
                         <button @click="launchGame(selectedGame)">
@@ -110,12 +110,15 @@ export default {
         return {
             games: [],
             currentPage: 'library',
-            selectedGame: null
+            selectedGame: null,
+            allBanners: null
         };
     },
     methods: {
         async addGame() {
-            let newGame = await Library.AddToLibrary(119133).catch(console.warn); // ELDEN RING ID
+            let newGame = await Library.AddToLibrary(119277).catch((err) => {
+                console.warn(err)
+            }); // ELDEN RING ID
             this.games.push(newGame)
         },
 
@@ -123,7 +126,9 @@ export default {
             this.selectedGame = game;
             this.currentPage = 'store';
             console.log(`Opening store page for game ${game.igdb_id}`);
-            game.Banners.forEach((banner) => {
+            let allBanners = game.artwork_url_list.concat(game.screenshot_url_list)
+            this.allBanners = allBanners
+            allBanners.forEach((banner) => {
                 console.log(banner)
             })
         },
