@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/joho/godotenv"
 	"net/http"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Image struct {
@@ -15,15 +16,16 @@ type Image struct {
 }
 
 type ApiGame struct {
-	Id                int    `json:"id"`
-	Name              string `json:"name"`
-	Description       string `json:"summary"`
-	Cover             Image  `json:"cover"`
-	CoverURL          string
-	Artworks          []Image `json:"artworks"`
-	ArtworkUrlList    []string
-	Screenshots       []Image `json:"screenshots"`
-	ScreenshotUrlList []string
+	Id          int    `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"summary"`
+
+	Cover             Image    `json:"-"`
+	CoverURL          string   `json:"-"`
+	Artworks          []Image  `json:"-"`
+	ArtworkUrlList    []string `json:"-"`
+	Screenshots       []Image  `json:"-"`
+	ScreenshotUrlList []string `json:"-"`
 }
 
 type APIManager struct {
