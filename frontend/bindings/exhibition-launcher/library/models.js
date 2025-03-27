@@ -33,12 +33,12 @@ export class Game {
              */
             this["description"] = "";
         }
-        if (!("playtime" in $$source)) {
+        if (!("playTime" in $$source)) {
             /**
              * @member
              * @type {number}
              */
-            this["playtime"] = 0;
+            this["playTime"] = 0;
         }
         if (!("achievments" in $$source)) {
             /**

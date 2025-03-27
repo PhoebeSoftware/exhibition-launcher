@@ -68,7 +68,7 @@
                         </button>
                         <div class="last-played-wrapper">
                             <h1>Last played</h1>
-                            <p>{{ selectedGame.lastPlayed || 'Never' }}</p>
+                            <p>{{ selectedGame.lastplayed || 'Never' }}</p>
                         </div>
                         <div class="play-time-wrapper">
                             <h1>Play time</h1>
@@ -111,14 +111,13 @@ export default {
             games: [],
             currentPage: 'library',
             selectedGame: null,
-            allBanners: null
         };
     },
     methods: {
         async addGame() {
             let newGame = await Library.AddToLibrary(119277).catch((err) => {
                 console.warn(err)
-            }); // ELDEN RING ID
+            });
             this.games.push(newGame)
         },
 
@@ -126,11 +125,6 @@ export default {
             this.selectedGame = game;
             this.currentPage = 'store';
             console.log(`Opening store page for game ${game.igdb_id}`);
-            let allBanners = game.artwork_url_list.concat(game.screenshot_url_list)
-            this.allBanners = allBanners
-            allBanners.forEach((banner) => {
-                console.log(banner)
-            })
         },
 
         openGamePage(game) {
