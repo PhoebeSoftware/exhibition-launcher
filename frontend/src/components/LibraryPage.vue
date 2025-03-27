@@ -60,6 +60,12 @@
 
         <!-- Game Page -->
         <div v-if="currentPage === 'game'" class="game-page">
+            <div class="game-page-content">
+                <button class="back-button" @click="returnToLibrary">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Library
+                </button>
+                <!-- Add more game details here as needed -->
+            </div>
             <div class="game-page-image-container"
                  :style="{ backgroundImage: `url(${getBackgroundImage()})` }">
                 <div class="game-user-stats">
@@ -86,15 +92,12 @@
                             <i :class="selectedGame.isFavorite ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
                         </button>
                     </div>
+                    <div>
+                        <p>{{selectedGame.description}}</p>
+                    </div>
                 </div>
             </div>
-            
-            <div class="game-page-content">
-                <button class="back-button" @click="returnToLibrary">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Library
-                </button>
-                <!-- Add more game details here as needed -->
-            </div>
+
         </div>
     </div>
 </template>
@@ -389,7 +392,7 @@ export default {
 }
 
 .game-store-banner {
-    height: 520px;
+    height: 900px;
     width: 100%;
     background-position: center;
     background-repeat: no-repeat;
@@ -408,7 +411,7 @@ export default {
 
 .game-page-image-container {
     width: 100%;
-    height: 300px;
+    height: 500px;
     background-color: rgb(35, 35, 35);
     background-position: center;
     background-repeat: no-repeat;
