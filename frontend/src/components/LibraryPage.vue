@@ -60,6 +60,7 @@
 
         <!-- Game Page -->
         <div v-if="currentPage === 'game'" class="game-page">
+<<<<<<< Updated upstream
             <div class="game-page-content">
                 <button class="back-button" @click="returnToLibrary">
                     <i class="fa-solid fa-arrow-left"></i> Back to Library
@@ -76,28 +77,52 @@
                         <div class="last-played-wrapper">
                             <h1>Last played</h1>
                             <p>{{ selectedGame.lastplayed || 'Never' }}</p>
+=======
+            <div class="game-page-image-container" :style="{ backgroundImage: `url(${selectedGame.Banners[0]})` }">
+                <div class="game-user-stats-container">
+                    <div class="game-user-stats">
+                        <div class="game-user-stats-left">
+                            <button @click="launchGame">
+                                <i class="fa-solid fa-play"></i>PLAY
+                            </button>
+                            <div class="last-played-wrapper">
+                                <h1>Last played</h1>
+                                <p>{{ selectedGame.lastPlayed || 'Never' }}</p>
+                            </div>
+                            <div class="play-time-wrapper">
+                                <h1>Play time</h1>
+                                <p>{{ selectedGame.playTime || '0 hours' }}</p>
+                            </div>
+>>>>>>> Stashed changes
                         </div>
-                        <div class="play-time-wrapper">
-                            <h1>Play time</h1>
-                            <p>{{ selectedGame.playTime || '0 hours' }}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="game-options-wrapper">
-                        <button @click="openGameSettings">
-                            <i class="fa-solid fa-gear"></i>
-                        </button>
+                        
+                        <div class="game-options-wrapper">
+                            <button @click="openGameSettings">
+                                <i class="fa-solid fa-gear"></i>
+                            </button>
     
-                        <button @click="toggleFavorite">
-                            <i :class="selectedGame.isFavorite ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
-                        </button>
+                            <button @click="toggleFavorite">
+                                <i :class="selectedGame.isFavorite ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
+                            </button>
+                        </div>
                     </div>
                     <div>
                         <p>{{selectedGame.description}}</p>
                     </div>
                 </div>
             </div>
+<<<<<<< Updated upstream
 
+=======
+            
+            <div class="game-page-content">
+                <div class="placeholder"></div>
+                <button class="back-button" @click="returnToLibrary">
+                    <i class="fa-solid fa-arrow-left"></i> Back to Library
+                </button>
+                <!-- Add more game details here as needed -->
+            </div>
+>>>>>>> Stashed changes
         </div>
     </div>
 </template>
@@ -396,6 +421,7 @@ export default {
     width: 100%;
     background-position: center;
     background-repeat: no-repeat;
+    background-size: cover;
 }
 
 /* Game Page Styles */
@@ -418,12 +444,22 @@ export default {
     border-radius: 15px;
     display: flex;
     align-items: end;
+    position: relative;
+}
+
+.game-user-stats-container {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
 }
 
 .game-user-stats {
-    position: sticky;
-    top: 100px;
     width: 100%;
+    position: sticky;
+    top: 0;
+    left: 0;
     backdrop-filter: blur(10px);
     background: linear-gradient(
         to bottom, 
@@ -511,5 +547,11 @@ export default {
 
 .back-button:hover {
     color: var(--text-color);
+}
+
+.placeholder {
+    height: 5000px;
+    width: 100%;
+    background-color: orange;
 }
 </style>
