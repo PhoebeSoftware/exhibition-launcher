@@ -11,4 +11,6 @@ downloads
 .task
 .DS_Store 
 sources
-./frontend/bindings
+/frontend/bindings
+./frontend/package-lock.json
+package-lock.json
