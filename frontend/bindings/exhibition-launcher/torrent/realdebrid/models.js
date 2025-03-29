@@ -160,6 +160,48 @@ export class DownloadItem {
     }
 }
 
+export class DownloadProgress {
+    /**
+     * Creates a new DownloadProgress instance.
+     * @param {Partial<DownloadProgress>} [$$source = {}] - The source object to create the DownloadProgress.
+     */
+    constructor($$source = {}) {
+        if (!("DownloadedBytes" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["DownloadedBytes"] = 0;
+        }
+        if (!("TotalBytes" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["TotalBytes"] = 0;
+        }
+        if (!("Percent" in $$source)) {
+            /**
+             * @member
+             * @type {number}
+             */
+            this["Percent"] = 0;
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new DownloadProgress instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {DownloadProgress}
+     */
+    static createFrom($$source = {}) {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new DownloadProgress(/** @type {Partial<DownloadProgress>} */($$parsedSource));
+    }
+}
+
 /**
  * @readonly
  * @enum {string}

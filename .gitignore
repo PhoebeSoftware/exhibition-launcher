@@ -11,3 +11,4 @@ downloads
 .task
 .DS_Store 
 sources
+./frontend/bindings

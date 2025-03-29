@@ -65,12 +65,24 @@ export function GetDiskSizeOfAllLinks(unrestrictResponses) {
 }
 
 /**
+ * @returns {Promise<$models.DownloadProgress> & { cancel(): void }}
+ */
+export function GetDownloadProgress() {
+    let $resultPromise = /** @type {any} */($Call.ByID(4165838017));
+    let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
+        return $$createType3($result);
+    }));
+    $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
+    return $typingPromise;
+}
+
+/**
  * @returns {Promise<$models.DownloadItem[]> & { cancel(): void }}
  */
 export function GetDownloads() {
     let $resultPromise = /** @type {any} */($Call.ByID(4283940807));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
-        return $$createType4($result);
+        return $$createType5($result);
     }));
     $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
     return $typingPromise;
@@ -82,7 +94,7 @@ export function GetDownloads() {
 export function GetTorents() {
     let $resultPromise = /** @type {any} */($Call.ByID(4269175713));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
-        return $$createType6($result);
+        return $$createType7($result);
     }));
     $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
     return $typingPromise;
@@ -95,7 +107,7 @@ export function GetTorents() {
 export function GetTorrentInfoById(id) {
     let $resultPromise = /** @type {any} */($Call.ByID(2465184132, id));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
-        return $$createType5($result);
+        return $$createType6($result);
     }));
     $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
     return $typingPromise;
@@ -107,7 +119,7 @@ export function GetTorrentInfoById(id) {
 export function GetTraffic() {
     let $resultPromise = /** @type {any} */($Call.ByID(2804281747));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
-        return $$createType8($result);
+        return $$createType9($result);
     }));
     $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
     return $typingPromise;
@@ -120,7 +132,7 @@ export function GetTraffic() {
 export function GetUser() {
     let $resultPromise = /** @type {any} */($Call.ByID(1335467865));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
-        return $$createType10($result);
+        return $$createType11($result);
     }));
     $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
     return $typingPromise;
@@ -152,7 +164,7 @@ export function UnrestrictCheck(link) {
 export function UnrestrictLink(link) {
     let $resultPromise = /** @type {any} */($Call.ByID(4231798901, link));
     let $typingPromise = /** @type {any} */($resultPromise.then(($result) => {
-        return $$createType11($result);
+        return $$createType12($result);
     }));
     $typingPromise.cancel = $resultPromise.cancel.bind($resultPromise);
     return $typingPromise;
@@ -162,12 +174,13 @@ export function UnrestrictLink(link) {
 const $$createType0 = $models.AddMagnetResponse.createFrom;
 const $$createType1 = $models.AvailableHost.createFrom;
 const $$createType2 = $Create.Array($$createType1);
-const $$createType3 = $models.DownloadItem.createFrom;
-const $$createType4 = $Create.Array($$createType3);
-const $$createType5 = $models.Torrent.createFrom;
-const $$createType6 = $Create.Array($$createType5);
-const $$createType7 = $models.TrafficInfo.createFrom;
-const $$createType8 = $Create.Map($Create.Any, $$createType7);
-const $$createType9 = $models.RealDebridUser.createFrom;
-const $$createType10 = $Create.Nullable($$createType9);
-const $$createType11 = $models.UnrestrictResponse.createFrom;
+const $$createType3 = $models.DownloadProgress.createFrom;
+const $$createType4 = $models.DownloadItem.createFrom;
+const $$createType5 = $Create.Array($$createType4);
+const $$createType6 = $models.Torrent.createFrom;
+const $$createType7 = $Create.Array($$createType6);
+const $$createType8 = $models.TrafficInfo.createFrom;
+const $$createType9 = $Create.Map($Create.Any, $$createType8);
+const $$createType10 = $models.RealDebridUser.createFrom;
+const $$createType11 = $Create.Nullable($$createType10);
+const $$createType12 = $models.UnrestrictResponse.createFrom;
