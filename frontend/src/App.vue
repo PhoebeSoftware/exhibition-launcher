@@ -2,7 +2,6 @@
   <div id="app">
     <AppTopbar/>
     <AppSidebar/>
-    <AppFooter/>
     <router-view class="content"/>
   </div>
 </template>
@@ -10,14 +9,12 @@
 <script>
 import AppSidebar from './components/AppSidebar.vue';
 import AppTopbar from './components/AppTopbar.vue';
-import AppFooter from './components/AppFooter.vue';
 
 export default {
   name: 'App',
   components: {
     AppSidebar,
     AppTopbar,
-    AppFooter
   }
 }
 </script>

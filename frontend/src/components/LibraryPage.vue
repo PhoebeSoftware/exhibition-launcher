@@ -60,7 +60,6 @@
 
         <!-- Game Page -->
         <div v-if="currentPage === 'game'" class="game-page">
-<<<<<<< Updated upstream
             <div class="game-page-content">
                 <button class="back-button" @click="returnToLibrary">
                     <i class="fa-solid fa-arrow-left"></i> Back to Library
@@ -76,12 +75,6 @@
                         </button>
                         <div class="last-played-wrapper">
                             <h1>Last played</h1>
-                            <p>{{ selectedGame.lastplayed || 'Never' }}</p>
-=======
-            <div class="game-page-image-container" :style="{ backgroundImage: `url(${selectedGame.Banners[0]})` }">
-                <div class="game-user-stats-container">
-                    <div class="game-user-stats">
-                        <div class="game-user-stats-left">
                             <button @click="launchGame">
                                 <i class="fa-solid fa-play"></i>PLAY
                             </button>
@@ -93,7 +86,6 @@
                                 <h1>Play time</h1>
                                 <p>{{ selectedGame.playTime || '0 hours' }}</p>
                             </div>
->>>>>>> Stashed changes
                         </div>
                         
                         <div class="game-options-wrapper">
@@ -111,18 +103,6 @@
                     </div>
                 </div>
             </div>
-<<<<<<< Updated upstream
-
-=======
-            
-            <div class="game-page-content">
-                <div class="placeholder"></div>
-                <button class="back-button" @click="returnToLibrary">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Library
-                </button>
-                <!-- Add more game details here as needed -->
-            </div>
->>>>>>> Stashed changes
         </div>
     </div>
 </template>
