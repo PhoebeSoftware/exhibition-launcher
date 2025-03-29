@@ -30,7 +30,19 @@ type RealDebridClient struct {
 	ApiKey  string
 	client  *http.Client
 	BaseURL string
+	DownloadProgress DownloadProgress
 }
+
+type DownloadProgress struct {
+	DownloadedBytes int64
+	TotalBytes int64
+	Percent    float64
+}
+
+func (c RealDebridClient) GetDownloadProgress() DownloadProgress {
+	return c.DownloadProgress
+}
+
 
 func NewRealDebridClient(apiKey string) *RealDebridClient {
 	return &RealDebridClient{
@@ -39,6 +51,7 @@ func NewRealDebridClient(apiKey string) *RealDebridClient {
 			Timeout: 10 * time.Minute,
 		},
 		BaseURL: "https://api.real-debrid.com/rest/1.0",
+		DownloadProgress: DownloadProgress{},
 	}
 }
 

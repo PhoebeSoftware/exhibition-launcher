@@ -27,6 +27,7 @@ type DownloadItem struct {
 	Generated string
 }
 
+
 var app = application.Get()
 
 func (client *RealDebridClient) GetDownloads() ([]DownloadItem, error) {
@@ -64,7 +65,7 @@ func (client *RealDebridClient) DownloadDirectLink(link string, filePath string)
 		return fmt.Errorf("could not create request: %w", err)
 	}
 
-	// A early request to fetch the size of the file so we loop through
+	// A early request to fetch for the size of the file we are looping through later
 	resp, err := client.client.Do(req)
 	if err != nil {
 		return fmt.Errorf("could not reach real debrid: %w", err)
@@ -145,13 +146,18 @@ func (client *RealDebridClient) DownloadDirectLink(link string, filePath string)
 	go func() {
 		defer close(done)
 		bar := progressbar.DefaultBytes(resp.ContentLength, "downloading")
+		client.DownloadProgress.TotalBytes = resp.ContentLength
 		for {
 			select {
 			case <-stopCh:
+				client.DownloadProgress = DownloadProgress{}
 				bar.Finish()
 				return
 			default:
 				//percent := float64(atomic.LoadInt64(&downloadedBytes)) / float64(totalSize) * 100
+				client.DownloadProgress.DownloadedBytes = downloadedBytes
+				client.DownloadProgress.Percent = (float64(downloadedBytes) / float64(resp.ContentLength)) * 100
+
 				err := bar.Set(int(atomic.LoadInt64(&downloadedBytes)))
 				if err != nil {
 					return

@@ -28,6 +28,19 @@ async function addTorrentByMagnet() {
     RealDebridClient.DownloadByMagnet(magnetLinkHollowKnight, path).catch((err) => {
         console.log(err)
     });
+    while (true) {
+        let downloadProgress = await RealDebridClient.GetDownloadProgress()
+        if (downloadProgress.DownloadedBytes <= downloadProgress.TotalBytes) {
+            console.log(downloadProgress.TotalBytes)
+            console.log(downloadProgress.DownloadedBytes)
+            console.log(downloadProgress.Percent + "%")
+        }
+        await sleep(10000)
+    }
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 }
 </script>
 
