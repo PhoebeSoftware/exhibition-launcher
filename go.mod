@@ -7,7 +7,6 @@ toolchain go1.23.5
 require (
 	github.com/anacrolix/torrent v1.58.1
 	github.com/joho/godotenv v1.5.1
-	github.com/schollz/progressbar/v3 v3.18.0
 	github.com/sqweek/dialog v0.0.0-20240226140203-065105509627
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.9
 )
@@ -75,7 +74,6 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/minio/sha256-simd v1.0.0 // indirect
-	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
 	github.com/mr-tron/base58 v1.2.0 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/multiformats/go-multihash v0.2.3 // indirect
@@ -122,7 +120,6 @@ require (
 	golang.org/x/net v0.37.0 // indirect
 	golang.org/x/sync v0.12.0 // indirect
 	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/term v0.30.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	golang.org/x/time v0.0.0-20220609170525-579cf78fd858 // indirect
 	golang.org/x/tools v0.31.0 // indirect

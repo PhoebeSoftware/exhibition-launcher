@@ -30,12 +30,12 @@ async function addTorrentByMagnet() {
     });
     while (true) {
         let downloadProgress = await RealDebridClient.GetDownloadProgress()
-        if (downloadProgress.DownloadedBytes <= downloadProgress.TotalBytes) {
+        if (downloadProgress.IsDownloading) {
             console.log(downloadProgress.TotalBytes)
             console.log(downloadProgress.DownloadedBytes)
             console.log(downloadProgress.Percent + "%")
         }
-        await sleep(10000)
+        await sleep(1000)
     }
 
     function sleep(ms) {

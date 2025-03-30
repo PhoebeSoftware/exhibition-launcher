@@ -37,6 +37,7 @@ type DownloadProgress struct {
 	DownloadedBytes int64
 	TotalBytes int64
 	Percent    float64
+	IsDownloading bool
 }
 
 func (c RealDebridClient) GetDownloadProgress() DownloadProgress {

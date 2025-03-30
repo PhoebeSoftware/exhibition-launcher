@@ -3,7 +3,6 @@ package realdebrid
 import (
 	"exhibition-launcher/utils"
 	"fmt"
-	"github.com/schollz/progressbar/v3"
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"io"
 	"log"
@@ -26,7 +25,6 @@ type DownloadItem struct {
 	Download  string
 	Generated string
 }
-
 
 var app = application.Get()
 
@@ -145,25 +143,17 @@ func (client *RealDebridClient) DownloadDirectLink(link string, filePath string)
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
-		bar := progressbar.DefaultBytes(resp.ContentLength, "downloading")
 		client.DownloadProgress.TotalBytes = resp.ContentLength
+		client.DownloadProgress.IsDownloading = true
 		for {
 			select {
 			case <-stopCh:
-				client.DownloadProgress = DownloadProgress{}
-				bar.Finish()
+				client.DownloadProgress = DownloadProgress{IsDownloading: false}
 				return
 			default:
 				//percent := float64(atomic.LoadInt64(&downloadedBytes)) / float64(totalSize) * 100
 				client.DownloadProgress.DownloadedBytes = downloadedBytes
 				client.DownloadProgress.Percent = (float64(downloadedBytes) / float64(resp.ContentLength)) * 100
-
-				err := bar.Set(int(atomic.LoadInt64(&downloadedBytes)))
-				if err != nil {
-					return
-				}
-
-				time.Sleep(10 * time.Millisecond)
 			}
 		}
 	}()

@@ -87,19 +87,19 @@
                                 <p>{{ selectedGame.playTime || '0 hours' }}</p>
                             </div>
                         </div>
-                        
+
                         <div class="game-options-wrapper">
                             <button @click="openGameSettings">
                                 <i class="fa-solid fa-gear"></i>
                             </button>
-    
+
                             <button @click="toggleFavorite">
                                 <i :class="selectedGame.isFavorite ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
                             </button>
                         </div>
                     </div>
                     <div>
-                        <p>{{selectedGame.description}}</p>
+                        <p>{{ selectedGame.description }}</p>
                     </div>
                 </div>
             </div>
@@ -108,9 +108,7 @@
 </template>
 
 <script>
-import router from "@/router.js";
 import {Library} from "../../bindings/exhibition-launcher/library/index.js";
-import {onMounted} from "vue";
 
 export default {
     name: 'LibraryPage',
@@ -442,14 +440,14 @@ export default {
     left: 0;
     backdrop-filter: blur(10px);
     background: linear-gradient(
-        to bottom, 
+        to bottom,
         rgba(25, 25, 25, 0.6) 0%,
         rgba(25, 25, 25, 0.8) 50%,
         rgba(25, 25, 25, 1) 100%
     );
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-start; 
+    align-items: flex-start;
     justify-content: space-between;
     padding: 10px 20px;
     gap: 10px;
@@ -469,7 +467,7 @@ export default {
 .play-time-wrapper {
     font-size: 12px;
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
     color: var(--text-color);
 }
 
