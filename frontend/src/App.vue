@@ -3,18 +3,21 @@
     <AppTopbar/>
     <AppSidebar/>
     <router-view class="content"/>
+    <AppFooter/>
   </div>
 </template>
 
 <script>
 import AppSidebar from './components/AppSidebar.vue';
 import AppTopbar from './components/AppTopbar.vue';
+import AppFooter from './components/AppFooter.vue';
 
 export default {
   name: 'App',
   components: {
     AppSidebar,
     AppTopbar,
+    AppFooter
   }
 }
 </script>
@@ -60,7 +63,7 @@ body {
   top: 40px;
   left: 200px;
   width: calc(100% - 200px);
-  height: calc(100% - 40px);
+  height: calc(100% - 100px);
   background-color: rgb(25, 24, 24);
 }
 </style>
