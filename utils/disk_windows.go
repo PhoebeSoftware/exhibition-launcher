@@ -35,4 +35,3 @@ func DiskUsage(path string) (disk DiskStatus) {
 	disk.Used = disk.All - disk.Free
 	return
 }
-

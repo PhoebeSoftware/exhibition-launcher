@@ -3,6 +3,7 @@ package realdebrid
 import (
 	"exhibition-launcher/utils"
 	"fmt"
+	"github.com/wailsapp/wails/v3/pkg/application"
 	"io"
 	"log"
 	"net/http"
@@ -39,7 +40,7 @@ func (client *RealDebridClient) GetDownloads() ([]DownloadItem, error) {
 
 	return result, nil
 }
-func (client *RealDebridClient) DownloadDirectLink(link string, filePath string) error {
+func (client *RealDebridClient) DownloadDirectLink(app *application.App, link string, filePath string) error {
 	startTime := time.Now()
 
 	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0644)
@@ -139,17 +140,20 @@ func (client *RealDebridClient) DownloadDirectLink(link string, filePath string)
 	done := make(chan struct{})
 	go func() {
 		defer close(done)
-		client.DownloadProgress.TotalBytes = resp.ContentLength
-		client.DownloadProgress.IsDownloading = true
 		for {
 			select {
 			case <-stopCh:
-				client.DownloadProgress = DownloadProgress{IsDownloading: false}
+				app.EmitEvent("download_complete", "Download Finished!")
 				return
 			default:
-				//percent := float64(atomic.LoadInt64(&downloadedBytes)) / float64(totalSize) * 100
-				client.DownloadProgress.DownloadedBytes = downloadedBytes
-				client.DownloadProgress.Percent = (float64(downloadedBytes) / float64(resp.ContentLength)) * 100
+				downloadedBytesAtomic := atomic.LoadInt64(&downloadedBytes)
+				percent := (float64(downloadedBytesAtomic) / float64(totalSize)) * 100
+				app.EmitEvent("download_progress", map[string]interface{}{
+					"percent": percent,
+					"downloadedBytes": downloadedBytesAtomic,
+					"totalBytes": totalSize,
+				})
+				time.Sleep(4 * time.Second)
 			}
 		}
 	}()
@@ -186,7 +190,7 @@ func (client *RealDebridClient) DownloadDirectLink(link string, filePath string)
 	return nil
 }
 
-func (client *RealDebridClient) DownloadByMagnet(magnetLink string, path string) error {
+func (client *RealDebridClient) DownloadByMagnet(app *application.App, magnetLink string, path string) error {
 	addMagnetResponse, err := client.AddTorrentByMagnet(magnetLink)
 	if err != nil {
 		return err
@@ -249,7 +253,7 @@ func (client *RealDebridClient) DownloadByMagnet(magnetLink string, path string)
 	for _, unrestrictResponse := range unrestrictResponseList {
 		downloadPath := filepath.Join(path, unrestrictResponse.Filename)
 		fmt.Println(unrestrictResponse.Link)
-		err = client.DownloadDirectLink(unrestrictResponse.Download, downloadPath)
+		err = client.DownloadDirectLink(app, unrestrictResponse.Download, downloadPath)
 		if err != nil {
 			return err
 		}

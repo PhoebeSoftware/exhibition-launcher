@@ -23,27 +23,14 @@ var (
 
 	ErrorNotEnoughDiskSpace = errors.New("Not enough diskspace")
 	Error503                = errors.New("File unavailable")
-	ErrorNoLinksFound = errors.New("Real debrid has no links on this torrent, try again later")
+	ErrorNoLinksFound       = errors.New("Real debrid has no links on this torrent, try again later")
 )
 
 type RealDebridClient struct {
 	ApiKey  string
 	client  *http.Client
 	BaseURL string
-	DownloadProgress DownloadProgress
 }
-
-type DownloadProgress struct {
-	DownloadedBytes int64
-	TotalBytes int64
-	Percent    float64
-	IsDownloading bool
-}
-
-func (client RealDebridClient) GetDownloadProgress() DownloadProgress {
-	return client.DownloadProgress
-}
-
 
 func NewRealDebridClient(apiKey string) *RealDebridClient {
 	return &RealDebridClient{
@@ -52,7 +39,6 @@ func NewRealDebridClient(apiKey string) *RealDebridClient {
 			Timeout: 10 * time.Minute,
 		},
 		BaseURL: "https://api.real-debrid.com/rest/1.0",
-		DownloadProgress: DownloadProgress{},
 	}
 }
 

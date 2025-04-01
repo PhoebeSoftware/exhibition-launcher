@@ -4,26 +4,26 @@ import (
 	"exhibition-launcher/torrent"
 	"exhibition-launcher/torrent/realdebrid"
 	"fmt"
-	"time"
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 var (
 	RealDebridType = "Real-Debrid"
-	TorrentType = "Torrent"
+	TorrentType    = "Torrent"
 )
 
 type Queue struct {
 	DownloadsInQueue []Download
-	TorrentManager *torrent.Manager
+	TorrentManager   *torrent.Manager
 	RealDebridClient *realdebrid.RealDebridClient
 	DownloadPath     string
+	App              *application.App
 }
 
-
 type Download struct {
-	Type string
+	Type       string
 	MagnetLink string
-	DownloadProgress realdebrid.DownloadProgress
+	Progress   float64
 }
 
 func (q *Queue) GetCurrentDownload() Download {
@@ -46,9 +46,8 @@ func (q *Queue) StartDownloads() error {
 	download := q.DownloadsInQueue[0]
 	switch download.Type {
 	case RealDebridType:
-		q.DownloadsInQueue[0].DownloadProgress.IsDownloading = true
 		fmt.Println("Starting Real-Debrid download!!")
-		err := q.StartRealDebridDownload(download)
+		err := q.StartRealDebridDownload(q.App, download)
 		if err != nil {
 			return err
 		}
@@ -57,18 +56,6 @@ func (q *Queue) StartDownloads() error {
 	}
 
 	// Next download
-	for {
-		if !q.GetCurrentDownload().DownloadProgress.IsDownloading {
-			q.RemoveFromQueue(0)
-			fmt.Println("STARTING NEXT DOWNLOAD GANG")
-			err := q.StartDownloads()
-			if err != nil {
-				return err
-			}
-			<-time.NewTimer(10 * time.Second).C
-			break
-		}
-	}
+
 	return nil
 }
-

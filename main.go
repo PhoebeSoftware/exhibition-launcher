@@ -136,7 +136,6 @@ func main() {
 		BackgroundColour: application.NewRGB(27, 38, 54),
 		URL:              "/",
 	}
-
 	services := []application.Service{
 		//application.NewService(torrentManager),
 		application.NewService(apiManager),
@@ -178,9 +177,9 @@ func main() {
 	//		return
 	//	}
 	//}()
-
 	app = application.New(appOptions)
 	app.NewWebviewWindowWithOptions(webViewWindowOpt)
+	queue.App = app
 
 	err = app.Run()
 	if err != nil {
