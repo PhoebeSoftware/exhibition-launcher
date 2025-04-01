@@ -1,10 +1,8 @@
 package realdebrid
 
 import (
-	"exhibition-launcher/queue"
 	"exhibition-launcher/utils"
 	"fmt"
-	"github.com/wailsapp/wails/v3/pkg/application"
 	"io"
 	"log"
 	"net/http"
@@ -27,10 +25,7 @@ type DownloadItem struct {
 	Generated string
 }
 
-var app = application.Get()
-
 func (client *RealDebridClient) GetDownloads() ([]DownloadItem, error) {
-
 	req, err := client.newRequest(http.MethodGet, "/downloads", nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("get request failed while requesting downloads: %w", err)
@@ -191,7 +186,7 @@ func (client *RealDebridClient) DownloadDirectLink(link string, filePath string)
 	return nil
 }
 
-func (client *RealDebridClient) DownloadByMagnet(magnetLink string, path string, download *queue.Download) error {
+func (client *RealDebridClient) DownloadByMagnet(magnetLink string, path string) error {
 	addMagnetResponse, err := client.AddTorrentByMagnet(magnetLink)
 	if err != nil {
 		return err

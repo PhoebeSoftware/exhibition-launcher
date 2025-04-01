@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"errors"
+	"exhibition-launcher/exhibitionQueue"
 	"exhibition-launcher/igdb"
 	"exhibition-launcher/library"
 	"exhibition-launcher/torrent"
@@ -83,6 +84,13 @@ func main() {
 		debridClient = realdebrid.NewRealDebridClient(settings.RealDebridSettings.DebridToken)
 	}
 
+	queue := exhibitionQueue.Queue{
+		DownloadsInQueue: []exhibitionQueue.Download{},
+		TorrentManager:   torrentManager,
+		RealDebridClient: debridClient,
+		DownloadPath:     settings.DownloadPath,
+	}
+
 	// This code is for refetching covers and banners but it will slow down startup
 	//for id, game := range libraryManager.Games {
 	//	gameData, err := apiManager.GetGameData(game.IGDBID)
@@ -137,6 +145,7 @@ func main() {
 		application.NewService(settings),
 		application.NewService(settingsManager),
 		application.NewService(&utils.PathUtil{}),
+		application.NewService(&queue),
 	}
 
 	if debridClient != nil {

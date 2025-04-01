@@ -40,8 +40,8 @@ type DownloadProgress struct {
 	IsDownloading bool
 }
 
-func (c RealDebridClient) GetDownloadProgress() DownloadProgress {
-	return c.DownloadProgress
+func (client RealDebridClient) GetDownloadProgress() DownloadProgress {
+	return client.DownloadProgress
 }
 
 
