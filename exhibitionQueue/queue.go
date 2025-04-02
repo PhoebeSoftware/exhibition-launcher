@@ -27,7 +27,6 @@ type Download struct {
 }
 
 func (q *Queue) GetCurrentDownload() Download {
-	fmt.Println("Getting current download!!!!!!")
 	return q.DownloadsInQueue[0]
 }
 
@@ -47,7 +46,7 @@ func (q *Queue) StartDownloads() error {
 	switch download.Type {
 	case RealDebridType:
 		fmt.Println("Starting Real-Debrid download!!")
-		err := q.StartRealDebridDownload(q.App, download)
+		err := q.RealDebridClient.DownloadByMagnet(q.App, download.MagnetLink, q.DownloadPath)
 		if err != nil {
 			return err
 		}
