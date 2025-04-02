@@ -70,7 +70,7 @@ func (q *Queue) StartDownloads() error {
 
 	// Next download
 	q.SetDownloading(false)
-	q.DownloadsInQueue = append(q.DownloadsInQueue[:0], q.DownloadsInQueue[1:]...)
+	q.RemoveFromQueue(0)
 	err := q.StartDownloads()
 	if err != nil {
 		return err
