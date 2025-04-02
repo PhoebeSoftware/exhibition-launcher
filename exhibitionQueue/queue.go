@@ -18,6 +18,7 @@ type Queue struct {
 	RealDebridClient *realdebrid.RealDebridClient
 	DownloadPath     string
 	App              *application.App
+	Downloading      bool
 }
 
 type Download struct {
@@ -30,6 +31,10 @@ func (q *Queue) GetCurrentDownload() Download {
 	return q.DownloadsInQueue[0]
 }
 
+func (q *Queue) GetDownloadInQueue() []Download {
+	return q.DownloadsInQueue
+}
+
 func (q *Queue) AddDownloadToQueue(d Download) {
 	q.DownloadsInQueue = append(q.DownloadsInQueue, d)
 }
@@ -37,11 +42,19 @@ func (q *Queue) AddDownloadToQueue(d Download) {
 func (q *Queue) RemoveFromQueue(i int) {
 	q.DownloadsInQueue = append(q.DownloadsInQueue[:i], q.DownloadsInQueue[i+1:]...)
 }
+
+func (q *Queue) SetDownloading(value bool) {
+	q.Downloading = value
+}
 func (q *Queue) StartDownloads() error {
-	if len(q.DownloadsInQueue) <= 0 {
-		fmt.Println("No downloads in queue")
-		return nil
+	if q.Downloading {
+		return fmt.Errorf("already downloading")
 	}
+	if len(q.DownloadsInQueue) <= 0 {
+		return fmt.Errorf("no downloads in queue")
+	}
+	defer q.SetDownloading(false)
+	q.SetDownloading(true)
 	download := q.DownloadsInQueue[0]
 	switch download.Type {
 	case RealDebridType:
@@ -55,6 +68,11 @@ func (q *Queue) StartDownloads() error {
 	}
 
 	// Next download
-
+	q.SetDownloading(false)
+	q.DownloadsInQueue = append(q.DownloadsInQueue[:0], q.DownloadsInQueue[1:]...)
+	err := q.StartDownloads()
+	if err != nil {
+		return err
+	}
 	return nil
 }

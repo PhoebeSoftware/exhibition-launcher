@@ -3,6 +3,7 @@
         <h1>Explore</h1>
         <p>Discover new content here.</p>
         <button @click="addToQueue()">Add torrent by magnet</button>
+        <button @click="startDownloads()">Start downloads / q</button>
         <p>Download progress {{ progress.toFixed(2) }}%</p>
     </div>
 
@@ -26,6 +27,9 @@ async function addToQueue(magnetLink) {
     }
 
     await Queue.AddRealDebridDownloadToQueue(magnetLinkHollowKnight)
+}
+
+function startDownloads() {
     Queue.StartDownloads().catch((err) => {
         console.log(err)
     })
