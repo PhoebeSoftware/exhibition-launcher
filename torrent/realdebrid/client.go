@@ -3,6 +3,7 @@ package realdebrid
 import (
 	"encoding/json"
 	"errors"
+	"exhibition-launcher/utils/jsonUtils/jsonModels"
 	"io"
 	"log"
 	"net/http"
@@ -31,6 +32,7 @@ type RealDebridClient struct {
 	client  *http.Client
 	BaseURL string
 	DownloadProgress DownloadProgress
+	Settings *jsonModels.Settings
 }
 
 type DownloadProgress struct {
@@ -40,19 +42,20 @@ type DownloadProgress struct {
 	IsDownloading bool
 }
 
-func (c RealDebridClient) GetDownloadProgress() DownloadProgress {
-	return c.DownloadProgress
+func (client RealDebridClient) GetDownloadProgress() DownloadProgress {
+	return client.DownloadProgress
 }
 
 
-func NewRealDebridClient(apiKey string) *RealDebridClient {
+func NewRealDebridClient(settings *jsonModels.Settings) *RealDebridClient {
 	return &RealDebridClient{
-		ApiKey: apiKey,
+		ApiKey: settings.RealDebridSettings.DebridToken,
 		client: &http.Client{
 			Timeout: 10 * time.Minute,
 		},
 		BaseURL: "https://api.real-debrid.com/rest/1.0",
 		DownloadProgress: DownloadProgress{},
+		Settings: settings,
 	}
 }
 

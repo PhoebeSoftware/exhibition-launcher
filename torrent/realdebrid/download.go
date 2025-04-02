@@ -3,7 +3,6 @@ package realdebrid
 import (
 	"exhibition-launcher/utils"
 	"fmt"
-	"github.com/wailsapp/wails/v3/pkg/application"
 	"io"
 	"log"
 	"net/http"
@@ -25,8 +24,6 @@ type DownloadItem struct {
 	Download  string
 	Generated string
 }
-
-var app = application.Get()
 
 func (client *RealDebridClient) GetDownloads() ([]DownloadItem, error) {
 
@@ -85,7 +82,7 @@ func (client *RealDebridClient) DownloadDirectLink(link string, filePath string)
 	var fileMutex sync.Mutex
 	var downloadedBytes = stat.Size()
 
-	numWorkers := 2
+	numWorkers := client.Settings.RealDebridSettings.NumberOfThreads
 	stopCh := make(chan interface{})
 	errCh := make(chan error, 10)
 	chunks := make(chan [2]int64, numWorkers)

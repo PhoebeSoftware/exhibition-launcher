@@ -10,6 +10,7 @@ type Settings struct {
 type RealDebridSettings struct {
 	UseRealDebrid bool `json:"use_real_debrid"`
 	DebridToken string `json:"debrid_token"`
+	NumberOfThreads int `json:"number_of_threads"`
 }
 
 func (s Settings) GetSettings() Settings {
@@ -20,4 +21,5 @@ func (s *Settings) DefaultValues() {
 	s.DownloadPath = filepath.Join("downloads")
 	s.RealDebridSettings.UseRealDebrid = false
 	s.RealDebridSettings.DebridToken = ""
+	s.RealDebridSettings.NumberOfThreads = 2
 }

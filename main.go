@@ -80,7 +80,7 @@ func main() {
 			fmt.Println(ErrorTokenIsEmpty)
 			return
 		}
-		debridClient = realdebrid.NewRealDebridClient(settings.RealDebridSettings.DebridToken)
+		debridClient = realdebrid.NewRealDebridClient(settings)
 	}
 
 	// This code is for refetching covers and banners but it will slow down startup
