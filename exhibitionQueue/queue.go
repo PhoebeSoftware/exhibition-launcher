@@ -28,7 +28,7 @@ type Download struct {
 	Progress   float64
 }
 
-func (q *Queue) GetCurrentDownload() Download {
+func (q *Queue) GetFirstDownload() Download {
 	return q.DownloadsInQueue[0]
 }
 
