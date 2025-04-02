@@ -22,6 +22,7 @@ type Queue struct {
 }
 
 type Download struct {
+	UUID string
 	Type       string
 	MagnetLink string
 	Progress   float64
