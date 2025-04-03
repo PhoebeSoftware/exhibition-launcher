@@ -4,7 +4,10 @@
         <p>Discover new content here.</p>
         <button @click="addToQueue()">Add torrent by magnet</button>
         <button @click="startDownloads()">Start downloads / q</button>
+        <button @click="pauseResumeDownloads()">Pause / Resume download</button>
         <p>Download progress {{ progress.toFixed(2) }}%</p>
+        <p>Time passed: {{ timePassed }}</p>
+        <p>Paused: {{ paused }}</p>
     </div>
 
 </template>
@@ -14,6 +17,7 @@
 
 import {Settings} from "../../bindings/exhibition-launcher/utils/jsonUtils/jsonModels/index.js";
 import {Queue} from "../../bindings/exhibition-launcher/exhibitionQueue/index.js";
+import {RealDebridClient} from "../../bindings/exhibition-launcher/torrent/realdebrid/index.js";
 
 
 async function addToQueue(magnetLink) {
@@ -29,6 +33,8 @@ async function addToQueue(magnetLink) {
     await Queue.AddRealDebridDownloadToQueue(magnetLinkHollowKnight)
 }
 
+
+
 function startDownloads() {
     Queue.StartDownloads().catch((err) => {
         console.log(err)
@@ -40,11 +46,13 @@ function startDownloads() {
 <script>
 
 import {Events} from "@wailsio/runtime";
+import {RealDebridClient} from "../../bindings/exhibition-launcher/torrent/realdebrid/index.js";
 
 export default {
     name: 'ExplorePage',
-    mounted() {
+    async mounted() {
         Events.On("download_progress", this.updateDownloadProgress)
+        this.paused = await RealDebridClient.GetPaused()
     },
     methods: {
         updateDownloadProgress(event) {
@@ -52,18 +60,29 @@ export default {
 
             if (progressData) {
                 this.progress = progressData.percent;
+                this.timePassed = progressData.timePassed
                 console.log("Current progress:", this.progress);
 
                 console.log("Downloaded bytes:", progressData.downloadedBytes);
                 console.log("Total bytes:", progressData.totalBytes);
+                console.log("Time passed:", progressData.timePassed);
             } else {
                 console.error("Progress data not found in expected format");
             }
+        },
+        async pauseResumeDownloads() {
+            // Should prob make a torrent pause too 💀
+            let pauseValue = !await RealDebridClient.GetPaused()
+            RealDebridClient.SetPaused(pauseValue);
+            this.paused = pauseValue
+            console.log(pauseValue)
         }
     },
     data() {
         return {
             progress: 0,
+            paused: false,
+            timePassed: "",
         }
     }
 

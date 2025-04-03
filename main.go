@@ -81,7 +81,7 @@ func main() {
 			fmt.Println(ErrorTokenIsEmpty)
 			return
 		}
-		debridClient = realdebrid.NewRealDebridClient(settings.RealDebridSettings.DebridToken)
+		debridClient = realdebrid.NewRealDebridClient(settings)
 	}
 
 	queue := exhibitionQueue.Queue{

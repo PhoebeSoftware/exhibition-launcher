@@ -3,6 +3,7 @@ package realdebrid
 import (
 	"encoding/json"
 	"errors"
+	"exhibition-launcher/utils/jsonUtils/jsonModels"
 	"io"
 	"log"
 	"net/http"
@@ -27,18 +28,27 @@ var (
 )
 
 type RealDebridClient struct {
-	ApiKey  string
-	client  *http.Client
-	BaseURL string
+	ApiKey   string
+	client   *http.Client
+	BaseURL  string
+	Paused   bool
+	Settings *jsonModels.Settings
 }
 
-func NewRealDebridClient(apiKey string) *RealDebridClient {
+func (client *RealDebridClient) SetPaused(value bool) {
+	client.Paused = value
+}
+func (client *RealDebridClient) GetPaused() bool {
+	return client.Paused
+}
+func NewRealDebridClient(settings *jsonModels.Settings) *RealDebridClient {
 	return &RealDebridClient{
-		ApiKey: apiKey,
+		ApiKey: settings.RealDebridSettings.DebridToken,
 		client: &http.Client{
 			Timeout: 10 * time.Minute,
 		},
-		BaseURL: "https://api.real-debrid.com/rest/1.0",
+		BaseURL:  "https://api.real-debrid.com/rest/1.0",
+		Settings: settings,
 	}
 }
 

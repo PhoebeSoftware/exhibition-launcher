@@ -84,6 +84,7 @@ func (client *RealDebridClient) DownloadDirectLink(app *application.App, link st
 
 	numWorkers := 2
 	stopCh := make(chan interface{})
+	pauseCh := make(chan interface{})
 	errCh := make(chan error, 10)
 	chunks := make(chan [2]int64, numWorkers)
 
@@ -96,6 +97,9 @@ func (client *RealDebridClient) DownloadDirectLink(app *application.App, link st
 			case chunk, ok := <-chunks:
 				if !ok {
 					return
+				}
+				if client.Paused {
+					client.checkIfResume()
 				}
 				rangeStart, rangeEnd := chunk[0], chunk[1]
 				req, err := http.NewRequest(http.MethodGet, link, nil)
@@ -141,6 +145,9 @@ func (client *RealDebridClient) DownloadDirectLink(app *application.App, link st
 	go func() {
 		defer close(done)
 		for {
+			if client.Paused {
+				client.checkIfResume()
+			}
 			select {
 			case <-stopCh:
 				app.EmitEvent("download_complete", "Download Finished!")
@@ -152,15 +159,22 @@ func (client *RealDebridClient) DownloadDirectLink(app *application.App, link st
 					"percent": percent,
 					"downloadedBytes": downloadedBytesAtomic,
 					"totalBytes": totalSize,
+					"timePassed": time.Since(startTime).String(),
 				})
-				time.Sleep(4 * time.Second)
+				time.Sleep(1 * time.Second)
 			}
 		}
 	}()
 
 	for i := 0; i < numWorkers; i++ {
-		wg.Add(1)
-		go worker()
+		select {
+		case <-pauseCh:
+			fmt.Println("Closed pause channel testtsestststst")
+			return fmt.Errorf("closed pause channel")
+		default:
+			wg.Add(1)
+			go worker()
+		}
 	}
 
 	for i := stat.Size(); i < totalSize; i += sizeOfChunk {
@@ -177,17 +191,22 @@ func (client *RealDebridClient) DownloadDirectLink(app *application.App, link st
 	wg.Wait()
 
 	close(errCh)
-
 	close(stopCh)
 	<-done
 
 	for err := range errCh {
 		return err
 	}
+	return err
+}
 
-	fmt.Println("\nDone with: " + filePath)
-	fmt.Println("Took: " + time.Since(startTime).String())
-	return nil
+func (client *RealDebridClient) checkIfResume() {
+	if client.Paused {
+		time.Sleep(100 * time.Millisecond)
+		client.checkIfResume()
+	} else {
+		return
+	}
 }
 
 func (client *RealDebridClient) DownloadByMagnet(app *application.App, magnetLink string, path string) error {
