@@ -4,6 +4,7 @@ import (
 	"exhibition-launcher/torrent"
 	"exhibition-launcher/torrent/realdebrid"
 	"fmt"
+
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
@@ -48,10 +49,18 @@ func (q *Queue) RemoveFromQueue(i int) {
 func (q *Queue) SetDownloading(value bool) {
 	q.Downloading = value
 }
+
 func (q *Queue) SetPaused(value bool) {
 	q.Paused = value
-	q.RealDebridClient.SetPaused(value)
+
+	switch q.DownloadsInQueue[0].Type {
+	case RealDebridType:
+		q.RealDebridClient.SetPaused(value)
+	case TorrentType:
+		q.TorrentManager.SetPaused(value)
+	}
 }
+
 func (q *Queue) GetPaused() bool {
 	return q.Paused
 }
@@ -63,9 +72,12 @@ func (q *Queue) StartDownloads() error {
 	if len(q.DownloadsInQueue) <= 0 {
 		return fmt.Errorf("no downloads in queue")
 	}
+
 	defer q.SetDownloading(false)
 	q.SetDownloading(true)
+
 	download := q.DownloadsInQueue[0]
+
 	switch download.Type {
 	case RealDebridType:
 		fmt.Println("Starting Real-Debrid download!!")
@@ -74,15 +86,24 @@ func (q *Queue) StartDownloads() error {
 			return err
 		}
 	case TorrentType:
-		// OMAR LOCK IN!!!
+		fmt.Println("Starting BitTorrent download!!")
+		t, err := q.TorrentManager.AddTorrent(q.App, download.MagnetLink)
+		if err != nil {
+			return err
+		}
+
+		// wacht
+		<-t.NotifyComplete()
 	}
 
 	// Next download
 	q.SetDownloading(false)
 	q.RemoveFromQueue(0)
+
 	err := q.StartDownloads()
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
