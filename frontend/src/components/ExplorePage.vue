@@ -72,7 +72,7 @@ export default {
             }
         },
         async pauseResumeDownloads() {
-            let pauseValue = !await RealDebridClient.GetPaused()
+            let pauseValue = !await Queue.GetPaused()
             Queue.SetPaused(pauseValue)
             this.paused = pauseValue
             console.log(pauseValue)
