@@ -47,12 +47,13 @@ function startDownloads() {
 
 import {Events} from "@wailsio/runtime";
 import {RealDebridClient} from "../../bindings/exhibition-launcher/torrent/realdebrid/index.js";
+import {Queue} from "../../bindings/exhibition-launcher/exhibitionQueue/index.js";
 
 export default {
     name: 'ExplorePage',
     async mounted() {
         Events.On("download_progress", this.updateDownloadProgress)
-        this.paused = await RealDebridClient.GetPaused()
+        this.paused = await Queue.GetPaused()
     },
     methods: {
         updateDownloadProgress(event) {
@@ -71,9 +72,8 @@ export default {
             }
         },
         async pauseResumeDownloads() {
-            // Should prob make a torrent pause too 💀
             let pauseValue = !await RealDebridClient.GetPaused()
-            RealDebridClient.SetPaused(pauseValue);
+            Queue.SetPaused(pauseValue)
             this.paused = pauseValue
             console.log(pauseValue)
         }

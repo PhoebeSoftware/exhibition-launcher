@@ -142,6 +142,7 @@ func (client *RealDebridClient) DownloadDirectLink(app *application.App, link st
 	}
 
 	done := make(chan struct{})
+	// Different thread for tracking progress
 	go func() {
 		defer close(done)
 		for {
@@ -199,7 +200,7 @@ func (client *RealDebridClient) DownloadDirectLink(app *application.App, link st
 	}
 	return err
 }
-
+// Sleep the program when client is paused resume after
 func (client *RealDebridClient) checkIfResume() {
 	if client.Paused {
 		time.Sleep(100 * time.Millisecond)

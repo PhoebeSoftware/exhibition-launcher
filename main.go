@@ -89,6 +89,7 @@ func main() {
 		TorrentManager:   torrentManager,
 		RealDebridClient: debridClient,
 		DownloadPath:     settings.DownloadPath,
+		Paused: false,
 	}
 
 	// This code is for refetching covers and banners but it will slow down startup

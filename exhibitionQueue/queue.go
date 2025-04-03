@@ -19,10 +19,11 @@ type Queue struct {
 	DownloadPath     string
 	App              *application.App
 	Downloading      bool
+	Paused           bool
 }
 
 type Download struct {
-	UUID string
+	UUID       string
 	Type       string
 	MagnetLink string
 	Progress   float64
@@ -47,6 +48,14 @@ func (q *Queue) RemoveFromQueue(i int) {
 func (q *Queue) SetDownloading(value bool) {
 	q.Downloading = value
 }
+func (q *Queue) SetPaused(value bool) {
+	q.Paused = value
+	q.RealDebridClient.SetPaused(value)
+}
+func (q *Queue) GetPaused() bool {
+	return q.Paused
+}
+
 func (q *Queue) StartDownloads() error {
 	if q.Downloading {
 		return fmt.Errorf("already downloading")
