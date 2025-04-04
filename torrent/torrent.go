@@ -1,6 +1,8 @@
 package torrent
 
 import (
+	"errors"
+	"exhibition-launcher/utils"
 	"fmt"
 	"net/http"
 	"os"
@@ -10,15 +12,16 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
-type DownloadData struct {
-	Name     string
-	Progress int
-	Speed    int
-}
+const (
+	KB = 1024
+	MB = 1024 * KB
+	GB = 1024 * MB
+)
+
 type Manager struct {
-	session    *torrent.Session
-	games      map[string]DownloadData
-	httpClient *http.Client
+	session     *torrent.Session
+	httpClient  *http.Client
+	downloadDir string
 }
 
 // start client en geef manager zodat je makkelijk kan bedienen zawg
@@ -31,6 +34,8 @@ func StartClient(path string) *Manager {
 
 	conf := torrent.DefaultConfig
 	conf.DataDir = path
+	conf.DataDirIncludesTorrentID = false
+	conf.Debug = false
 
 	session, err := torrent.NewSession(conf)
 
@@ -40,79 +45,99 @@ func StartClient(path string) *Manager {
 	}
 
 	return &Manager{
-		session:    session,
-		games:      make(map[string]DownloadData),
-		httpClient: &http.Client{},
+		session:     session,
+		httpClient:  &http.Client{},
+		downloadDir: path,
+	}
+}
+
+func HumanizeBytesPerSecond(bytesPerSec float64) string {
+	switch {
+	case bytesPerSec >= GB:
+		return fmt.Sprintf("%.2f GB/s", bytesPerSec/GB)
+	case bytesPerSec >= MB:
+		return fmt.Sprintf("%.2f MB/s", bytesPerSec/MB)
+	case bytesPerSec >= KB:
+		return fmt.Sprintf("%.2f KB/s", bytesPerSec/KB)
+	default:
+		return fmt.Sprintf("%.0f B/s", bytesPerSec)
 	}
 }
 
 func (manager *Manager) SetPaused(value bool) {
-	fmt.Println("Setting paused:", value)
+	fmt.Println("Setting BitTorrent paused to ", value)
 
 	if value {
 		manager.session.StopAll()
 	} else {
 		manager.session.StartAll()
 	}
+}
 
+func IsTriggered(ch <-chan struct{}) bool {
+	select {
+	case _, ok := <-ch:
+		return !ok
+	default:
+		return false
+	}
 }
 
 // add download
 // start ook torrent meteen
-func (manager Manager) AddTorrent(app *application.App, magnetLink string) (*torrent.Torrent, error) {
+func (manager Manager) AddTorrent(app *application.App, uuid string, magnetLink string) (*torrent.Torrent, error) {
 	startTime := time.Now()
 
-	fmt.Println("Adding torrent:", magnetLink)
-	t, err := manager.session.AddURI(magnetLink, nil)
+	fmt.Println("Adding torrent ", uuid)
+	t, err := manager.session.AddURI(magnetLink, &torrent.AddTorrentOptions{
+		ID:                uuid,
+		StopAfterDownload: true, // FUCK seeding
+	})
 	if err != nil {
 		return t, err
 	}
 
-	fmt.Println("Getting metadata")
+	// get metadata
+	fmt.Println("Getting BitTorrent metadata")
 	<-t.NotifyMetadata()
-	fmt.Println("Download starting")
 
-	manager.games[t.Name()] = DownloadData{
-		Name:     t.Name(),
-		Progress: 0,
-		Speed:    0,
+	// check space
+	disk := utils.DiskUsage(manager.downloadDir)
+	if int64(disk.Free) < t.Stats().Bytes.Total {
+		fmt.Println("Insufficient disk space")
+		return t, errors.New("get yo bread right nigga")
 	}
+
+	fmt.Println("BitTorrent Download starting")
 
 	// speed goroutine
 	go func() {
 		ticker := time.NewTicker(time.Second)
 		defer ticker.Stop()
-		for {
-			select {
-			case <-ticker.C:
-				stats := t.Stats()
 
-				completionRatio := float64(stats.Bytes.Completed) / float64(stats.Bytes.Total)
-				if completionRatio <= 0.0 {
-					fmt.Println("might be paused")
-					continue
-				}
+		for range ticker.C {
+			stats := t.Stats()
+			if stats.Status == torrent.Stopped || stats.Status == torrent.Stopping {
+				continue // paused
+			}
 
-				game := manager.games[t.Name()]
-				game.Speed = stats.Speed.Download
-				game.Progress = int(completionRatio * 100)
+			completionRatio := float64(stats.Bytes.Completed) / float64(stats.Bytes.Total)
+			percentage := int(completionRatio * 100)
+			speedySpeed := HumanizeBytesPerSecond(float64(stats.Speed.Download))
 
-				manager.games[t.Name()] = game
-				fmt.Printf("Game: %s, Progress: %d%%, Speed: %d bytes/s\n", game.Name, game.Progress, game.Speed)
-				app.EmitEvent("download_progress", map[string]interface{}{
-					"percent":         game.Progress,
-					"downloadedBytes": stats.Bytes.Completed,
-					"totalBytes":      stats.Bytes.Total,
-					"timePassed":      time.Since(startTime).String(),
-				})
+			fmt.Printf("%s: Progress: %d%%, Speed: %s ETA: %s\n", t.Name(), percentage, speedySpeed, stats.ETA)
+			app.EmitEvent("download_progress", map[string]interface{}{
+				"percent":         percentage,
+				"downloadedBytes": stats.Bytes.Completed,
+				"totalBytes":      stats.Bytes.Total,
+				"timePassed":      time.Since(startTime).String(),
+			})
 
-				if stats.Bytes.Completed == stats.Bytes.Total {
-					fmt.Printf("Download complete: %s\n", t.Name())
-					app.EmitEvent("download_complete", "Download Finished!")
-
-					delete(manager.games, t.Name())
-					return
-				}
+			// trust
+			if IsTriggered(t.NotifyComplete()) || IsTriggered(t.NotifyClose()) {
+				fmt.Printf("BitTorrent Download complete for %s\n", t.Name())
+				app.EmitEvent("download_complete", "Download Finished!")
+				return
 			}
 		}
 	}()
