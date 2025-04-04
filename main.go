@@ -12,6 +12,7 @@ import (
 	"exhibition-launcher/utils/jsonUtils/jsonModels"
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 	"runtime"
 
@@ -73,6 +74,18 @@ func main() {
 	}
 
 	apiManager = igdb.NewAPI()
+	token, err := apiManager.GetAccesToken()
+	if err != nil {
+		fmt.Println("error fetching acces token:",err)
+		return
+	}
+
+	err = os.Setenv("IGDB_AUTH", token)
+	if err != nil {
+		fmt.Println("error setting auth token",err)
+		return
+	}
+
 	libraryManager = library.GetLibrary(apiManager)
 	if settings.RealDebridSettings.UseRealDebrid {
 		if settings.RealDebridSettings.DebridToken == "" {

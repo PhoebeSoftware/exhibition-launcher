@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
+	"net/url"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -29,6 +31,48 @@ type ApiGame struct {
 
 type APIManager struct {
 	client *http.Client
+}
+
+func (a *APIManager) GetAccesToken() (string, error) {
+	client := a.client
+	params := url.Values{}
+	params.Add("client_id", os.Getenv("IGDB_CLIENT"))
+	params.Add("client_secret", os.Getenv("IGDB_SECRET"))
+	params.Add("grant_type", "client_credentials")
+	uri := "https://id.twitch.tv/oauth2/token" + "?" + params.Encode()
+	fmt.Println(uri)
+	req, err := http.NewRequest(http.MethodPost, uri, nil)
+	if err != nil {
+		return "", fmt.Errorf("error setting up request:%w", err)
+	}
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	type AuthResponse struct {
+		AccessToken string `json:"access_token"`
+		ExpiresIn   int    `json:"expires_in"`
+		TokenType   string `json:"token_type"`
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("error while requesting:%w", err)
+	}
+
+	var authResponse AuthResponse
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("error reading body:%w",err)
+	}
+
+	err = json.Unmarshal(body, &authResponse)
+	if err != nil {
+		return "", fmt.Errorf("error decoding json:%w", err)
+	}
+
+	return authResponse.AccessToken, nil
+
 }
 
 func SetupHeader(request *http.Request) {
