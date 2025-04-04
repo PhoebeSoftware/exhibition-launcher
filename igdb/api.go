@@ -3,11 +3,13 @@ package igdb
 import (
 	"bytes"
 	"encoding/json"
+	"exhibition-launcher/utils/jsonUtils"
 	"exhibition-launcher/utils/jsonUtils/jsonModels"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 type Image struct {
@@ -70,7 +72,8 @@ func (a *APIManager) GetAndSetNewAuthToken() (string, error) {
 
 	a.settings.IgdbSettings.IgdbAuth = authResponse.AccessToken
 	a.settings.IgdbSettings.ExpiresIn = authResponse.ExpiresIn
-
+	expiresAt := time.Now().Add(time.Duration(authResponse.ExpiresIn) * time.Second)
+	a.settings.IgdbSettings.ExpiresAt = expiresAt
 	return authResponse.AccessToken, nil
 }
 
@@ -79,11 +82,28 @@ func (a *APIManager) SetupHeader(request *http.Request) {
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", a.settings.IgdbSettings.IgdbAuth))
 }
 
-func NewAPI(settings *jsonModels.Settings) (*APIManager, error) {
-	return &APIManager{
+func NewAPI(settings *jsonModels.Settings, settingsManager *jsonUtils.JsonManager) (*APIManager, error) {
+	apiManager := &APIManager{
 		client:   &http.Client{},
 		settings: settings,
-	}, nil
+	}
+
+	// Generate new auth token if needed
+	if time.Now().After(settings.IgdbSettings.ExpiresAt) {
+		fmt.Println("Generating new auth token because the old one has expired")
+		_, err := apiManager.GetAndSetNewAuthToken()
+		if err != nil {
+			fmt.Println("error fetching acces token:", err)
+			return nil, err
+		}
+		// Save new auth token
+		err = settingsManager.Save()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return apiManager, nil
 }
 
 func (a *APIManager) GetGameData(id int) (ApiGame, error) {

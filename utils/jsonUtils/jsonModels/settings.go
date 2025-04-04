@@ -1,6 +1,9 @@
 package jsonModels
 
-import "path/filepath"
+import (
+	"path/filepath"
+	"time"
+)
 
 type Settings struct {
 	DownloadPath   string `json:"download_path"`
@@ -21,6 +24,9 @@ type IgdbSettings struct {
 
 	// In seconds
 	ExpiresIn int `json:"expires_in"`
+
+	// Basic go time format
+	ExpiresAt time.Time `json:"expires_at"`
 }
 
 func (s Settings) GetSettings() Settings {

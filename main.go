@@ -72,22 +72,13 @@ func main() {
 		return
 	}
 
-	apiManager, err = igdb.NewAPI(settings)
+	apiManager, err = igdb.NewAPI(settings, settingsManager)
 	if err != nil {
 		fmt.Println("error fetching acces token:", err)
 		return
 	}
 
-	_, err = apiManager.GetAndSetNewAuthToken()
-	if err != nil {
-		fmt.Println("error fetching acces token:", err)
-		return
-	}
-	// Save new auth token
-	err = settingsManager.Save()
-	if err != nil {
-		return
-	}
+
 
 	libraryManager = library.GetLibrary(apiManager)
 	if settings.RealDebridSettings.UseRealDebrid {
