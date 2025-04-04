@@ -7,7 +7,6 @@ toolchain go1.23.5
 require (
 	github.com/cenkalti/rain v1.13.0
 	github.com/google/uuid v1.6.0
-	github.com/joho/godotenv v1.5.1
 	github.com/sqweek/dialog v0.0.0-20240226140203-065105509627
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.9
 )

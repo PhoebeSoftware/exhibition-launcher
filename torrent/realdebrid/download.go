@@ -82,7 +82,7 @@ func (client *RealDebridClient) DownloadDirectLink(app *application.App, link st
 	var fileMutex sync.Mutex
 	var downloadedBytes = stat.Size()
 
-	numWorkers := 2
+	numWorkers := client.Settings.RealDebridSettings.NumberOfThreads
 	stopCh := make(chan interface{})
 	pauseCh := make(chan interface{})
 	errCh := make(chan error, 10)

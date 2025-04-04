@@ -16,7 +16,6 @@
 
 
 import {Settings} from "../../bindings/exhibition-launcher/utils/jsonUtils/jsonModels/index.js";
-import {Queue} from "../../bindings/exhibition-launcher/exhibitionQueue/index.js";
 import {RealDebridClient} from "../../bindings/exhibition-launcher/torrent/realdebrid/index.js";
 
 
@@ -32,7 +31,6 @@ async function addToQueue(magnetLink) {
 
     await Queue.AddRealDebridDownloadToQueue(magnetLinkHollowKnight)
 }
-
 
 
 function startDownloads() {

@@ -13,4 +13,8 @@ downloads
 sources
 /frontend/bindings
 ./frontend/package-lock.json
-package-lock.json
+./package.json
+./package-lock.json
+./node_modules
+./frontend/.vscode
+node_modules

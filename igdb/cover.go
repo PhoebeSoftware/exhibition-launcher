@@ -16,7 +16,7 @@ func (a *APIManager) GetCover(coverID int) (string, error) {
 		return result, err
 	}
 
-	SetupHeader(request)
+	a.SetupHeader(request)
 
 	response, err := a.client.Do(request)
 	if err != nil {

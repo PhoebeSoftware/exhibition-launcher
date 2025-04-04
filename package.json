@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@wailsapp/runtime": "^1.1.1",
-    "vue-router": "^4.5.0"
-  }
-}

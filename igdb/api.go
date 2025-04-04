@@ -3,12 +3,13 @@ package igdb
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
+	"exhibition-launcher/utils/jsonUtils"
+	"exhibition-launcher/utils/jsonUtils/jsonModels"
 	"fmt"
+	"io"
 	"net/http"
-	"os"
-
-	"github.com/joho/godotenv"
+	"net/url"
+	"time"
 )
 
 type Image struct {
@@ -16,39 +17,93 @@ type Image struct {
 }
 
 type ApiGame struct {
-	Id          int    `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"summary"`
-
-	Cover             Image    `json:"-"`
-	CoverURL          string   `json:"-"`
-	Artworks          []Image  `json:"-"`
-	ArtworkUrlList    []string `json:"-"`
-	Screenshots       []Image  `json:"-"`
-	ScreenshotUrlList []string `json:"-"`
+	Id                int    `json:"id"`
+	Name              string `json:"name"`
+	Description       string `json:"summary"`
+	Cover             Image  `json:"cover"`
+	CoverURL          string
+	Artworks          []Image `json:"artworks"`
+	ArtworkUrlList    []string
+	Screenshots       []Image `json:"screenshots"`
+	ScreenshotUrlList []string
 }
 
 type APIManager struct {
-	client *http.Client
+	client   *http.Client
+	settings *jsonModels.Settings
 }
 
-func SetupHeader(request *http.Request) {
-	request.Header.Set("Client-ID", os.Getenv("IGDB_CLIENT"))
-	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", os.Getenv("IGDB_AUTH")))
-}
-
-// Special error so we can check in main
-var (
-	ErrorNoCoversFound = errors.New("could not find a cover with this id")
-)
-
-func NewAPI() *APIManager {
-	err := godotenv.Load()
+func (a *APIManager) GetAndSetNewAuthToken() (string, error) {
+	client := a.client
+	params := url.Values{}
+	params.Add("client_id", a.settings.IgdbSettings.IgdbClient)
+	params.Add("client_secret", a.settings.IgdbSettings.IgdbSecret)
+	params.Add("grant_type", "client_credentials")
+	uri := "https://id.twitch.tv/oauth2/token" + "?" + params.Encode()
+	req, err := http.NewRequest(http.MethodPost, uri, nil)
 	if err != nil {
-		fmt.Println("Error loading .env file")
+		return "", fmt.Errorf("error setting up request:%w", err)
 	}
 
-	return &APIManager{client: &http.Client{}}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	type AuthResponse struct {
+		AccessToken string `json:"access_token"`
+		ExpiresIn   int    `json:"expires_in"`
+		TokenType   string `json:"token_type"`
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("error while requesting:%w", err)
+	}
+
+	var authResponse AuthResponse
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("error reading body:%w", err)
+	}
+
+	err = json.Unmarshal(body, &authResponse)
+	if err != nil {
+		return "", fmt.Errorf("error decoding json:%w", err)
+	}
+
+	a.settings.IgdbSettings.IgdbAuth = authResponse.AccessToken
+	a.settings.IgdbSettings.ExpiresIn = authResponse.ExpiresIn
+	expiresAt := time.Now().Add(time.Duration(authResponse.ExpiresIn) * time.Second)
+	a.settings.IgdbSettings.ExpiresAt = expiresAt
+	return authResponse.AccessToken, nil
+}
+
+func (a *APIManager) SetupHeader(request *http.Request) {
+	request.Header.Set("Client-ID", a.settings.IgdbSettings.IgdbClient)
+	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", a.settings.IgdbSettings.IgdbAuth))
+}
+
+func NewAPI(settings *jsonModels.Settings, settingsManager *jsonUtils.JsonManager) (*APIManager, error) {
+	apiManager := &APIManager{
+		client:   &http.Client{},
+		settings: settings,
+	}
+
+	// Generate new auth token if needed
+	if time.Now().After(settings.IgdbSettings.ExpiresAt) {
+		fmt.Println("Generating new auth token because the old one has expired")
+		_, err := apiManager.GetAndSetNewAuthToken()
+		if err != nil {
+			fmt.Println("error fetching acces token:", err)
+			return nil, err
+		}
+		// Save new auth token
+		err = settingsManager.Save()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return apiManager, nil
 }
 
 func (a *APIManager) GetGameData(id int) (ApiGame, error) {
@@ -59,7 +114,7 @@ func (a *APIManager) GetGameData(id int) (ApiGame, error) {
 		return ApiGame{}, err
 	}
 
-	SetupHeader(request)
+	a.SetupHeader(request)
 
 	response, err := a.client.Do(request)
 	if err != nil {
@@ -109,7 +164,7 @@ func (a *APIManager) GetGames(query string) []ApiGame {
 		return []ApiGame{}
 	}
 
-	SetupHeader(request)
+	a.SetupHeader(request)
 
 	response, err := a.client.Do(request)
 	if err != nil {
