@@ -12,7 +12,6 @@ import (
 	"exhibition-launcher/utils/jsonUtils/jsonModels"
 	"fmt"
 	"log"
-	"os"
 	"path/filepath"
 	"runtime"
 
@@ -75,18 +74,13 @@ func main() {
 
 	apiManager, err = igdb.NewAPI()
 	if err != nil {
-		fmt.Println("error fetching acces token:",err)
-		return
-	}
-	token, err := apiManager.GetAccesToken()
-	if err != nil {
-		fmt.Println("error fetching acces token:",err)
+		fmt.Println("error fetching acces token:", err)
 		return
 	}
 
-	err = os.Setenv("IGDB_AUTH", token)
+	_, err = apiManager.GetAndSetNewAuthToken()
 	if err != nil {
-		fmt.Println("error setting auth token",err)
+		fmt.Println("error fetching acces token:", err)
 		return
 	}
 
