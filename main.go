@@ -73,7 +73,11 @@ func main() {
 		return
 	}
 
-	apiManager = igdb.NewAPI()
+	apiManager, err = igdb.NewAPI()
+	if err != nil {
+		fmt.Println("error fetching acces token:",err)
+		return
+	}
 	token, err := apiManager.GetAccesToken()
 	if err != nil {
 		fmt.Println("error fetching acces token:",err)
