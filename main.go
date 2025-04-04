@@ -72,7 +72,7 @@ func main() {
 		return
 	}
 
-	apiManager, err = igdb.NewAPI()
+	apiManager, err = igdb.NewAPI(settings)
 	if err != nil {
 		fmt.Println("error fetching acces token:", err)
 		return
@@ -81,6 +81,11 @@ func main() {
 	_, err = apiManager.GetAndSetNewAuthToken()
 	if err != nil {
 		fmt.Println("error fetching acces token:", err)
+		return
+	}
+	// Save new auth token
+	err = settingsManager.Save()
+	if err != nil {
 		return
 	}
 

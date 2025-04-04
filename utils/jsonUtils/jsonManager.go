@@ -31,7 +31,7 @@ func NewJsonManager(path string, config Configurable) (*JsonManager, error) {
 func (manager *JsonManager) Load() error {
 	file, err := os.Open(manager.Path)
 	if err != nil {
-		return fmt.Errorf("could not open jsonUtils file: %w", err)
+		return fmt.Errorf("could not open json file: %w", err)
 	}
 	defer file.Close()
 

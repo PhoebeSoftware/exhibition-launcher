@@ -18,7 +18,7 @@ func (a *APIManager) GetArtworkURLs(artworkIDs []int) ([]string, error) {
 			return result, err
 		}
 
-		SetupHeader(request)
+		a.SetupHeader(request)
 
 		response, err := a.client.Do(request)
 		if err != nil {
