@@ -56,6 +56,7 @@ func (q *Queue) GetPaused() bool {
 	return q.Paused
 }
 
+// StartDownloads starts the first donwload from the q.DownloadsInQueue. When done removes the first one and queues again until there are no more items in the array.
 func (q *Queue) StartDownloads() error {
 	if q.Downloading {
 		return fmt.Errorf("already downloading")
