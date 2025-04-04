@@ -13,14 +13,23 @@ var (
 	TorrentType    = "Torrent"
 )
 
+type QueueStatus int
+
+const (
+	Idle QueueStatus = iota
+	Downloading
+	Extracting
+)
+
 type Queue struct {
 	DownloadsInQueue []Download
 	TorrentManager   *torrent.Manager
 	RealDebridClient *realdebrid.RealDebridClient
-	DownloadPath     string
 	App              *application.App
-	Downloading      bool
-	Paused           bool
+
+	DownloadPath string
+	QueueStatus  QueueStatus
+	Paused       bool
 }
 
 type Download struct {
@@ -32,6 +41,10 @@ type Download struct {
 
 func (q *Queue) GetFirstDownload() Download {
 	return q.DownloadsInQueue[0]
+}
+
+func (q *Queue) SetStatus(status QueueStatus) {
+	q.QueueStatus = status
 }
 
 func (q *Queue) GetDownloadInQueue() []Download {
@@ -46,14 +59,10 @@ func (q *Queue) RemoveFromQueue(i int) {
 	q.DownloadsInQueue = append(q.DownloadsInQueue[:i], q.DownloadsInQueue[i+1:]...)
 }
 
-func (q *Queue) SetDownloading(value bool) {
-	q.Downloading = value
-}
-
 func (q *Queue) SetPaused(value bool) {
 	q.Paused = value
 
-	switch q.DownloadsInQueue[0].Type {
+	switch q.GetFirstDownload().Type {
 	case RealDebridType:
 		q.RealDebridClient.SetPaused(value)
 	case TorrentType:
@@ -67,17 +76,17 @@ func (q *Queue) GetPaused() bool {
 
 // StartDownloads starts the first donwload from the q.DownloadsInQueue. When done removes the first one and queues again until there are no more items in the array.
 func (q *Queue) StartDownloads() error {
-	if q.Downloading {
+	if q.QueueStatus != Idle {
 		return fmt.Errorf("already downloading")
 	}
 	if len(q.DownloadsInQueue) <= 0 {
 		return fmt.Errorf("no downloads in queue")
 	}
 
-	defer q.SetDownloading(false)
-	q.SetDownloading(true)
+	defer q.SetStatus(Idle)
+	q.SetStatus(Downloading)
 
-	download := q.DownloadsInQueue[0]
+	download := q.GetFirstDownload()
 
 	switch download.Type {
 	case RealDebridType:
@@ -88,7 +97,7 @@ func (q *Queue) StartDownloads() error {
 		}
 	case TorrentType:
 		fmt.Println("Starting BitTorrent download!!")
-		t, err := q.TorrentManager.AddTorrent(q.App, download.MagnetLink)
+		t, err := q.TorrentManager.AddTorrent(q.App, download.UUID, download.MagnetLink)
 		if err != nil {
 			return err
 		}
@@ -97,8 +106,10 @@ func (q *Queue) StartDownloads() error {
 		<-t.NotifyComplete()
 	}
 
+	fmt.Printf("%s download complete\n", download.Type)
+
 	// Next download
-	q.SetDownloading(false)
+	q.SetStatus(Idle)
 	q.RemoveFromQueue(0)
 
 	err := q.StartDownloads()

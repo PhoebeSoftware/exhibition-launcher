@@ -18,11 +18,16 @@ require (
 	github.com/ProtonMail/go-crypto v1.1.5 // indirect
 	github.com/TheTitanrain/w32 v0.0.0-20180517000239-4f5cfb03fabf // indirect
 	github.com/adrg/xdg v0.5.0 // indirect
+	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/bep/debounce v1.2.1 // indirect
+	github.com/bodgit/plumbing v1.3.0 // indirect
+	github.com/bodgit/sevenzip v1.4.0 // indirect
+	github.com/bodgit/windows v1.0.1 // indirect
 	github.com/cenkalti/backoff/v3 v3.2.2 // indirect
 	github.com/cenkalti/log v1.0.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cloudflare/circl v1.3.8 // indirect
+	github.com/connesc/cipherio v0.2.1 // indirect
 	github.com/cyphar/filepath-securejoin v0.3.6 // indirect
 	github.com/ebitengine/purego v0.4.0-alpha.4 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
@@ -41,7 +46,9 @@ require (
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect
 	github.com/juju/ratelimit v1.0.2 // indirect
+	github.com/kdomanski/iso9660 v0.3.3 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
+	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
 	github.com/leaanthony/go-ansi-parser v1.6.1 // indirect
 	github.com/leaanthony/u v1.1.1 // indirect
@@ -56,6 +63,8 @@ require (
 	github.com/multiformats/go-varint v0.0.6 // indirect
 	github.com/nictuku/dht v0.0.0-20201226073453-fd1c1dd3d66a // indirect
 	github.com/nictuku/nettools v0.0.0-20150117095333-8867a2107ad3 // indirect
+	github.com/nwaples/rardecode v1.1.3 // indirect
+	github.com/pierrec/lz4/v4 v4.1.17 // indirect
 	github.com/pjbgf/sha1cd v0.3.2 // indirect
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c // indirect
 	github.com/powerman/rpc-codec v1.2.2 // indirect
@@ -66,12 +75,14 @@ require (
 	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 // indirect
 	github.com/skeema/knownhosts v1.3.0 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
+	github.com/ulikunitz/xz v0.5.12 // indirect
 	github.com/wailsapp/go-webview2 v1.0.19 // indirect
 	github.com/wailsapp/mimetype v1.4.1 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/youtube/vitess v3.0.0-rc.3+incompatible // indirect
 	github.com/zeebo/bencode v1.0.0 // indirect
 	go.etcd.io/bbolt v1.3.11 // indirect
+	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
 	golang.org/x/crypto v0.36.0 // indirect
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
 	golang.org/x/mod v0.24.0 // indirect
@@ -80,6 +91,7 @@ require (
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	golang.org/x/tools v0.31.0 // indirect
+	golift.io/xtractr v0.2.2 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	lukechampine.com/blake3 v1.1.6 // indirect
