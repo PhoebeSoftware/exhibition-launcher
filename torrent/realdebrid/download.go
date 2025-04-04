@@ -3,6 +3,7 @@ package realdebrid
 import (
 	"exhibition-launcher/utils"
 	"fmt"
+	"github.com/wailsapp/wails/v3/pkg/application"
 	"io"
 	"log"
 	"net/http"

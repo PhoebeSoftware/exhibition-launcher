@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"errors"
+	"exhibition-launcher/exhibitionQueue"
 	"exhibition-launcher/igdb"
 	"exhibition-launcher/library"
 	"exhibition-launcher/torrent"
@@ -79,6 +80,13 @@ func main() {
 	}
 
 
+	queue := exhibitionQueue.Queue{
+		DownloadsInQueue: []exhibitionQueue.Download{},
+		TorrentManager:   torrentManager,
+		RealDebridClient: debridClient,
+		DownloadPath:     settings.DownloadPath,
+		Paused:           false,
+	}
 
 	libraryManager = library.GetLibrary(apiManager)
 	if settings.RealDebridSettings.UseRealDebrid {
@@ -104,21 +112,7 @@ func main() {
 	//	libraryManager.Games[id] = game
 	//}
 
-	//torrentManager = torrent.StartClient(settings.DownloadPath)
 
-	//go func() {
-	//	results := torrent.Scrape_1337x("goat simulator 3")
-	//	for _, result := range results {
-	//		data := torrent.Get_1337x_data(result)
-	//		fmt.Printf("Title: %s\nUploader: %s\nDownloads: %d\nDate: %s\n\n", data.Title, data.Uploader, data.Downloads, data.Date)
-	//	}
-	//}()
-
-	// Create a new Wails application by providing the necessary options.
-	// Variables 'Name' and 'Description' are for application metadata.
-	// 'Assets' configures the asset server with the 'FS' variable pointing to the frontend files.
-	// 'Bind' is a list of Go struct instances. The frontend has access to the methods of these instances.
-	// 'Mac' options tailor the application when running an macOS.
 
 	webViewWindowOpt := application.WebviewWindowOptions{
 		Title:     "Exhibition Launcher",
@@ -144,6 +138,7 @@ func main() {
 		application.NewService(settings),
 		application.NewService(settingsManager),
 		application.NewService(&utils.PathUtil{}),
+		application.NewService(&queue),
 	}
 
 	if debridClient != nil {
@@ -179,6 +174,10 @@ func main() {
 
 	app = application.New(appOptions)
 	app.NewWebviewWindowWithOptions(webViewWindowOpt)
+
+	queue.App = app
+	queue.AddTorrentDownloadToQueue("magnet:?xt=urn:btih:AF8061222ACBB5EDD6DA353E4177FFC403426A88&dn=Schedule+I+v0.3.3f14&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.moeking.me%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.theoks.net%3A6969%2Fannounce&tr=udp%3A%2F%2Fmovies.zsw.ca%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.tiny-vps.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker-udp.gbitt.info%3A80%2Fannounce&tr=http%3A%2F%2Ftracker.gbitt.info%3A80%2Fannounce&tr=https%3A%2F%2Ftracker.gbitt.info%3A443%2Fannounce&tr=http%3A%2F%2Ftracker.ccp.ovh%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.ccp.ovh%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.dler.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=http%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Fopentracker.i2p.rocks%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fcoppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce")
+
 
 	err = app.Run()
 	if err != nil {

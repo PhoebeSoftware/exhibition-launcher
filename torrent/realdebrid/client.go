@@ -28,24 +28,16 @@ var (
 )
 
 type RealDebridClient struct {
-	ApiKey  string
-	client  *http.Client
-	BaseURL string
-	DownloadProgress DownloadProgress
-	Settings *jsonModels.Settings
+	ApiKey           string
+	client           *http.Client
+	BaseURL          string
+	Settings         *jsonModels.Settings
+	Paused           bool
 }
 
-type DownloadProgress struct {
-	DownloadedBytes int64
-	TotalBytes int64
-	Percent    float64
-	IsDownloading bool
+func (client *RealDebridClient) SetPaused(value bool) {
+	client.Paused = value
 }
-
-func (client RealDebridClient) GetDownloadProgress() DownloadProgress {
-	return client.DownloadProgress
-}
-
 
 func NewRealDebridClient(settings *jsonModels.Settings) *RealDebridClient {
 	return &RealDebridClient{
@@ -54,7 +46,6 @@ func NewRealDebridClient(settings *jsonModels.Settings) *RealDebridClient {
 			Timeout: 10 * time.Minute,
 		},
 		BaseURL: "https://api.real-debrid.com/rest/1.0",
-		DownloadProgress: DownloadProgress{},
 		Settings: settings,
 	}
 }
