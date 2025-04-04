@@ -26,7 +26,6 @@ type DownloadItem struct {
 }
 
 func (client *RealDebridClient) GetDownloads() ([]DownloadItem, error) {
-
 	req, err := client.newRequest(http.MethodGet, "/downloads", nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("get request failed while requesting downloads: %w", err)
@@ -40,7 +39,7 @@ func (client *RealDebridClient) GetDownloads() ([]DownloadItem, error) {
 
 	return result, nil
 }
-func (client *RealDebridClient) DownloadDirectLink(link string, filePath string) error {
+func (client *RealDebridClient) DownloadDirectLink(app *application.App, link string, filePath string) error {
 	startTime := time.Now()
 
 	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0644)
@@ -84,6 +83,7 @@ func (client *RealDebridClient) DownloadDirectLink(link string, filePath string)
 
 	numWorkers := client.Settings.RealDebridSettings.NumberOfThreads
 	stopCh := make(chan interface{})
+	pauseCh := make(chan interface{})
 	errCh := make(chan error, 10)
 	chunks := make(chan [2]int64, numWorkers)
 
@@ -96,6 +96,9 @@ func (client *RealDebridClient) DownloadDirectLink(link string, filePath string)
 			case chunk, ok := <-chunks:
 				if !ok {
 					return
+				}
+				if client.Paused {
+					client.checkIfResume()
 				}
 				rangeStart, rangeEnd := chunk[0], chunk[1]
 				req, err := http.NewRequest(http.MethodGet, link, nil)
@@ -138,26 +141,40 @@ func (client *RealDebridClient) DownloadDirectLink(link string, filePath string)
 	}
 
 	done := make(chan struct{})
+	// Different thread for tracking progress
 	go func() {
 		defer close(done)
-		client.DownloadProgress.TotalBytes = resp.ContentLength
-		client.DownloadProgress.IsDownloading = true
 		for {
+			if client.Paused {
+				client.checkIfResume()
+			}
 			select {
 			case <-stopCh:
-				client.DownloadProgress = DownloadProgress{IsDownloading: false}
+				app.EmitEvent("download_complete", "Download Finished!")
 				return
 			default:
-				//percent := float64(atomic.LoadInt64(&downloadedBytes)) / float64(totalSize) * 100
-				client.DownloadProgress.DownloadedBytes = downloadedBytes
-				client.DownloadProgress.Percent = (float64(downloadedBytes) / float64(resp.ContentLength)) * 100
+				downloadedBytesAtomic := atomic.LoadInt64(&downloadedBytes)
+				percent := (float64(downloadedBytesAtomic) / float64(totalSize)) * 100
+				app.EmitEvent("download_progress", map[string]interface{}{
+					"percent": percent,
+					"downloadedBytes": downloadedBytesAtomic,
+					"totalBytes": totalSize,
+					"timePassed": time.Since(startTime).String(),
+				})
+				time.Sleep(1 * time.Second)
 			}
 		}
 	}()
 
 	for i := 0; i < numWorkers; i++ {
-		wg.Add(1)
-		go worker()
+		select {
+		case <-pauseCh:
+			fmt.Println("Closed pause channel testtsestststst")
+			return fmt.Errorf("closed pause channel")
+		default:
+			wg.Add(1)
+			go worker()
+		}
 	}
 
 	for i := stat.Size(); i < totalSize; i += sizeOfChunk {
@@ -174,20 +191,25 @@ func (client *RealDebridClient) DownloadDirectLink(link string, filePath string)
 	wg.Wait()
 
 	close(errCh)
-
 	close(stopCh)
 	<-done
 
 	for err := range errCh {
 		return err
 	}
-
-	fmt.Println("\nDone with: " + filePath)
-	fmt.Println("Took: " + time.Since(startTime).String())
-	return nil
+	return err
+}
+// Sleep the program when client is paused resume after
+func (client *RealDebridClient) checkIfResume() {
+	if client.Paused {
+		time.Sleep(100 * time.Millisecond)
+		client.checkIfResume()
+	} else {
+		return
+	}
 }
 
-func (client *RealDebridClient) DownloadByMagnet(magnetLink string, path string) error {
+func (client *RealDebridClient) DownloadByMagnet(app *application.App, magnetLink string, path string) error {
 	addMagnetResponse, err := client.AddTorrentByMagnet(magnetLink)
 	if err != nil {
 		return err
@@ -250,7 +272,7 @@ func (client *RealDebridClient) DownloadByMagnet(magnetLink string, path string)
 	for _, unrestrictResponse := range unrestrictResponseList {
 		downloadPath := filepath.Join(path, unrestrictResponse.Filename)
 		fmt.Println(unrestrictResponse.Link)
-		err = client.DownloadDirectLink(unrestrictResponse.Download, downloadPath)
+		err = client.DownloadDirectLink(app, unrestrictResponse.Download, downloadPath)
 		if err != nil {
 			return err
 		}

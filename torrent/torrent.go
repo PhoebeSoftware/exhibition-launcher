@@ -6,16 +6,17 @@ import (
 	"os"
 	"time"
 
-	"github.com/anacrolix/torrent"
+	"github.com/cenkalti/rain/torrent"
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 type DownloadData struct {
 	Name     string
-	Progress int
+	Progress float64
 	Speed    int
 }
 type Manager struct {
-	client     *torrent.Client
+	session    *torrent.Session
 	games      map[string]DownloadData
 	httpClient *http.Client
 }
@@ -25,64 +26,91 @@ func StartClient(path string) *Manager {
 	dirErr := os.MkdirAll(path, os.ModePerm)
 	if dirErr != nil {
 		fmt.Println("Error creating downloads directory")
+		return nil
 	}
 
-	clientConfig := torrent.NewDefaultClientConfig()
-	clientConfig.DataDir = path
-	client, err := torrent.NewClient(clientConfig)
+	conf := torrent.DefaultConfig
+	conf.DataDir = path
+
+	session, err := torrent.NewSession(conf)
 
 	if err != nil {
-		fmt.Println("Error starting torrent client")
+		fmt.Println("Error starting torrent client:", err)
+		return nil
 	}
 
 	return &Manager{
-		client:     client,
+		session:    session,
 		games:      make(map[string]DownloadData),
 		httpClient: &http.Client{},
 	}
 }
 
+func (manager *Manager) SetPaused(value bool) {
+	fmt.Println("Setting paused:", value)
+
+	if value {
+		manager.session.StopAll()
+	} else {
+		manager.session.StartAll()
+	}
+
+}
+
 // add download
 // start ook torrent meteen
-func (manager Manager) AddTorrent(magnetLink string) (*torrent.Torrent, error) {
-	t, err := manager.client.AddMagnet(magnetLink)
+func (manager Manager) AddTorrent(app *application.App, magnetLink string) (*torrent.Torrent, error) {
+	startTime := time.Now()
+
+	fmt.Println("Adding torrent:", magnetLink)
+	t, err := manager.session.AddURI(magnetLink, nil)
 	if err != nil {
 		return t, err
 	}
 
 	fmt.Println("Getting metadata")
-	<-t.GotInfo()
-
+	<-t.NotifyMetadata()
 	fmt.Println("Download starting")
-	t.DownloadAll()
 
-	manager.games[t.Info().Name] = DownloadData{
-		Name:     t.Info().Name,
+	manager.games[t.Name()] = DownloadData{
+		Name:     t.Name(),
 		Progress: 0,
 		Speed:    0,
 	}
 
 	// speed goroutine
 	go func() {
-		var lastBytes int = 0
-
 		ticker := time.NewTicker(time.Second)
 		defer ticker.Stop()
 		for {
 			select {
 			case <-ticker.C:
-				currentBytes := int(t.BytesCompleted())
-				completionRatio := float64(currentBytes) / float64(t.Info().TotalLength())
+				stats := t.Stats()
 
-				game := manager.games[t.Info().Name]
-				game.Speed = currentBytes - lastBytes
-				game.Progress = int(completionRatio * 100)
+				completionRatio := float64(stats.Bytes.Completed) / float64(stats.Bytes.Total)
+				if completionRatio <= 0.0 {
+					fmt.Println("might be paused")
+					continue
+				}
 
-				manager.games[t.Info().Name] = game
+				game := manager.games[t.Name()]
+				game.Speed = stats.Speed.Download
+				game.Progress = float64(completionRatio * 100)
 
-				lastBytes = currentBytes
-				if completionRatio >= 1.0 {
-					delete(manager.games, t.Info().Name)
+				manager.games[t.Name()] = game
+				fmt.Printf("Game: %s, Progress: %f%%, Speed: %d bytes/s\n", game.Name, game.Progress, game.Speed)
+				app.EmitEvent("download_progress", map[string]interface{}{
+					"percent":         game.Progress,
+					"downloadedBytes": stats.Bytes.Completed,
+					"totalBytes":      stats.Bytes.Total,
+					"timePassed":      time.Since(startTime).String(),
+				})
+
+				if stats.Bytes.Completed == stats.Bytes.Total {
+					fmt.Printf("Download complete: %s\n", t.Name())
+					app.EmitEvent("download_complete", "Download Finished!")
+
+					delete(manager.games, t.Name())
 					return
 				}
 			}

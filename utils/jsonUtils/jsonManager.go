@@ -12,7 +12,7 @@ type Configurable interface {
 
 type JsonManager struct {
 	Config Configurable
-	Path string
+	Path   string
 }
 
 func NewJsonManager(path string, config Configurable) (*JsonManager, error) {

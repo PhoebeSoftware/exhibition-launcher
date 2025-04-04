@@ -14,6 +14,7 @@ type TrafficInfo struct {
 	Extra int
 	Reset string
 }
+
 func (client *RealDebridClient) GetTraffic() (map[string]TrafficInfo, error) {
 
 	type TrafficResponse map[string]TrafficInfo
@@ -32,4 +33,3 @@ func (client *RealDebridClient) GetTraffic() (map[string]TrafficInfo, error) {
 
 	return trafficResponse, nil
 }
-
