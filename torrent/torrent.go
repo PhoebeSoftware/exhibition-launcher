@@ -88,6 +88,10 @@ func (manager Manager) AddTorrent(app *application.App, magnetLink string) (*tor
 				stats := t.Stats()
 
 				completionRatio := float64(stats.Bytes.Completed) / float64(stats.Bytes.Total)
+				if completionRatio <= 0.0 {
+					fmt.Println("might be paused")
+					continue
+				}
 
 				game := manager.games[t.Name()]
 				game.Speed = stats.Speed.Download
@@ -102,7 +106,7 @@ func (manager Manager) AddTorrent(app *application.App, magnetLink string) (*tor
 					"timePassed":      time.Since(startTime).String(),
 				})
 
-				if completionRatio >= 1.0 {
+				if stats.Bytes.Completed == stats.Bytes.Total {
 					fmt.Printf("Download complete: %s\n", t.Name())
 					app.EmitEvent("download_complete", "Download Finished!")
 
