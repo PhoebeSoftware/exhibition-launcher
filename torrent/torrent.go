@@ -12,7 +12,7 @@ import (
 
 type DownloadData struct {
 	Name     string
-	Progress int
+	Progress float64
 	Speed    int
 }
 type Manager struct {
@@ -95,10 +95,10 @@ func (manager Manager) AddTorrent(app *application.App, magnetLink string) (*tor
 
 				game := manager.games[t.Name()]
 				game.Speed = stats.Speed.Download
-				game.Progress = int(completionRatio * 100)
+				game.Progress = float64(completionRatio * 100)
 
 				manager.games[t.Name()] = game
-				fmt.Printf("Game: %s, Progress: %d%%, Speed: %d bytes/s\n", game.Name, game.Progress, game.Speed)
+				fmt.Printf("Game: %s, Progress: %f%%, Speed: %d bytes/s\n", game.Name, game.Progress, game.Speed)
 				app.EmitEvent("download_progress", map[string]interface{}{
 					"percent":         game.Progress,
 					"downloadedBytes": stats.Bytes.Completed,
