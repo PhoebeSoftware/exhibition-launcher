@@ -9,6 +9,7 @@ type Settings struct {
 	DownloadPath       string             `json:"download_path"`
 	RealDebridSettings RealDebridSettings `json:"real_debrid_settings"`
 	IgdbSettings       IgdbSettings       `json:"igdb_settings"`
+	BitTorrentSettings BitTorrentSettings `json:"bittorrent_settings"`
 }
 
 type RealDebridSettings struct {
@@ -29,6 +30,12 @@ type IgdbSettings struct {
 	ExpiresAt time.Time `json:"expires_at"`
 }
 
+type BitTorrentSettings struct {
+	UseDHT bool   `json:"use_dht"`
+	UsePEX bool   `json:"use_pex"`
+	Port   uint16 `json:"port"`
+}
+
 func (s Settings) GetSettings() Settings {
 	return s
 }
@@ -42,4 +49,7 @@ func (s *Settings) DefaultValues() {
 	s.IgdbSettings.IgdbSecret = "client_secret"
 	s.IgdbSettings.IgdbAuth = "auto_generated_on_launch"
 	s.IgdbSettings.ExpiresIn = 0
+	s.BitTorrentSettings.UseDHT = true
+	s.BitTorrentSettings.UsePEX = true
+	s.BitTorrentSettings.Port = 9000
 }
