@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/cenkalti/rain/torrent"
@@ -26,10 +27,10 @@ type Manager struct {
 }
 
 // start client en geef manager zodat je makkelijk kan bedienen zawg
-func StartClient(path string) *Manager {
+func StartClient(path string, pex bool, dht bool, port uint16) *Manager {
 	dirErr := os.MkdirAll(path, os.ModePerm)
 	if dirErr != nil {
-		fmt.Println("Error creating downloads directory")
+		fmt.Println("Error creating downloads directory:", dirErr)
 		return nil
 	}
 
@@ -38,7 +39,19 @@ func StartClient(path string) *Manager {
 	conf.DataDirIncludesTorrentID = false
 	conf.Debug = false
 
+	conf.DHTEnabled = dht
+	conf.PEXEnabled = pex
+
+	conf.ResumeOnStartup = false
+	conf.Database = filepath.Join(path, "bittorrent.db")
+
+	// alleen frigging ranges zijn er
+	conf.PortBegin = port
+	conf.PortEnd = port + 10
+
 	session, err := torrent.NewSession(conf)
+
+	fmt.Println("port available:", session.Stats().PortsAvailable)
 
 	if err != nil {
 		fmt.Println("Error starting torrent client:", err)
@@ -68,7 +81,7 @@ func HumanizeBytes(bytesPerSec float64) string {
 }
 
 func (manager *Manager) SetPaused(value bool) {
-	fmt.Println("Setting BitTorrent paused to ", value)
+	fmt.Println("Setting BitTorrent paused to", value)
 
 	if value {
 		manager.session.StopAll()
@@ -91,7 +104,8 @@ func IsTriggered(ch <-chan struct{}) bool {
 func (manager Manager) AddTorrent(app *application.App, uuid string, magnetLink string) (*torrent.Torrent, error) {
 	startTime := time.Now()
 
-	fmt.Println("Adding torrent ", uuid)
+	// add torrent to session
+	fmt.Println("Adding torrent", uuid)
 	t, err := manager.session.AddURI(magnetLink, &torrent.AddTorrentOptions{
 		ID:                uuid,
 		StopAfterDownload: true, // FUCK seeding
@@ -100,51 +114,66 @@ func (manager Manager) AddTorrent(app *application.App, uuid string, magnetLink 
 		return t, err
 	}
 
+	fmt.Println("using port:", t.Port())
+
 	// get metadata
 	fmt.Println("Getting BitTorrent metadata")
-	<-t.NotifyMetadata()
+	for !IsTriggered(t.NotifyMetadata()) {
+		fmt.Println("Searching for metadata...")
+		time.Sleep(time.Second)
+	}
 
-	// check space
+	// get space data
 	disk := utils.DiskUsage(manager.downloadDir)
 	torrentSize := t.Stats().Bytes.Incomplete
 
 	fmt.Printf("%s free (%s left to download)\n", HumanizeBytes(float64(disk.Free)), HumanizeBytes(float64(torrentSize)))
 
+	// check space
 	if int64(disk.Free) < torrentSize {
+		manager.session.RemoveTorrent(uuid)
 		fmt.Println("Insufficient disk space")
 		return t, errors.New("get yo bread right nigga")
 	}
 
-	fmt.Println("BitTorrent Download starting")
+	fmt.Println("BitTorrent download starting")
 
 	// speed goroutine
 	go func() {
 		ticker := time.NewTicker(time.Second)
 		defer ticker.Stop()
 
+		lastBytesDown := float64(0)
+		lastBytesUp := float64(0)
+
 		for range ticker.C {
 			stats := t.Stats()
-			if stats.Status == torrent.Stopped || stats.Status == torrent.Stopping {
-				continue // paused
+			if stats.Status == torrent.Stopped || stats.Status == torrent.Seeding {
+				fmt.Println("Torrent paused")
+				if IsTriggered(t.NotifyComplete()) || IsTriggered(t.NotifyClose()) {
+					fmt.Printf("BitTorrent download complete for %s!\n", t.Name())
+					app.EmitEvent("download_complete", "Download Finished!")
+					break
+				}
 			}
 
-			completionRatio := float64(stats.Bytes.Completed) / float64(stats.Bytes.Total)
-			percentage := int(completionRatio * 100)
-			speedySpeed := HumanizeBytes(float64(stats.Speed.Download))
+			if stats.Status != torrent.Stopping {
+				completionRatio := float64(stats.Bytes.Completed) / float64(stats.Bytes.Total)
+				percentage := int(completionRatio * 100)
 
-			fmt.Printf("%s: Progress: %d%%, Speed: %s/s ETA: %s\n", t.Name(), percentage, speedySpeed, stats.ETA)
-			app.EmitEvent("download_progress", map[string]interface{}{
-				"percent":         percentage,
-				"downloadedBytes": stats.Bytes.Completed,
-				"totalBytes":      stats.Bytes.Total,
-				"timePassed":      time.Since(startTime).String(),
-			})
+				downSpeed := HumanizeBytes(float64(stats.Bytes.Completed) - float64(lastBytesDown))
+				upSpeed := HumanizeBytes(float64(stats.Bytes.Uploaded) - float64(lastBytesUp))
 
-			// trust
-			if IsTriggered(t.NotifyComplete()) || IsTriggered(t.NotifyClose()) {
-				fmt.Printf("BitTorrent Download complete for %s\n", t.Name())
-				app.EmitEvent("download_complete", "Download Finished!")
-				return
+				lastBytesDown = float64(stats.Bytes.Completed)
+				lastBytesUp = float64(stats.Bytes.Uploaded)
+
+				fmt.Printf("\n%s\nProgress: %d%%\n↑: %s/s\n↓: %s/s\nETA: %s\n", t.Name(), percentage, upSpeed, downSpeed, stats.ETA)
+				app.EmitEvent("download_progress", map[string]interface{}{
+					"percent":         percentage,
+					"downloadedBytes": stats.Bytes.Completed,
+					"totalBytes":      stats.Bytes.Total,
+					"timePassed":      time.Since(startTime).String(),
+				})
 			}
 		}
 	}()
