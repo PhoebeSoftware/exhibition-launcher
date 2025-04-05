@@ -40,7 +40,7 @@ func (client *RealDebridClient) GetDownloads() ([]DownloadItem, error) {
 
 	return result, nil
 }
-func (client *RealDebridClient) DownloadDirectLink(app *application.App, link string, filePath string) error {
+func (client *RealDebridClient) DownloadDirectLink(app *application.App, link string, sizeOfFile int64, filePath string) error {
 	startTime := time.Now()
 
 	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_WRONLY, 0644)
@@ -55,24 +55,12 @@ func (client *RealDebridClient) DownloadDirectLink(app *application.App, link st
 		return fmt.Errorf("could not get stats from file: %w", err)
 	}
 
-	req, err := http.NewRequest(http.MethodGet, link, nil)
-	if err != nil {
-		return fmt.Errorf("could not create request: %w", err)
-	}
-
-	// A early request to fetch for the size of the file we are looping through later
-	resp, err := client.client.Do(req)
-	if err != nil {
-		return fmt.Errorf("could not reach real debrid: %w", err)
-	}
-
-	defer resp.Body.Close()
-	if stat.Size() >= resp.ContentLength {
+	if stat.Size() >= sizeOfFile {
 		log.Printf("%v is already installed\n", filePath)
 		return nil
 	}
 
-	totalSize := resp.ContentLength
+	totalSize := sizeOfFile
 	// 10mb
 	sizeOfChunk := int64(10000000)
 
@@ -273,7 +261,7 @@ func (client *RealDebridClient) DownloadByMagnet(app *application.App, magnetLin
 	for _, unrestrictResponse := range unrestrictResponseList {
 		downloadPath := filepath.Join(path, unrestrictResponse.Filename)
 		fmt.Println(unrestrictResponse.Link)
-		err = client.DownloadDirectLink(app, unrestrictResponse.Download, downloadPath)
+		err = client.DownloadDirectLink(app, unrestrictResponse.Download, unrestrictResponse.Filesize, downloadPath)
 		if err != nil {
 			return err
 		}
