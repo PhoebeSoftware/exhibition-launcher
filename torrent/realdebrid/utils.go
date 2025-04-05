@@ -1,7 +1,6 @@
 package realdebrid
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -13,14 +12,14 @@ func (client *RealDebridClient) GetDiskSizeOfAllLinks(path string, unrestrictRes
 
 	for _, unrestrictResponse := range unrestrictResponses {
 		size := unrestrictResponse.Filesize
-		fmt.Println(unrestrictResponse.Filename)
 
 		// If the file already exists
 		// size = size - filesize
 		pathToFile := filepath.Join(path, unrestrictResponse.Filename)
-		file, err := os.OpenFile(pathToFile, os.O_CREATE|os.O_RDONLY, 0644)
+		file, err := os.OpenFile(pathToFile, os.O_RDONLY, 0644)
 		if err != nil {
-			return totalSize, err
+			totalSize += size
+			continue
 		}
 
 		defer file.Close()
