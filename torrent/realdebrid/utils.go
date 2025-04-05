@@ -1,27 +1,35 @@
 package realdebrid
 
 import (
-	"fmt"
-	"net/http"
+	"os"
+	"path/filepath"
 )
 
-func (client *RealDebridClient) GetDiskSizeOfAllLinks(unrestrictResponses []UnrestrictResponse) (int64, error) {
+func (client *RealDebridClient) GetDiskSizeOfAllLinks(path string, unrestrictResponses []UnrestrictResponse) (int64, error) {
 	var (
 		totalSize int64
 	)
 
 	for _, unrestrictResponse := range unrestrictResponses {
-		req, err := http.NewRequest(http.MethodGet, unrestrictResponse.Download, nil)
+		size := int64(unrestrictResponse.Filesize)
+
+		// If the file already exists
+		// size = size - filesize
+		path = filepath.Join(path, unrestrictResponse.Filename)
+		file, err := os.OpenFile(path, os.O_CREATE|os.O_RDONLY, 0644)
 		if err != nil {
-			return totalSize, fmt.Errorf("could create request: %w", err)
+			return totalSize, err
 		}
 
-		resp, err := client.client.Do(req)
-		if err != nil {
-			return totalSize, fmt.Errorf("could not fetch size: %w", err)
-		}
+		defer file.Close()
 
-		totalSize += resp.ContentLength
+		fileStat, err := file.Stat()
+		if err != nil {
+			return totalSize, err
+		}
+		size -= fileStat.Size()
+
+		totalSize += size
 	}
 
 	return totalSize, nil

@@ -67,7 +67,7 @@ func (client *RealDebridClient) DownloadDirectLink(app *application.App, link st
 	}
 
 	defer resp.Body.Close()
-	if stat.Size() == resp.ContentLength {
+	if stat.Size() >= resp.ContentLength {
 		log.Printf("%v is already installed\n", filePath)
 		return nil
 	}
@@ -261,7 +261,7 @@ func (client *RealDebridClient) DownloadByMagnet(app *application.App, magnetLin
 	}
 
 	disk := utils.DiskUsage(path)
-	totalSize, err := client.GetDiskSizeOfAllLinks(unrestrictResponseList)
+	totalSize, err := client.GetDiskSizeOfAllLinks(path, unrestrictResponseList)
 	if err != nil {
 		return err
 	}
