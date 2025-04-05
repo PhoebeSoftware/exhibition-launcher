@@ -3,13 +3,9 @@ package exhibitionQueue
 import (
 	"exhibition-launcher/torrent"
 	"exhibition-launcher/torrent/realdebrid"
-	"exhibition-launcher/utils"
 	"fmt"
-	"path/filepath"
-	"slices"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
-	"golift.io/xtractr"
 )
 
 var (
@@ -122,25 +118,7 @@ func (q *Queue) StartDownloads() error {
 			break
 		}
 
-		for _, file := range files {
-			ext := filepath.Ext(file.Path())
-			if !slices.Contains(Extensions, ext) {
-				continue
-			}
-
-			fmt.Println("Extracting file:", file.Path())
-			size, files, _, err := xtractr.ExtractFile(&xtractr.XFile{
-				FilePath:  filepath.Join(q.DownloadPath, file.Path()),
-				OutputDir: filepath.Join(q.DownloadPath, t.Name()),
-			})
-
-			if err != nil {
-				fmt.Println("Error extracting file:", err)
-				continue
-			}
-
-			fmt.Printf("Extracted %d files, final disk usage: %s\n", len(files), utils.HumanizeBytes(float64(size)))
-		}
+		ExtractFiles(files, q.DownloadPath, t.Name())
 
 		removeErr := q.TorrentManager.RemoveTorrent(download.UUID)
 		if removeErr != nil {
