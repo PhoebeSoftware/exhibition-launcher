@@ -53,10 +53,6 @@ func (client *RealDebridClient) AddTorrentByMagnet(magnetLink string) (AddMagnet
 		return result, fmt.Errorf("error while adding torrent by magnet link: %w", err)
 	}
 
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
 	fmt.Println(req.URL.String())
 	return result, nil
 }

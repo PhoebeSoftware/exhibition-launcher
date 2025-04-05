@@ -209,6 +209,10 @@ func (client *RealDebridClient) DownloadByMagnet(app *application.App, magnetLin
 	if err != nil {
 		return err
 	}
+	fmt.Println(torrent.Status)
+	if torrent.Status != "downloaded" && torrent.Status != "waiting_files_selection" && torrent.Status != "downloading" {
+		return fmt.Errorf("error torrent is not downloaded on real-debrid yet")
+	}
 
 	err = client.SelectFiles(torrent)
 	if err != nil {
