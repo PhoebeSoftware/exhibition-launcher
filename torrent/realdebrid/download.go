@@ -200,30 +200,40 @@ func (client *RealDebridClient) checkIfResume() {
 }
 
 func (client *RealDebridClient) DownloadByMagnet(app *application.App, magnetLink string, path string) error {
-	addMagnetResponse, err := client.AddTorrentByMagnet(magnetLink)
+	id, err := client.CheckIfTorrentAlreadyExists(magnetLink)
+	if err != nil {
+		return err
+	}
+	if id == "" {
+		fmt.Println("Torrent is not on real debrid adding now...")
+		addMagnetResponse, err := client.AddTorrentByMagnet(magnetLink)
+		if err != nil {
+			return err
+		}
+
+		id = addMagnetResponse.Id
+		torrent, err := client.GetTorrentInfoById(id)
+		if err != nil {
+			return err
+		}
+
+		err = client.SelectFiles(torrent)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Re fetch torrent because torrent should now have selected files and links
+	torrent, err := client.GetTorrentInfoById(id)
 	if err != nil {
 		return err
 	}
 
-	torrent, err := client.GetTorrentInfoById(addMagnetResponse.Id)
-	if err != nil {
-		return err
-	}
 	fmt.Println(torrent.Status)
 	if torrent.Status != "downloaded" && torrent.Status != "waiting_files_selection" && torrent.Status != "downloading" {
 		return fmt.Errorf("error torrent is not downloaded on real-debrid yet")
 	}
 
-	err = client.SelectFiles(torrent)
-	if err != nil {
-		return err
-	}
-
-	// Re fetch torrent because torrent should now have selected files and links
-	torrent, err = client.GetTorrentInfoById(addMagnetResponse.Id)
-	if err != nil {
-		return err
-	}
 
 	var unrestrictResponseList []UnrestrictResponse
 

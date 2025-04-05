@@ -73,7 +73,7 @@ func (client *RealDebridClient) GetTorrentInfoById(id string) (Torrent, error) {
 	return result, nil
 }
 
-func (client *RealDebridClient) GetTorents() ([]Torrent, error) {
+func (client *RealDebridClient) GetTorrents() ([]Torrent, error) {
 	req, err := client.newRequest(http.MethodGet, "/torrents", nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error while encoding url: %w", err)
@@ -108,4 +108,24 @@ func (client *RealDebridClient) SelectFiles(torrent Torrent) error {
 		return fmt.Errorf("get request failed while posting select files: %w", err)
 	}
 	return nil
+}
+
+func (client *RealDebridClient) CheckIfTorrentAlreadyExists(magnetLink string) (string, error) {
+	torrents, err := client.GetTorrents()
+	if err != nil {
+		return "", err
+	}
+
+	magnetHash, err := GetMagnetLinkHash(magnetLink)
+	if err != nil {
+		return "", err
+	}
+
+	for _, torrent := range torrents {
+		if torrent.Hash == magnetHash {
+			return torrent.ID, err
+		}
+	}
+
+	return "", nil
 }
