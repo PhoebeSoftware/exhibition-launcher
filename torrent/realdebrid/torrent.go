@@ -110,6 +110,7 @@ func (client *RealDebridClient) SelectFiles(torrent Torrent) error {
 	return nil
 }
 
+// CheckIfTorrentAlreadyExists Returns torrent id name is misleading
 func (client *RealDebridClient) CheckIfTorrentAlreadyExists(magnetLink string) (string, error) {
 	torrents, err := client.GetTorrents()
 	if err != nil {
