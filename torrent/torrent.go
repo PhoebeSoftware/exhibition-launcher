@@ -16,6 +16,7 @@ const (
 	KB = 1024
 	MB = 1024 * KB
 	GB = 1024 * MB
+	TB = 1024 * GB
 )
 
 type Manager struct {
@@ -51,16 +52,18 @@ func StartClient(path string) *Manager {
 	}
 }
 
-func HumanizeBytesPerSecond(bytesPerSec float64) string {
+func HumanizeBytes(bytesPerSec float64) string {
 	switch {
+	case bytesPerSec >= TB:
+		return fmt.Sprintf("%.2f TB", bytesPerSec/TB)
 	case bytesPerSec >= GB:
-		return fmt.Sprintf("%.2f GB/s", bytesPerSec/GB)
+		return fmt.Sprintf("%.2f GB", bytesPerSec/GB)
 	case bytesPerSec >= MB:
-		return fmt.Sprintf("%.2f MB/s", bytesPerSec/MB)
+		return fmt.Sprintf("%.2f MB", bytesPerSec/MB)
 	case bytesPerSec >= KB:
-		return fmt.Sprintf("%.2f KB/s", bytesPerSec/KB)
+		return fmt.Sprintf("%.2f KB", bytesPerSec/KB)
 	default:
-		return fmt.Sprintf("%.0f B/s", bytesPerSec)
+		return fmt.Sprintf("%.0f B", bytesPerSec)
 	}
 }
 
@@ -103,7 +106,11 @@ func (manager Manager) AddTorrent(app *application.App, uuid string, magnetLink 
 
 	// check space
 	disk := utils.DiskUsage(manager.downloadDir)
-	if int64(disk.Free) < t.Stats().Bytes.Total {
+	torrentSize := t.Stats().Bytes.Incomplete
+
+	fmt.Printf("%s free (%s left to download)\n", HumanizeBytes(float64(disk.Free)), HumanizeBytes(float64(torrentSize)))
+
+	if int64(disk.Free) < torrentSize {
 		fmt.Println("Insufficient disk space")
 		return t, errors.New("get yo bread right nigga")
 	}
@@ -123,9 +130,9 @@ func (manager Manager) AddTorrent(app *application.App, uuid string, magnetLink 
 
 			completionRatio := float64(stats.Bytes.Completed) / float64(stats.Bytes.Total)
 			percentage := int(completionRatio * 100)
-			speedySpeed := HumanizeBytesPerSecond(float64(stats.Speed.Download))
+			speedySpeed := HumanizeBytes(float64(stats.Speed.Download))
 
-			fmt.Printf("%s: Progress: %d%%, Speed: %s ETA: %s\n", t.Name(), percentage, speedySpeed, stats.ETA)
+			fmt.Printf("%s: Progress: %d%%, Speed: %s/s ETA: %s\n", t.Name(), percentage, speedySpeed, stats.ETA)
 			app.EmitEvent("download_progress", map[string]interface{}{
 				"percent":         percentage,
 				"downloadedBytes": stats.Bytes.Completed,
