@@ -3,9 +3,13 @@ package exhibitionQueue
 import (
 	"exhibition-launcher/torrent"
 	"exhibition-launcher/torrent/realdebrid"
+	"exhibition-launcher/utils"
 	"fmt"
+	"path/filepath"
+	"slices"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
+	"golift.io/xtractr"
 )
 
 var (
@@ -14,6 +18,12 @@ var (
 )
 
 type QueueStatus int
+
+var Extensions = []string{
+	".zip",
+	".rar",
+	".7z",
+}
 
 const (
 	Idle QueueStatus = iota
@@ -104,6 +114,38 @@ func (q *Queue) StartDownloads() error {
 
 		// wacht
 		<-t.NotifyComplete()
+
+		// extraction
+		files, err := t.Files()
+		if err != nil {
+			fmt.Println("Error getting file stats:", err)
+			break
+		}
+
+		for _, file := range files {
+			ext := filepath.Ext(file.Path())
+			if !slices.Contains(Extensions, ext) {
+				continue
+			}
+
+			fmt.Println("Extracting file:", file.Path())
+			size, files, _, err := xtractr.ExtractFile(&xtractr.XFile{
+				FilePath:  filepath.Join(q.DownloadPath, file.Path()),
+				OutputDir: filepath.Join(q.DownloadPath, t.Name()),
+			})
+
+			if err != nil {
+				fmt.Println("Error extracting file:", err)
+				continue
+			}
+
+			fmt.Printf("Extracted %d files, final disk usage: %s\n", len(files), utils.HumanizeBytes(float64(size)))
+		}
+
+		removeErr := q.TorrentManager.RemoveTorrent(download.UUID)
+		if removeErr != nil {
+			fmt.Println("Error removing torrent:", err)
+		}
 	}
 
 	fmt.Printf("%s download complete\n", download.Type)
