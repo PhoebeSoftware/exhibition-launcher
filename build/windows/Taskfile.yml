@@ -16,9 +16,9 @@ tasks:
       - task: generate:syso
       - go build {{.BUILD_FLAGS}} -o {{.BIN_DIR}}/{{.APP_NAME}}.exe
       - cmd: powershell Remove-item *.syso
-        platforms: [windows]
+        platforms: [ windows ]
       - cmd: rm -f *.syso
-        platforms: [linux, darwin]
+        platforms: [ linux, darwin ]
     vars:
       BUILD_FLAGS: '{{if eq .PRODUCTION "true"}}-tags production -trimpath -buildvcs=false -ldflags="-w -s -H windowsgui"{{else}}-buildvcs=false -gcflags=all="-l"{{end}}'
     env:

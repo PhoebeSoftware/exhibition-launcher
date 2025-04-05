@@ -24,15 +24,15 @@ var (
 
 	ErrorNotEnoughDiskSpace = errors.New("Not enough diskspace")
 	Error503                = errors.New("File unavailable")
-	ErrorNoLinksFound = errors.New("Real debrid has no links on this torrent, try again later")
+	ErrorNoLinksFound       = errors.New("Real debrid has no links on this torrent, try again later")
 )
 
 type RealDebridClient struct {
-	ApiKey           string
-	client           *http.Client
-	BaseURL          string
-	Settings         *jsonModels.Settings
-	Paused           bool
+	ApiKey   string
+	client   *http.Client
+	BaseURL  string
+	Settings *jsonModels.Settings
+	Paused   bool
 }
 
 func (client *RealDebridClient) SetPaused(value bool) {
@@ -45,7 +45,7 @@ func NewRealDebridClient(settings *jsonModels.Settings) *RealDebridClient {
 		client: &http.Client{
 			Timeout: 10 * time.Minute,
 		},
-		BaseURL: "https://api.real-debrid.com/rest/1.0",
+		BaseURL:  "https://api.real-debrid.com/rest/1.0",
 		Settings: settings,
 	}
 }

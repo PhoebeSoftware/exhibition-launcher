@@ -145,10 +145,10 @@ func (client *RealDebridClient) DownloadDirectLink(app *application.App, link st
 				downloadedBytesAtomic := atomic.LoadInt64(&downloadedBytes)
 				percent := (float64(downloadedBytesAtomic) / float64(totalSize)) * 100
 				app.EmitEvent("download_progress", map[string]interface{}{
-					"percent": percent,
+					"percent":         percent,
 					"downloadedBytes": downloadedBytesAtomic,
-					"totalBytes": totalSize,
-					"timePassed": time.Since(startTime).String(),
+					"totalBytes":      totalSize,
+					"timePassed":      time.Since(startTime).String(),
 				})
 				time.Sleep(1 * time.Second)
 			}
@@ -188,6 +188,7 @@ func (client *RealDebridClient) DownloadDirectLink(app *application.App, link st
 	}
 	return err
 }
+
 // Sleep the program when client is paused resume after
 func (client *RealDebridClient) checkIfResume() {
 	if client.Paused {

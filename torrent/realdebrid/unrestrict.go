@@ -10,7 +10,7 @@ type UnrestrictResponse struct {
 	ID         string `json:"id"`
 	Filename   string `json:"filename"`
 	MimeType   string `json:"mimeType"`
-	Filesize   int64    `json:"filesize"`
+	Filesize   int64  `json:"filesize"`
 	Link       string `json:"link"`
 	Host       string `json:"host"`
 	Chunks     int    `json:"chunks"`

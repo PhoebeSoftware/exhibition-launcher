@@ -6,21 +6,21 @@ import (
 )
 
 type Settings struct {
-	DownloadPath   string `json:"download_path"`
+	DownloadPath       string             `json:"download_path"`
 	RealDebridSettings RealDebridSettings `json:"real_debrid_settings"`
-	IgdbSettings IgdbSettings `json:"igdb_settings"`
+	IgdbSettings       IgdbSettings       `json:"igdb_settings"`
 }
 
 type RealDebridSettings struct {
-	UseRealDebrid bool `json:"use_real_debrid"`
-	DebridToken string `json:"debrid_token"`
-	NumberOfThreads int `json:"number_of_threads"`
+	UseRealDebrid   bool   `json:"use_real_debrid"`
+	DebridToken     string `json:"debrid_token"`
+	NumberOfThreads int    `json:"number_of_threads"`
 }
 
 type IgdbSettings struct {
 	IgdbClient string `json:"igdb_client"`
 	IgdbSecret string `json:"igdb_secret"`
-	IgdbAuth string `json:"igdb_auth"`
+	IgdbAuth   string `json:"igdb_auth"`
 
 	// In seconds
 	ExpiresIn int `json:"expires_in"`
