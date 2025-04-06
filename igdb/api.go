@@ -33,7 +33,7 @@ type APIManager struct {
 
 func (a *APIManager) SetupHeader(request *http.Request) {
 	request.Header.Set("Client-ID", a.settings.IgdbSettings.IgdbClient)
-	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", a.settings.IgdbAuth))
+	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", a.settings.IgdbSettings.IgdbAuth))
 }
 
 func NewAPI(settings *jsonModels.Settings, settingsManager *jsonUtils.JsonManager) (*APIManager, error) {

@@ -24,7 +24,7 @@ import (
 // made available to the frontend.
 // See https://pkg.go.dev/embed for more information.
 var libraryManager *library.Library
-var apiManager *igdb.APIManager
+var igdbApiManager *igdb.APIManager
 var torrentManager *torrent.Manager
 var debridClient *realdebrid.RealDebridClient
 
@@ -72,13 +72,14 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-
-	apiManager, err = igdb.NewAPI(settings, settingsManager)
-	if err != nil {
-		fmt.Println(err)
-		return
+	if settings.UseDirectIGDB {
+		igdbApiManager, err = igdb.NewAPI(settings, settingsManager)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 	}
-	libraryManager = library.GetLibrary(apiManager)
+	libraryManager = library.GetLibrary(igdbApiManager)
 	if settings.RealDebridSettings.UseRealDebrid {
 		if settings.RealDebridSettings.DebridToken == "" {
 			// TO:DO ADD A UI FOR THIS OR SMTH
@@ -101,7 +102,7 @@ func main() {
 
 	// This code is for refetching covers and banners but it will slow down startup
 	//for id, game := range libraryManager.Games {
-	//	gameData, err := apiManager.GetGameData(game.IGDBID)
+	//	gameData, err := igdbApiManager.GetGameData(game.IGDBID)
 	//	if err != nil {
 	//		fmt.Println("Error fetching data for game:", game.IGDBID, err)
 	//		continue
@@ -129,7 +130,7 @@ func main() {
 	}
 	services := []application.Service{
 		application.NewService(torrentManager),
-		application.NewService(apiManager),
+		application.NewService(igdbApiManager),
 		application.NewService(libraryManager),
 		application.NewService(&WindowService{}),
 		application.NewService(settings),
