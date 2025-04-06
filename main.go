@@ -133,7 +133,6 @@ func main() {
 		application.NewService(libraryManager),
 		application.NewService(&WindowService{}),
 		application.NewService(settings),
-		application.NewService(settingsManager),
 		application.NewService(&utils.PathUtil{}),
 		application.NewService(&queue),
 	}
