@@ -3,12 +3,10 @@ package igdb
 import (
 	"bytes"
 	"encoding/json"
-	"exhibition-launcher/utils/jsonUtils"
-	"exhibition-launcher/utils/jsonUtils/jsonModels"
+	"exhibtion-proxy/jsonUtils"
+	"exhibtion-proxy/jsonUtils/jsonModels"
 	"fmt"
-	"io"
 	"net/http"
-	"net/url"
 	"time"
 )
 
@@ -19,13 +17,13 @@ type Image struct {
 type ApiGame struct {
 	Id                int    `json:"id"`
 	Name              string `json:"name"`
-	Description       string `json:"summary"`
-	Cover             Image  `json:"cover"`
-	CoverURL          string
-	Artworks          []Image `json:"artworks"`
-	ArtworkUrlList    []string
-	Screenshots       []Image `json:"screenshots"`
-	ScreenshotUrlList []string
+	Description       string   `json:"summary"`
+	Cover             Image    `json:"cover"`
+	CoverURL          string   `json:"cover_url"`
+	Artworks          []Image  `json:"artworks"`
+	ArtworkUrlList    []string `json:"artwork_url_list"`
+	Screenshots       []Image  `json:"screenshots"`
+	ScreenshotUrlList []string `json:"screenshot_url_list"`
 }
 
 type APIManager struct {
@@ -33,53 +31,9 @@ type APIManager struct {
 	settings *jsonModels.Settings
 }
 
-func (a *APIManager) GetAndSetNewAuthToken() (string, error) {
-	client := a.client
-	params := url.Values{}
-	params.Add("client_id", a.settings.IgdbSettings.IgdbClient)
-	params.Add("client_secret", a.settings.IgdbSettings.IgdbSecret)
-	params.Add("grant_type", "client_credentials")
-	uri := "https://id.twitch.tv/oauth2/token" + "?" + params.Encode()
-	req, err := http.NewRequest(http.MethodPost, uri, nil)
-	if err != nil {
-		return "", fmt.Errorf("error setting up request:%w", err)
-	}
-
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-	type AuthResponse struct {
-		AccessToken string `json:"access_token"`
-		ExpiresIn   int    `json:"expires_in"`
-		TokenType   string `json:"token_type"`
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", fmt.Errorf("error while requesting:%w", err)
-	}
-
-	var authResponse AuthResponse
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("error reading body:%w", err)
-	}
-
-	err = json.Unmarshal(body, &authResponse)
-	if err != nil {
-		return "", fmt.Errorf("error decoding json:%w", err)
-	}
-
-	a.settings.IgdbSettings.IgdbAuth = authResponse.AccessToken
-	a.settings.IgdbSettings.ExpiresIn = authResponse.ExpiresIn
-	expiresAt := time.Now().Add(time.Duration(authResponse.ExpiresIn) * time.Second)
-	a.settings.IgdbSettings.ExpiresAt = expiresAt
-	return authResponse.AccessToken, nil
-}
-
 func (a *APIManager) SetupHeader(request *http.Request) {
-	request.Header.Set("Client-ID", a.settings.IgdbSettings.IgdbClient)
-	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", a.settings.IgdbSettings.IgdbAuth))
+	request.Header.Set("Client-ID", a.settings.IgdbClient)
+	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", a.settings.IgdbAuth))
 }
 
 func NewAPI(settings *jsonModels.Settings, settingsManager *jsonUtils.JsonManager) (*APIManager, error) {
@@ -89,7 +43,7 @@ func NewAPI(settings *jsonModels.Settings, settingsManager *jsonUtils.JsonManage
 	}
 
 	// Generate new auth token if needed
-	if time.Now().After(settings.IgdbSettings.ExpiresAt) {
+	if time.Now().After(settings.ExpiresAt) {
 		fmt.Println("Generating new auth token because the old one has expired")
 		_, err := apiManager.GetAndSetNewAuthToken()
 		if err != nil {
@@ -133,49 +87,65 @@ func (a *APIManager) GetGameData(id int) (ApiGame, error) {
 	}
 
 	firstGameData := gameDataList[0]
-	fmt.Println(firstGameData.Name+" :", firstGameData.Id)
 	imageID := firstGameData.Cover.ImageID
 	imageURL := fmt.Sprintf("https://images.igdb.com/igdb/image/upload/t_cover_big/%s.jpg", imageID)
 	firstGameData.CoverURL = imageURL
-	fmt.Println("added cover " + imageURL)
 
 	for _, image := range firstGameData.Artworks {
 		imageID := image.ImageID
 		imageURL := fmt.Sprintf("https://images.igdb.com/igdb/image/upload/t_1080p/%s.jpg", imageID)
 		firstGameData.ArtworkUrlList = append(firstGameData.ArtworkUrlList, imageURL)
-		fmt.Println("added artwork " + imageURL)
 	}
 
 	for _, image := range firstGameData.Screenshots {
 		imageID := image.ImageID
 		imageURL := fmt.Sprintf("https://images.igdb.com/igdb/image/upload/t_1080p/%s.jpg", imageID)
 		firstGameData.ScreenshotUrlList = append(firstGameData.ScreenshotUrlList, imageURL)
-		fmt.Println("added screenshot " + imageURL)
 	}
 
 	return firstGameData, nil
 }
 
-func (a *APIManager) GetGames(query string) []ApiGame {
-	header := fmt.Sprintf(`fields id, name, summary, cover; search "%s";`, query)
+func (a *APIManager) GetGames(query string) ([]ApiGame, error)  {
+	header := fmt.Sprintf(`fields id, name, summary, cover.*, artworks.*, screenshots.*; search "%s";`, query)
 
 	request, err := http.NewRequest("POST", "https://api.igdb.com/v4/games/", bytes.NewBuffer([]byte(header)))
 	if err != nil {
-		return []ApiGame{}
+		return []ApiGame{}, err
 	}
 
 	a.SetupHeader(request)
 
 	response, err := a.client.Do(request)
 	if err != nil {
-		return []ApiGame{}
+		return []ApiGame{}, err
 	}
 	defer response.Body.Close()
 
 	var games []ApiGame
-	jsonErr := json.NewDecoder(response.Body).Decode(&games)
-	if jsonErr != nil {
-		return []ApiGame{}
+	err = json.NewDecoder(response.Body).Decode(&games)
+	if err != nil {
+		return []ApiGame{}, err
 	}
-	return games
+
+	for i, game := range games {
+		imageID := game.Cover.ImageID
+		imageURL := fmt.Sprintf("https://images.igdb.com/igdb/image/upload/t_cover_big/%s.jpg", imageID)
+		games[i].CoverURL = imageURL
+
+		for _, image := range game.Artworks {
+			imageID := image.ImageID
+			imageURL := fmt.Sprintf("https://images.igdb.com/igdb/image/upload/t_1080p/%s.jpg", imageID)
+			games[i].ArtworkUrlList = append(game.ArtworkUrlList, imageURL)
+		}
+
+		for _, image := range game.Screenshots {
+			imageID := image.ImageID
+			imageURL := fmt.Sprintf("https://images.igdb.com/igdb/image/upload/t_1080p/%s.jpg", imageID)
+			games[i].ScreenshotUrlList = append(game.ScreenshotUrlList, imageURL)
+		}
+
+	}
+
+	return games, nil
 }
