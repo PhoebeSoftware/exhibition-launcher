@@ -72,6 +72,8 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+	// test code
+	settings.UseDirectIGDB = true
 	if settings.UseDirectIGDB {
 		igdbApiManager, err = igdb.NewAPI(settings, settingsManager)
 		if err != nil {
