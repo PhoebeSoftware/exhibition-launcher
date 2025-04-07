@@ -1,8 +1,6 @@
 module exhibition-launcher
 
-go 1.23.0
-
-toolchain go1.23.5
+go 1.24.1
 
 require (
 	github.com/cenkalti/rain v1.13.0
@@ -10,11 +8,13 @@ require (
 	github.com/sqweek/dialog v0.0.0-20240226140203-065105509627
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.9
 	golift.io/xtractr v0.2.2
+
 )
 
 require (
 	dario.cat/mergo v1.0.1 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
+	github.com/PhoebeSoftware/exhibition-proxy-library v0.0.0-20250407103258-af84e61b5bc0 // indirect
 	github.com/ProtonMail/go-crypto v1.1.5 // indirect
 	github.com/TheTitanrain/w32 v0.0.0-20180517000239-4f5cfb03fabf // indirect
 	github.com/adrg/xdg v0.5.0 // indirect
