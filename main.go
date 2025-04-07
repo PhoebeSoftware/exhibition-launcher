@@ -73,8 +73,7 @@ func main() {
 		return
 	}
 	// test code
-	settings.UseDirectIGDB = true
-	if settings.UseDirectIGDB {
+	if settings.UseLocalProxy {
 		igdbApiManager, err = igdb.NewAPI(settings, settingsManager)
 		if err != nil {
 			fmt.Println(err)

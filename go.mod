@@ -14,7 +14,6 @@ require (
 require (
 	dario.cat/mergo v1.0.1 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
-	github.com/PhoebeSoftware/exhibition-proxy-library v0.0.0-20250407103258-af84e61b5bc0 // indirect
 	github.com/ProtonMail/go-crypto v1.1.5 // indirect
 	github.com/TheTitanrain/w32 v0.0.0-20180517000239-4f5cfb03fabf // indirect
 	github.com/adrg/xdg v0.5.0 // indirect
@@ -91,6 +90,7 @@ require (
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.23.0 // indirect
 	golang.org/x/tools v0.31.0 // indirect
+	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	lukechampine.com/blake3 v1.1.6 // indirect
