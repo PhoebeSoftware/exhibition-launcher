@@ -35,7 +35,7 @@ export default {
     --background-color: rgb(25, 25, 25);
     --text-color: rgb(211, 211, 211);
     --secondary-text-color: rgb(118, 118, 118);
-    --accent-color: rgb(229, 63, 51);
+    --accent-color: #0c8dd8;
     --hover-background-color: rgb(32, 32, 32);
     --progress-bar-background-color: rgba(255, 255, 255, 0.043);
     --game-box-info-background-color: rgb(30, 30, 30);
