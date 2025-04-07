@@ -1,3 +1,0 @@
-[submodule "proxy"]
-	path = proxy
-	url = git@github.com:PhoebeSoftware/exhibiton-proxy.git
