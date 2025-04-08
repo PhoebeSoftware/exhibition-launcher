@@ -15,12 +15,6 @@ var (
 
 type QueueStatus int
 
-var Extensions = []string{
-	".zip",
-	".rar",
-	".7z",
-}
-
 const (
 	Idle QueueStatus = iota
 	Downloading
@@ -118,13 +112,17 @@ func (q *Queue) StartDownloads() error {
 			break
 		}
 
-		paths := []string{}
+		// extract dem files brah
 		for _, file := range files {
-			paths = append(paths, file.Path())
+			go func() {
+				err := ExtractFile(file.Path(), q.DownloadPath, t.Name())
+				if err != nil {
+					fmt.Println("Error extracting file:", err)
+				}
+			}()
 		}
 
-		ExtractFiles(paths, q.DownloadPath, t.Name())
-
+		// remove torrent cuh
 		removeErr := q.TorrentManager.RemoveTorrent(download.UUID)
 		if removeErr != nil {
 			fmt.Println("Error removing torrent:", err)
