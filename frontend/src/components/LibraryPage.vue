@@ -168,12 +168,29 @@ export default {
         }
     },
     async mounted() {
-        Library.GetAllGames().then((games) => {
-            Object.values(games).forEach((game) => {
+        const amountOfGames = await Library.GetAmountOfGames()
+
+        console.log(amountOfGames)
+        const portion = 100;
+
+        for (let i = 0; i < amountOfGames; i += portion) {
+            console.log(i)
+            let games = await Library.GetRangeGame(portion, i)
+            games.forEach((game) => {
                 console.log(game);
                 this.games.push(game);
-            });
-        });
+            })
+        }
+
+        // Library.GetRangeGame(100, 0).then()
+        //
+        //
+        // Library.GetAllGames().then((games) => {
+        //     Object.values(games).forEach((game) => {
+        //         console.log(game);
+        //         this.games.push(game);
+        //     });
+        // });
     }
 };
 </script>

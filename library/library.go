@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"time"
 
 	"github.com/sqweek/dialog"
@@ -39,6 +40,10 @@ func (lib *Library) GetAllGames() map[int]jsonModels.Game {
 	return lib.Library.Games
 }
 
+func (lib *Library) GetAmountOfGames() int {
+	return len(lib.Library.Games)
+}
+
 func (lib *Library) GetAllGameIDs() []int{
 	var intList []int
 	for i := range lib.Library.Games {
@@ -55,7 +60,8 @@ func (lib *Library) GetGame(igdbId int) (jsonModels.Game, error) {
 }
 
 func (lib *Library) GetRangeGame(amount int, offset int) ([]jsonModels.Game, error) {
-	games := []jsonModels.Game{}
+	var games []jsonModels.Game
+
 	if len(lib.Library.Games) == 0 {
 		return games, fmt.Errorf("no games in library")
 	}
@@ -64,19 +70,24 @@ func (lib *Library) GetRangeGame(amount int, offset int) ([]jsonModels.Game, err
 		return games, fmt.Errorf("offset out of range")
 	}
 
-	if amount <= 0 || amount > len(lib.Library.Games)-offset {
-		return games, fmt.Errorf("amount out of range")
+	var keys []int
+	for k := range lib.Library.Games {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+
+	end := offset + amount
+	if end > len(keys) {
+		end = len(keys)
 	}
 
-	for i := offset; i < offset+amount; i++ {
-		foundGame, ok := lib.Library.Games[i]
-		if !ok || len(games) >= amount {
-			break
-		}
-		games = append(games, foundGame)
+	for _, key := range keys[offset:end] {
+		games = append(games, lib.Library.Games[key])
 	}
+
 	return games, nil
 }
+
 
 func (lib *Library) AddToLibrary(igdbId int) (jsonModels.Game, error) {
 	// prompt executable location
