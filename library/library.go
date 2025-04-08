@@ -1,12 +1,10 @@
 package library
 
 import (
-	"encoding/json"
 	"exhibition-launcher/igdb"
+	"exhibition-launcher/utils/jsonUtils"
+	"exhibition-launcher/utils/jsonUtils/jsonModels"
 	"fmt"
-	"io"
-	"log"
-	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
@@ -15,82 +13,43 @@ import (
 	"github.com/sqweek/dialog"
 )
 
-type Game struct {
-	IGDBID            int      `json:"igdb_id"`
-	Name              string   `json:"name"`
-	Description       string   `json:"description"`
-	PlayTime          int      `json:"playTime"`
-	Achievments       []int    `json:"achievments"`
-	Executable        string   `json:"executable"`
-	Running           bool     `json:"running"`
-	Favorite          bool     `json:"favorite"`
-	CoverURL          string   `json:"cover_url"`
-	ArtworkUrlList    []string `json:"artwork_url_list"`
-	ScreenshotUrlList []string `json:"screenshot_url_list"`
-}
-
 type Library struct {
-	Games      map[int]Game `json:"games"`
-	APIManager *igdb.APIManager
+	LibraryManager *jsonUtils.JsonManager
+	Library        *jsonModels.Library
+	APIManager     *igdb.APIManager
 }
 
 // geeft library.json als Library struct vol met data
 func GetLibrary(apiManager *igdb.APIManager) *Library {
-	file, err := os.OpenFile(filepath.Join(".", "library.json"), os.O_RDWR|os.O_CREATE, 0644)
+	library := &jsonModels.Library{}
+	libraryManager, err := jsonUtils.NewJsonManager(filepath.Join("library.json"), library)
 	if err != nil {
-		log.Printf("Error opening/creating library.json: %v", err)
-		return &Library{
-			Games:      make(map[int]Game),
-			APIManager: apiManager,
-		}
-	}
-	defer file.Close()
-
-	bytes, err := io.ReadAll(file)
-	if err != nil {
-		log.Printf("Error reading library.json: %v", err)
-		return &Library{
-			Games:      make(map[int]Game),
-			APIManager: apiManager,
-		}
+		fmt.Println(err)
+		return nil
 	}
 
-	if len(bytes) == 0 {
-		emptyLib := &Library{
-			Games:      make(map[int]Game),
-			APIManager: apiManager,
-		}
-		jsonData, err := json.MarshalIndent(emptyLib, "", "    ")
-		if err != nil {
-			log.Printf("Error marshaling empty library: %v", err)
-			return emptyLib
-		}
-		if _, err := file.Write(jsonData); err != nil {
-			log.Printf("Error writing empty library: %v", err)
-		}
-		return emptyLib
+	return &Library{
+		LibraryManager: libraryManager,
+		Library:        library,
+		APIManager:     apiManager,
 	}
-
-	var library Library
-	if err := json.Unmarshal(bytes, &library); err != nil {
-		log.Printf("Error unmarshalling library.json: %v", err)
-		return &Library{
-			Games:      make(map[int]Game),
-			APIManager: apiManager,
-		}
-	}
-
-	library.APIManager = apiManager
-	return &library
 }
 
-func (lib *Library) GetAllGames() map[int]Game {
-	return lib.Games
+func (lib *Library) GetAllGames() map[int]jsonModels.Game {
+	return lib.Library.Games
 }
 
-func (lib *Library) AddToLibrary(igdbId int) (Game, error) {
+func (lib *Library) GetGame(igdbId int) (jsonModels.Game, error) {
+	game, ok := lib.Library.Games[igdbId]
+	if !ok {
+		return game, fmt.Errorf("game with IGDB ID %d not found", igdbId)
+	}
+	return game, nil
+}
+
+func (lib *Library) AddToLibrary(igdbId int) (jsonModels.Game, error) {
 	// prompt executable location
-	var game Game
+	var game jsonModels.Game
 	executable, err := dialog.File().Title("Select game executable").Filter("Executable files", "exe", "app", "ink", "bat").Load()
 	if err != nil {
 		return game, fmt.Errorf("failed to select executable: %w", err)
@@ -108,7 +67,7 @@ func (lib *Library) AddToLibrary(igdbId int) (Game, error) {
 	}
 
 	// Append the new game
-	game = Game{
+	game = jsonModels.Game{
 		IGDBID:            igdbId,
 		Name:              gameData.Name,
 		Description:       gameData.Description,
@@ -121,31 +80,26 @@ func (lib *Library) AddToLibrary(igdbId int) (Game, error) {
 		ScreenshotUrlList: gameData.ScreenshotUrlList,
 		ArtworkUrlList:    gameData.ArtworkUrlList,
 	}
-	lib.Games[igdbId] = game
+	lib.Library.Games[igdbId] = game
 
-	// Marshal the entire library to JSON
-	jsonData, err := json.Marshal(lib)
-	if err != nil {
-		return game, fmt.Errorf("failed to marshal library: %w", err)
-	}
-
-	// Write to file
-	err = os.WriteFile("library.json", jsonData, 0644)
-	if err != nil {
-		return game, fmt.Errorf("failed to write library file: %w", err)
+	saveErr := lib.LibraryManager.Save()
+	if saveErr != nil {
+		return game, fmt.Errorf("failed to save library: %w", saveErr)
 	}
 
 	return game, nil
 }
 
 func (lib *Library) StartApp(igdbId int) error {
-	game := lib.Games[igdbId]
+	game := lib.Library.Games[igdbId]
+
 	var cmd *exec.Cmd
 	if runtime.GOOS == "darwin" {
 		cmd = exec.Command("open", game.Executable)
 	} else {
 		cmd = exec.Command(game.Executable)
 	}
+
 	cmd.Dir = filepath.Dir(game.Executable)
 	err := cmd.Start()
 	if err != nil {
@@ -155,6 +109,8 @@ func (lib *Library) StartApp(igdbId int) error {
 	fmt.Printf("Started game with PID: %d\n", cmd.Process.Pid)
 
 	game.Running = true
+	lib.Library.Games[igdbId] = game
+	_ = lib.LibraryManager.Save()
 
 	go func() {
 		seconds := 0
@@ -176,6 +132,9 @@ func (lib *Library) StartApp(igdbId int) error {
 
 				game.Running = false
 				game.PlayTime += seconds
+				lib.Library.Games[igdbId] = game
+				_ = lib.LibraryManager.Save()
+
 				return
 			}
 		}
