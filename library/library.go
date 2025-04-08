@@ -39,6 +39,13 @@ func (lib *Library) GetAllGames() map[int]jsonModels.Game {
 	return lib.Library.Games
 }
 
+func (lib *Library) GetAllGameIDs() []int{
+	var intList []int
+	for i := range lib.Library.Games {
+		intList = append(intList, i)
+	}
+	return intList
+}
 func (lib *Library) GetGame(igdbId int) (jsonModels.Game, error) {
 	game, ok := lib.Library.Games[igdbId]
 	if !ok {
