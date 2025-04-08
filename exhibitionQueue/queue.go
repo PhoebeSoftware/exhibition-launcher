@@ -118,7 +118,12 @@ func (q *Queue) StartDownloads() error {
 			break
 		}
 
-		ExtractFiles(files, q.DownloadPath, t.Name())
+		paths := []string{}
+		for _, file := range files {
+			paths = append(paths, file.Path())
+		}
+
+		ExtractFiles(paths, q.DownloadPath, t.Name())
 
 		removeErr := q.TorrentManager.RemoveTorrent(download.UUID)
 		if removeErr != nil {
