@@ -15,8 +15,8 @@ type Image struct {
 }
 
 type ApiGame struct {
-	Id                int    `json:"id"`
-	Name              string `json:"name"`
+	Id                int      `json:"id"`
+	Name              string   `json:"name"`
 	Description       string   `json:"summary"`
 	Cover             Image    `json:"cover"`
 	CoverURL          string   `json:"cover_url"`
@@ -106,7 +106,7 @@ func (a *APIManager) GetGameData(id int) (ApiGame, error) {
 	return firstGameData, nil
 }
 
-func (a *APIManager) GetGames(query string) ([]ApiGame, error)  {
+func (a *APIManager) GetGames(query string) ([]ApiGame, error) {
 	header := fmt.Sprintf(`fields id, name, summary, cover.*, artworks.*, screenshots.*; search "%s";`, query)
 
 	request, err := http.NewRequest("POST", "https://api.igdb.com/v4/games/", bytes.NewBuffer([]byte(header)))

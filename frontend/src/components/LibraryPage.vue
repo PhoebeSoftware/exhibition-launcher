@@ -7,6 +7,7 @@
                     <span>Sort by:</span>
                     <button id="sort-library-by">Time played <i class="fa-solid fa-chevron-down"></i></button>
                 </div>
+
                 <div class="Library-favorites-container">
                     <button id="all-button" class="active">
                         All
@@ -28,7 +29,9 @@
             <div class="game-library-container">
                 <div class="game-library-game-box" v-for="game in games" :key="game.igdb_id"
                      @click="openGamePage(game)"
-                     :style="{ backgroundImage: `url(${game.cover_url})`}">
+                     :style="{
+                         backgroundImage: `url(${getCoverUrlFromGame(game)})`
+                     }">
                     <div class="game-box-info">
                         <div class="text-container">
                             <h1>{{ game.name }}</h1>
@@ -50,8 +53,8 @@
 
             <div class="game-store-content">
                 <h1>Game Store Page</h1>
-                <div v-for="banner in allBanners">
-                    <div class="game-store-banner" :style="{ backgroundImage: `url(${banner})`}"></div>
+                <div>
+                    <div class="game-store-banner"></div>
                     <p>This is a placeholder for game #{{ selectedGame.igdb_id }}</p>
                     <p>Store page content will be implemented later</p>
                 </div>
@@ -116,13 +119,15 @@ export default {
     },
     methods: {
         getBackgroundImage() {
+            let url;
             if (this.selectedGame.artwork_url_list && this.selectedGame.artwork_url_list.length > 0) {
-                return this.selectedGame.artwork_url_list[0];
+                url = this.selectedGame.artwork_url_list[0];
             } else if (this.selectedGame.screenshot_url_list && this.selectedGame.screenshot_url_list.length > 0) {
-                return this.selectedGame.screenshot_url_list[0];
+                url = this.selectedGame.screenshot_url_list[0];
             } else {
-                return this.selectedGame.CoverURL;
+                url = this.selectedGame.cover_url;
             }
+            return new URL(url, import.meta.url).href
         },
         async addGame() {
             let newGame = await Library.AddToLibrary(119277).catch((err) => {
@@ -131,16 +136,18 @@ export default {
             this.games.push(newGame)
         },
 
+        getCoverUrlFromGame(game) {
+            return new URL(game.cover_url, import.meta.url).href
+        },
+
         openGameStore(game) {
             this.selectedGame = game;
             this.currentPage = 'store';
-            console.log(`Opening store page for game ${game.igdb_id}`);
         },
 
         openGamePage(game) {
             this.selectedGame = game;
             this.currentPage = 'game';
-            console.log(`Opening game page for game ${game.igdb_id}`);
         },
 
         launchGame(game) {

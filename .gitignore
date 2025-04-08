@@ -21,3 +21,4 @@ node_modules
 go.work
 go.work.sum
 proxysettings.json
+frontend/src/cache

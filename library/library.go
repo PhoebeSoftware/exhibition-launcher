@@ -5,6 +5,7 @@ import (
 	"exhibition-launcher/utils/jsonUtils"
 	"exhibition-launcher/utils/jsonUtils/jsonModels"
 	"fmt"
+	"net/http"
 	"os/exec"
 	"path/filepath"
 	"runtime"
@@ -18,6 +19,7 @@ type Library struct {
 	LibraryManager *jsonUtils.JsonManager
 	Library        *jsonModels.Library
 	APIManager     *igdb.APIManager
+	Client         *http.Client
 }
 
 // geeft library.json als Library struct vol met data
@@ -33,45 +35,46 @@ func GetLibrary(apiManager *igdb.APIManager) *Library {
 		LibraryManager: libraryManager,
 		Library:        library,
 		APIManager:     apiManager,
+		Client:         &http.Client{},
 	}
 }
 
-func (lib *Library) GetAllGames() map[int]jsonModels.Game {
-	return lib.Library.Games
+func (l *Library) GetAllGames() map[int]jsonModels.Game {
+	return l.Library.Games
 }
 
-func (lib *Library) GetAmountOfGames() int {
-	return len(lib.Library.Games)
+func (l *Library) GetAmountOfGames() int {
+	return len(l.Library.Games)
 }
 
-func (lib *Library) GetAllGameIDs() []int{
+func (l *Library) GetAllGameIDs() []int {
 	var intList []int
-	for i := range lib.Library.Games {
+	for i := range l.Library.Games {
 		intList = append(intList, i)
 	}
 	return intList
 }
-func (lib *Library) GetGame(igdbId int) (jsonModels.Game, error) {
-	game, ok := lib.Library.Games[igdbId]
+func (l *Library) GetGame(igdbId int) (jsonModels.Game, error) {
+	game, ok := l.Library.Games[igdbId]
 	if !ok {
 		return game, fmt.Errorf("game with IGDB ID %d not found", igdbId)
 	}
 	return game, nil
 }
 
-func (lib *Library) GetRangeGame(amount int, offset int) ([]jsonModels.Game, error) {
+func (l *Library) GetRangeGame(amount int, offset int) ([]jsonModels.Game, error) {
 	var games []jsonModels.Game
 
-	if len(lib.Library.Games) == 0 {
+	if len(l.Library.Games) == 0 {
 		return games, fmt.Errorf("no games in library")
 	}
 
-	if offset < 0 || offset >= len(lib.Library.Games) {
+	if offset < 0 || offset >= len(l.Library.Games) {
 		return games, fmt.Errorf("offset out of range")
 	}
 
 	var keys []int
-	for k := range lib.Library.Games {
+	for k := range l.Library.Games {
 		keys = append(keys, k)
 	}
 	sort.Ints(keys)
@@ -82,14 +85,13 @@ func (lib *Library) GetRangeGame(amount int, offset int) ([]jsonModels.Game, err
 	}
 
 	for _, key := range keys[offset:end] {
-		games = append(games, lib.Library.Games[key])
+		games = append(games, l.Library.Games[key])
 	}
 
 	return games, nil
 }
 
-
-func (lib *Library) AddToLibrary(igdbId int) (jsonModels.Game, error) {
+func (l *Library) AddToLibrary(igdbId int) (jsonModels.Game, error) {
 	// prompt executable location
 	var game jsonModels.Game
 	executable, err := dialog.File().Title("Select game executable").Filter("Executable files", "exe", "app", "ink", "bat").Load()
@@ -98,15 +100,14 @@ func (lib *Library) AddToLibrary(igdbId int) (jsonModels.Game, error) {
 	}
 
 	// game data
-	gameData, err := lib.APIManager.GetGameData(igdbId)
+	gameData, err := l.APIManager.GetGameData(igdbId)
 	if err != nil {
 		return game, err
 	}
-	fmt.Println("Game data:")
-	fmt.Println(gameData)
 	if gameData.Name == "" {
 		return game, fmt.Errorf("failed to get game data")
 	}
+
 
 	// Append the new game
 	game = jsonModels.Game{
@@ -122,9 +123,22 @@ func (lib *Library) AddToLibrary(igdbId int) (jsonModels.Game, error) {
 		ScreenshotUrlList: gameData.ScreenshotUrlList,
 		ArtworkUrlList:    gameData.ArtworkUrlList,
 	}
-	lib.Library.Games[igdbId] = game
 
-	saveErr := lib.LibraryManager.Save()
+
+	// If caching fails still add game to library just with https instead
+	err = l.CacheAllImagesAndChangePaths(&game, gameData)
+	if err != nil {
+		l.Library.Games[igdbId] = game
+		err := l.LibraryManager.Save()
+		if err != nil {
+			return game, err
+		}
+		return game, err
+	}
+
+	l.Library.Games[igdbId] = game
+
+	saveErr := l.LibraryManager.Save()
 	if saveErr != nil {
 		return game, fmt.Errorf("failed to save library: %w", saveErr)
 	}
@@ -132,8 +146,8 @@ func (lib *Library) AddToLibrary(igdbId int) (jsonModels.Game, error) {
 	return game, nil
 }
 
-func (lib *Library) StartApp(igdbId int) error {
-	game := lib.Library.Games[igdbId]
+func (l *Library) StartApp(igdbId int) error {
+	game := l.Library.Games[igdbId]
 
 	var cmd *exec.Cmd
 	if runtime.GOOS == "darwin" {
@@ -151,8 +165,8 @@ func (lib *Library) StartApp(igdbId int) error {
 	fmt.Printf("Started game with PID: %d\n", cmd.Process.Pid)
 
 	game.Running = true
-	lib.Library.Games[igdbId] = game
-	_ = lib.LibraryManager.Save()
+	l.Library.Games[igdbId] = game
+	_ = l.LibraryManager.Save()
 
 	go func() {
 		seconds := 0
@@ -174,8 +188,8 @@ func (lib *Library) StartApp(igdbId int) error {
 
 				game.Running = false
 				game.PlayTime += seconds
-				lib.Library.Games[igdbId] = game
-				_ = lib.LibraryManager.Save()
+				l.Library.Games[igdbId] = game
+				_ = l.LibraryManager.Save()
 
 				return
 			}
