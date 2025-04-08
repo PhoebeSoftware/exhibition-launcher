@@ -75,28 +75,22 @@
                         </button>
                         <div class="last-played-wrapper">
                             <h1>Last played</h1>
-                            <button @click="launchGame">
-                                <i class="fa-solid fa-play"></i>PLAY
-                            </button>
-                            <div class="last-played-wrapper">
-                                <h1>Last played</h1>
-                                <p>{{ selectedGame.lastPlayed || 'Never' }}</p>
-                            </div>
-                            <div class="play-time-wrapper">
-                                <h1>Play time</h1>
-                                <p>{{ selectedGame.playTime || '0 hours' }}</p>
-                            </div>
+                            <p>{{ selectedGame.lastplayed || 'Never' }}</p>
                         </div>
-
-                        <div class="game-options-wrapper">
-                            <button @click="openGameSettings">
-                                <i class="fa-solid fa-gear"></i>
-                            </button>
-
-                            <button @click="toggleFavorite">
-                                <i :class="selectedGame.isFavorite ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
-                            </button>
+                        <div class="play-time-wrapper">
+                            <h1>Play time</h1>
+                            <p>{{ selectedGame.playTime || '0 hours' }}</p>
                         </div>
+                    </div>
+
+                    <div class="game-options-wrapper">
+                        <button @click="openGameSettings">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
+
+                        <button @click="toggleFavorite">
+                            <i :class="selectedGame.isFavorite ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
+                        </button>
                     </div>
                     <div>
                         <p>{{ selectedGame.description }}</p>
