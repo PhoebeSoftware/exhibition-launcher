@@ -47,6 +47,30 @@ func (lib *Library) GetGame(igdbId int) (jsonModels.Game, error) {
 	return game, nil
 }
 
+func (lib *Library) GetRangeGame(amount int, offset int) ([]jsonModels.Game, error) {
+	games := []jsonModels.Game{}
+	if len(lib.Library.Games) == 0 {
+		return games, fmt.Errorf("no games in library")
+	}
+
+	if offset < 0 || offset >= len(lib.Library.Games) {
+		return games, fmt.Errorf("offset out of range")
+	}
+
+	if amount <= 0 || amount > len(lib.Library.Games)-offset {
+		return games, fmt.Errorf("amount out of range")
+	}
+
+	for i := offset; i < offset+amount; i++ {
+		foundGame, ok := lib.Library.Games[i]
+		if !ok || len(games) >= amount {
+			break
+		}
+		games = append(games, foundGame)
+	}
+	return games, nil
+}
+
 func (lib *Library) AddToLibrary(igdbId int) (jsonModels.Game, error) {
 	// prompt executable location
 	var game jsonModels.Game
