@@ -12,6 +12,7 @@ import (
 	"exhibition-launcher/utils/jsonUtils"
 	"exhibition-launcher/utils/jsonUtils/jsonModels"
 	"fmt"
+	"github.com/PhoebeSoftware/exhibition-proxy-library/exhibition-proxy"
 	"log"
 	"path/filepath"
 	"runtime"
@@ -72,8 +73,16 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+	settings.UseLocalProxy = true
+	proxy := exhibition_proxy.Proxy{
+		SettingsPath: "proxysettings.json",
+		Port: 8080,
+	}
 	// test code
 	if settings.UseLocalProxy {
+		go func() {
+			proxy.StartServer()
+		}()
 		igdbApiManager, err = igdb.NewAPI(settings, settingsManager)
 		if err != nil {
 			fmt.Println(err)

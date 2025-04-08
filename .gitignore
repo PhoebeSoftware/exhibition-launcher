@@ -18,3 +18,6 @@ sources
 ./node_modules
 ./frontend/.vscode
 node_modules
+go.work
+go.work.sum
+proxysettings.json
