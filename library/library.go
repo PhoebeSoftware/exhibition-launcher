@@ -91,12 +91,19 @@ func (l *Library) GetRangeGame(amount int, offset int) ([]jsonModels.Game, error
 	return games, nil
 }
 
-func (l *Library) AddToLibrary(igdbId int) (jsonModels.Game, error) {
+func (l *Library) AddToLibrary(igdbId int, promptDialog bool) (jsonModels.Game, error) {
 	// prompt executable location
-	var game jsonModels.Game
-	executable, err := dialog.File().Title("Select game executable").Filter("Executable files", "exe", "app", "ink", "bat").Load()
-	if err != nil {
-		return game, fmt.Errorf("failed to select executable: %w", err)
+	var (
+		game jsonModels.Game
+		executable = ""
+		err error
+	)
+
+	if promptDialog {
+		executable, err = dialog.File().Title("Select game executable").Filter("Executable files", "exe", "app", "ink", "bat").Load()
+		if err != nil {
+			return game, fmt.Errorf("failed to select executable: %w", err)
+		}
 	}
 
 	// game data

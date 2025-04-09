@@ -78,7 +78,7 @@
                         </button>
                         <div class="last-played-wrapper">
                             <h1>Last played</h1>
-                            <p>{{ selectedGame.lastplayed || 'Never' }}</p>
+                            <p>{{ selectedGame.last_played || 'Never' }}</p>
                         </div>
                         <div class="play-time-wrapper">
                             <h1>Play time</h1>
@@ -120,9 +120,9 @@ export default {
     methods: {
         getBackgroundImage() {
             let url;
-            if (this.selectedGame.artwork_url_list && this.selectedGame.artwork_url_list.length > 0) {
+            if (this.selectedGame.artwork_url_list != null && this.selectedGame.artwork_url_list.length > 0) {
                 url = this.selectedGame.artwork_url_list[0];
-            } else if (this.selectedGame.screenshot_url_list && this.selectedGame.screenshot_url_list.length > 0) {
+            } else if (this.selectedGame.screenshot_url_list != null && this.selectedGame.screenshot_url_list.length > 0) {
                 url = this.selectedGame.screenshot_url_list[0];
             } else {
                 url = this.selectedGame.cover_url;
@@ -130,7 +130,7 @@ export default {
             return new URL(url, import.meta.url).href
         },
         async addGame() {
-            let newGame = await Library.AddToLibrary(119277).catch((err) => {
+            let newGame = await Library.AddToLibrary(119277, false).catch((err) => {
                 console.warn(err)
             });
             this.games.push(newGame)
@@ -183,10 +183,11 @@ export default {
         for (let i = 0; i < amountOfGames; i += portion) {
             console.log(i)
             let games = await Library.GetRangeGame(portion, i)
-            games.forEach((game) => {
-                console.log(game);
+            for (let j = 0; j < games.length; j++) {
+                let game = games[j]
+                console.log(game.name + " : " + game.igdb_id + " : " + j);
                 this.games.push(game);
-            })
+            }
         }
 
         // Library.GetRangeGame(100, 0).then()
