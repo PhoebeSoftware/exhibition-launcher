@@ -23,7 +23,7 @@ import (
 // Any files in the frontend/dist folder will be embedded into the binary and
 // made available to the frontend.
 // See https://pkg.go.dev/embed for more information.
-var libraryManager *library.Library
+var libraryManager *library.LibraryManager
 var igdbApiManager *igdb.APIManager
 var torrentManager *torrent.Manager
 var debridClient *realdebrid.RealDebridClient
