@@ -170,16 +170,16 @@ func main() {
 
 	// Add a bunch of games
 	
-	go func() {
-		for i := 2000; i < 7000; i++ {
-			game, err := libraryManager.AddToLibrary(i, false);
-			if err != nil {
-				fmt.Println(err)
-				continue
-			}
-			fmt.Println("Added game:",game.Name)
-		}
-	}()
+	//go func() {
+	//	for i := 2000; i < 7000; i++ {
+	//		game, err := libraryManager.AddToLibrary(i, false);
+	//		if err != nil {
+	//			fmt.Println(err)
+	//			continue
+	//		}
+	//		fmt.Println("Added game:",game.Name)
+	//	}
+	//}()
 
 	// Schedule I v0.3.3f14
 	queue.AddTorrentDownloadToQueue("magnet:?xt=urn:btih:TJYZXLE3DEBYGA5GFVPCDXP2Z4BLHCWJ&dn=Schedule%20I&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce")
