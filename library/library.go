@@ -15,46 +15,56 @@ import (
 	"github.com/sqweek/dialog"
 )
 
-type Library struct {
-	LibraryManager *jsonUtils.JsonManager
-	Library        *jsonModels.Library
+type LibraryManager struct {
+	JsonManager *jsonUtils.JsonManager
+	Library     *jsonModels.Library
 	APIManager     *igdb.APIManager
 	Client         *http.Client
 }
 
-// geeft library.json als Library struct vol met data
-func GetLibrary(apiManager *igdb.APIManager) *Library {
+func (l *LibraryManager) GetSortedIDs() []int {
+	keys := make([]int, 0, len(l.Library.Games))
+
+	for k := range l.Library.Games {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+	return keys
+}
+
+// geeft library.json als LibraryManager struct vol met data
+func GetLibrary(apiManager *igdb.APIManager) *LibraryManager {
 	library := &jsonModels.Library{}
-	libraryManager, err := jsonUtils.NewJsonManager(filepath.Join("library.json"), library)
+	jsonManager, err := jsonUtils.NewJsonManager(filepath.Join("library.json"), library)
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
 
-	return &Library{
-		LibraryManager: libraryManager,
-		Library:        library,
-		APIManager:     apiManager,
-		Client:         &http.Client{},
+	return &LibraryManager{
+		JsonManager: jsonManager,
+		Library:     library,
+		APIManager:  apiManager,
+		Client:      &http.Client{},
 	}
 }
 
-func (l *Library) GetAllGames() map[int]jsonModels.Game {
+func (l *LibraryManager) GetAllGames() map[int]jsonModels.Game {
 	return l.Library.Games
 }
 
-func (l *Library) GetAmountOfGames() int {
+func (l *LibraryManager) GetAmountOfGames() int {
 	return len(l.Library.Games)
 }
 
-func (l *Library) GetAllGameIDs() []int {
+func (l *LibraryManager) GetAllGameIDs() []int {
 	var intList []int
 	for i := range l.Library.Games {
 		intList = append(intList, i)
 	}
 	return intList
 }
-func (l *Library) GetGame(igdbId int) (jsonModels.Game, error) {
+func (l *LibraryManager) GetGame(igdbId int) (jsonModels.Game, error) {
 	game, ok := l.Library.Games[igdbId]
 	if !ok {
 		return game, fmt.Errorf("game with IGDB ID %d not found", igdbId)
@@ -62,7 +72,7 @@ func (l *Library) GetGame(igdbId int) (jsonModels.Game, error) {
 	return game, nil
 }
 
-func (l *Library) GetRangeGame(amount int, offset int) ([]jsonModels.Game, error) {
+func (l *LibraryManager) GetRangeGame(amount int, offset int) ([]jsonModels.Game, error) {
 	var games []jsonModels.Game
 
 	if len(l.Library.Games) == 0 {
@@ -91,7 +101,7 @@ func (l *Library) GetRangeGame(amount int, offset int) ([]jsonModels.Game, error
 	return games, nil
 }
 
-func (l *Library) AddToLibrary(igdbId int, promptDialog bool) (jsonModels.Game, error) {
+func (l *LibraryManager) AddToLibrary(igdbId int, promptDialog bool) (jsonModels.Game, error) {
 	// prompt executable location
 	var (
 		game jsonModels.Game
@@ -143,7 +153,7 @@ func (l *Library) AddToLibrary(igdbId int, promptDialog bool) (jsonModels.Game, 
 	err = l.CacheAllImagesAndChangePaths(&game, gameData)
 	if err != nil {
 		l.Library.Games[igdbId] = game
-		err := l.LibraryManager.Save()
+		err := l.JsonManager.Save()
 		if err != nil {
 			return game, err
 		}
@@ -152,7 +162,7 @@ func (l *Library) AddToLibrary(igdbId int, promptDialog bool) (jsonModels.Game, 
 
 	l.Library.Games[igdbId] = game
 
-	saveErr := l.LibraryManager.Save()
+	saveErr := l.JsonManager.Save()
 	if saveErr != nil {
 		return game, fmt.Errorf("failed to save library: %w", saveErr)
 	}
@@ -160,7 +170,7 @@ func (l *Library) AddToLibrary(igdbId int, promptDialog bool) (jsonModels.Game, 
 	return game, nil
 }
 
-func (l *Library) StartApp(igdbId int) error {
+func (l *LibraryManager) StartApp(igdbId int) error {
 	game := l.Library.Games[igdbId]
 
 	var cmd *exec.Cmd
@@ -180,7 +190,7 @@ func (l *Library) StartApp(igdbId int) error {
 
 	game.Running = true
 	l.Library.Games[igdbId] = game
-	_ = l.LibraryManager.Save()
+	_ = l.JsonManager.Save()
 
 	go func() {
 		seconds := 0
@@ -203,7 +213,7 @@ func (l *Library) StartApp(igdbId int) error {
 				game.Running = false
 				game.PlayTime += seconds
 				l.Library.Games[igdbId] = game
-				_ = l.LibraryManager.Save()
+				_ = l.JsonManager.Save()
 
 				return
 			}

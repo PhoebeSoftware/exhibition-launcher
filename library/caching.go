@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-func (l *Library) CacheImageToDisk(gameName string, cachingPath string, uri string) (string, error) {
+func (l *LibraryManager) CacheImageToDisk(gameName string, cachingPath string, uri string) (string, error) {
 	req, err := http.NewRequest(http.MethodGet, uri, nil)
 	if err != nil {
 		return "", err
@@ -56,7 +56,7 @@ func (l *Library) CacheImageToDisk(gameName string, cachingPath string, uri stri
 	return encodedPath, nil
 }
 
-func (l *Library) CacheAllImagesAndChangePaths(game *jsonModels.Game, gameData igdb.ApiGame) error {
+func (l *LibraryManager) CacheAllImagesAndChangePaths(game *jsonModels.Game, gameData igdb.ApiGame) error {
 	pathToCache := filepath.Join("./frontend/src/cache")
 
 	var (
