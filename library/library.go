@@ -98,6 +98,13 @@ func (l *Library) AddToLibrary(igdbId int, promptDialog bool) (jsonModels.Game, 
 		executable = ""
 		err error
 	)
+	for _, gameInLoop := range l.Library.Games {
+		if gameInLoop.IGDBID == igdbId {
+			// TODO ADD MENU IF USER WANTS TO REFETCH DATA
+			fmt.Println("Game is already in library:", gameInLoop.Name)
+			return gameInLoop, nil
+		}
+	}
 
 	if promptDialog {
 		executable, err = dialog.File().Title("Select game executable").Filter("Executable files", "exe", "app", "ink", "bat").Load()

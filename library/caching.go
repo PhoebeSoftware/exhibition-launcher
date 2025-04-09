@@ -7,8 +7,10 @@ import (
 	"github.com/google/uuid"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func (l *Library) CacheImageToDisk(gameName string, cachingPath string, uri string) (string, error) {
@@ -44,12 +46,14 @@ func (l *Library) CacheImageToDisk(gameName string, cachingPath string, uri stri
 
 	// Change the path so it is relative to the frontend
 	// In ./frontend
-	// cache/{game}/image.jpg
+	// for example: ./cache/{game}/image.jpg
 	relativePath := filepath.Join("..", "cache", gameName, fileName)
+	// Encode the path so weird characters like ', ", ? dont blow things up but exclude /'s for paths
+	encodedPath := encodePathSegments(relativePath)
 
 	fmt.Println("Succesfully cached image:", fileName)
 
-	return relativePath, nil
+	return encodedPath, nil
 }
 
 func (l *Library) CacheAllImagesAndChangePaths(game *jsonModels.Game, gameData igdb.ApiGame) error {
@@ -64,15 +68,15 @@ func (l *Library) CacheAllImagesAndChangePaths(game *jsonModels.Game, gameData i
 		return err
 	}
 
-	for i, url := range game.ArtworkUrlList {
-		game.ArtworkUrlList[i], err = l.CacheImageToDisk(gameData.Name, pathToCache, url)
+	for i, uri := range game.ArtworkUrlList {
+		game.ArtworkUrlList[i], err = l.CacheImageToDisk(gameData.Name, pathToCache, uri)
 		if err != nil {
 			return err
 		}
 	}
 
-	for i, url := range game.ScreenshotUrlList {
-		game.ScreenshotUrlList[i], err = l.CacheImageToDisk(gameData.Name, pathToCache, url)
+	for i, uri := range game.ScreenshotUrlList {
+		game.ScreenshotUrlList[i], err = l.CacheImageToDisk(gameData.Name, pathToCache, uri)
 		if err != nil {
 			return err
 		}
@@ -80,3 +84,15 @@ func (l *Library) CacheAllImagesAndChangePaths(game *jsonModels.Game, gameData i
 	return nil
 }
 
+func encodePathSegments(path string) string {
+	// Split the path into segments using "/" as a delimiter.
+	segments := strings.Split(path, "/")
+
+	// Encode each segment.
+	for i, segment := range segments {
+		segments[i] = url.PathEscape(segment)
+	}
+
+	// Join the encoded segments using "/" as the delimiter.
+	return strings.Join(segments, "/")
+}

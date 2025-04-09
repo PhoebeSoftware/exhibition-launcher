@@ -130,7 +130,7 @@ export default {
             return new URL(url, import.meta.url).href
         },
         async addGame() {
-            let newGame = await Library.AddToLibrary(119277, false).catch((err) => {
+            let newGame = await Library.AddToLibrary(119277, true).catch((err) => {
                 console.warn(err)
             });
             this.games.push(newGame)
