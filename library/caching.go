@@ -75,20 +75,20 @@ func (l *LibraryManager) CacheAllImagesAndChangePaths(game *jsonModels.Game, gam
 		err error
 	)
 
-	game.CoverURL, err = l.CacheImageToDisk(gameData.Name, gameData.CoverURL)
+	game.CoverFilename, err = l.CacheImageToDisk(gameData.Name, gameData.CoverURL)
 	if err != nil {
 		return err
 	}
 
-	for i, uri := range game.ArtworkUrlList {
-		game.ArtworkUrlList[i], err = l.CacheImageToDisk(gameData.Name , uri)
+	for i, uri := range game.ArtworkFilenames {
+		game.ArtworkFilenames[i], err = l.CacheImageToDisk(gameData.Name , uri)
 		if err != nil {
 			return err
 		}
 	}
 
-	for i, uri := range game.ScreenshotUrlList {
-		game.ScreenshotUrlList[i], err = l.CacheImageToDisk(gameData.Name, uri)
+	for i, uri := range game.ScreenshotFilenames {
+		game.ScreenshotFilenames[i], err = l.CacheImageToDisk(gameData.Name, uri)
 		if err != nil {
 			return err
 		}

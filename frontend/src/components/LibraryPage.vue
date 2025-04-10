@@ -123,14 +123,14 @@ export default {
     methods: {
         getBackgroundImage() {
             let url;
-            if (this.selectedGame.artwork_url_list != null && this.selectedGame.artwork_url_list.length > 0) {
+            if (this.selectedGame.artwork_filenames != null && this.selectedGame.artwork_filenames.length > 0) {
                 url = this.artworkUrls[this.selectedGame.igdb_id][0];
-            } else if (this.selectedGame.screenshot_url_list != null && this.selectedGame.screenshot_url_list.length > 0) {
+            } else if (this.selectedGame.screenshot_filenames != null && this.selectedGame.screenshot_filenames.length > 0) {
                 url = this.screenshotsUrls[this.selectedGame.igdb_id][0];
             } else {
                 url = this.coverUrls[this.selectedGame.igdb_id]
             }
-            return new URL(url, import.meta.url).href
+            return url
         },
         async addGame() {
             let newGame = await LibraryManager.AddToLibrary(119277, true).catch((err) => {
@@ -174,19 +174,19 @@ export default {
             this.currentPage = 'library';
         },
         async loadCoverImages(game) {
-            this.coverUrls[game.igdb_id] = await LibraryManager.GetImageBase64(game.cover_url);
+            this.coverUrls[game.igdb_id] = await LibraryManager.GetImageBase64(game.cover_filename);
         },
         async loadArtworkImages(game) {
             let list = [];
-            for (let i = 0; i < game.artwork_url_list.length; i++) {
-                list.push(await LibraryManager.GetImageBase64(game.artwork_url_list[i]))
+            for (let i = 0; i < game.artwork_filenames.length; i++) {
+                list.push(await LibraryManager.GetImageBase64(game.artwork_filenames[i]))
             }
             this.artworkUrls[game.igdb_id] = list
         },
         async loadScreenshotImages(game) {
             let list = [];
-            for (let i = 0; i < game.screenshot_url_list.length; i++) {
-                list.push(await LibraryManager.GetImageBase64(game.screenshot_url_list[i]))
+            for (let i = 0; i < game.screenshot_filenames.length; i++) {
+                list.push(await LibraryManager.GetImageBase64(game.screenshot_filenames[i]))
             }
             this.screenshotsUrls[game.igdb_id] = list
         },

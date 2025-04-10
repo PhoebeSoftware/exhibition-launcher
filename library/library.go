@@ -135,17 +135,17 @@ func (l *LibraryManager) AddToLibrary(igdbId int, promptDialog bool) (jsonModels
 
 	// Append the new game
 	game = jsonModels.Game{
-		IGDBID:            igdbId,
-		Name:              gameData.Name,
-		Description:       gameData.Description,
-		PlayTime:          0,
-		Achievments:       []int{},
-		Executable:        executable,
-		Running:           false,
-		Favorite:          false,
-		CoverURL:          gameData.CoverURL,
-		ScreenshotUrlList: gameData.ScreenshotUrlList,
-		ArtworkUrlList:    gameData.ArtworkUrlList,
+		IGDBID:              igdbId,
+		Name:                gameData.Name,
+		Description:         gameData.Description,
+		PlayTime:            0,
+		Achievments:         []int{},
+		Executable:          executable,
+		Running:             false,
+		Favorite:            false,
+		CoverFilename:       gameData.CoverURL,
+		ScreenshotFilenames: gameData.ScreenshotUrlList,
+		ArtworkFilenames:    gameData.ArtworkUrlList,
 	}
 
 

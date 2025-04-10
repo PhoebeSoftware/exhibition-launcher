@@ -110,9 +110,9 @@ func main() {
 	//		continue
 	//	}
 	//
-	//	game.CoverURL = gameData.CoverURL
-	//	game.ArtworkUrlList = gameData.ArtworkUrlList
-	//	game.ScreenshotUrlList = gameData.ScreenshotUrlList
+	//	game.CoverFilename = gameData.CoverFilename
+	//	game.ArtworkFilenames = gameData.ArtworkFilenames
+	//	game.ScreenshotFilenames = gameData.ScreenshotFilenames
 	//	libraryManager.Games[id] = game
 	//}
 	webViewWindowOpt := application.WebviewWindowOptions{
