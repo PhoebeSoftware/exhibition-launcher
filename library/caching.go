@@ -8,10 +8,8 @@ import (
 	"github.com/google/uuid"
 	"io"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 func getImageCachePath() string {
@@ -56,7 +54,6 @@ func (l *LibraryManager) CacheImageToDisk(gameName string, uri string) (string, 
 
 	// Encode the path so weird characters like ', ", ? dont blow things up but exclude /'s for paths
 	fmt.Println("Succesfully cached image:", pathToFile)
-
 	return fileName, nil
 }
 
@@ -70,7 +67,7 @@ func (l *LibraryManager) GetImageBase64(filename string) (string, error) {
 	return "data:image/png;base64," + base64Data, nil
 }
 
-func (l *LibraryManager) CacheAllImagesAndChangePaths(game *jsonModels.Game, gameData igdb.ApiGame) error {
+func (l *LibraryManager) CacheAllImages(game *jsonModels.Game, gameData igdb.ApiGame) error {
 	var (
 		err error
 	)
@@ -80,15 +77,32 @@ func (l *LibraryManager) CacheAllImagesAndChangePaths(game *jsonModels.Game, gam
 		return err
 	}
 
-	for i, uri := range game.ArtworkFilenames {
-		game.ArtworkFilenames[i], err = l.CacheImageToDisk(gameData.Name , uri)
+	err = l.CacheArtworks(game, gameData)
+	if err != nil {
+		return err
+	}
+	err = l.CacheScreenshots(game, gameData)
+	if err != nil {
+	    return err
+	}
+
+	return nil
+}
+
+func (l *LibraryManager) CacheArtworks(game *jsonModels.Game, gameData igdb.ApiGame) error {
+	for _, uri := range gameData.ArtworkUrlList {
+		fileName, err := l.CacheImageToDisk(gameData.Name, uri)
+		game.ArtworkFilenames = append(game.ArtworkFilenames, fileName)
 		if err != nil {
 			return err
 		}
 	}
-
-	for i, uri := range game.ScreenshotFilenames {
-		game.ScreenshotFilenames[i], err = l.CacheImageToDisk(gameData.Name, uri)
+	return nil
+}
+func (l *LibraryManager) CacheScreenshots(game *jsonModels.Game, gameData igdb.ApiGame) error {
+	for _, uri := range gameData.ScreenshotUrlList {
+		fileName, err := l.CacheImageToDisk(gameData.Name, uri)
+		game.ScreenshotFilenames = append(game.ScreenshotFilenames, fileName)
 		if err != nil {
 			return err
 		}
@@ -96,15 +110,55 @@ func (l *LibraryManager) CacheAllImagesAndChangePaths(game *jsonModels.Game, gam
 	return nil
 }
 
-func encodePathSegments(path string) string {
-	// Split the path into segments using "/" as a delimiter.
-	segments := strings.Split(path, "/")
+// CheckForCache checks if cache exists if it does not it caches the images
+func (l *LibraryManager) CheckForCache() {
+	for _, game := range l.Library.Games {
+		if game.ArtworkFilenames != nil && game.ScreenshotFilenames != nil && game.CoverFilename != "" {
+			continue
+		}
+		fmt.Println("No cache found trying to refetch...")
 
-	// Encode each segment.
-	for i, segment := range segments {
-		segments[i] = url.PathEscape(segment)
+		gameData, err := l.APIManager.GetGameData(game.IGDBID)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		if gameData.Name == "" {
+			fmt.Println("Failed to get game data", err)
+			continue
+		}
+
+		if game.ScreenshotFilenames == nil {
+			err = l.CacheScreenshots(&game, gameData)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+		}
+
+		if game.ArtworkFilenames == nil {
+			err = l.CacheArtworks(&game, gameData)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+		}
+
+		if game.CoverFilename == "" {
+			game.CoverFilename, err = l.CacheImageToDisk(gameData.Name, gameData.CoverURL)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+		}
+
+		l.Library.Games[game.IGDBID] = game
+
+		err = l.JsonManager.Save()
+		if err != nil {
+			fmt.Println("Failed to save data", err)
+			continue
+		}
+
 	}
-
-	// Join the encoded segments using "/" as the delimiter.
-	return strings.Join(segments, "/")
 }

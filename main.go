@@ -81,7 +81,16 @@ func main() {
 			return
 		}
 	}
-	libraryManager = library.GetLibrary(igdbApiManager)
+	libraryManager, err = library.GetLibrary(igdbApiManager)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	go func() {
+		libraryManager.CheckForCache()
+	}()
+
 	if settings.RealDebridSettings.UseRealDebrid {
 		if settings.RealDebridSettings.DebridToken == "" {
 			// TO:DO ADD A UI FOR THIS OR SMTH
