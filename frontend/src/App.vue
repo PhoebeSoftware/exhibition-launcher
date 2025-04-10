@@ -51,9 +51,9 @@ html, body {
 body {
     background-color: #000000;
     color: white;
+    overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
-/* Chrome, Edge, Safari */
 ::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -64,21 +64,14 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: var(--outline); /* thumb color */
+    background-color: var(--outline);
     border-radius: 8px;
-    border: 2px solid var(--background-color); /* creates padding around thumb */
+    border: 2px solid var(--background-color);
 }
 
 ::-webkit-scrollbar-thumb:hover {
     background-color: var(--accent-color);
 }
-
-/* Firefox */
-* {
-    scrollbar-width: thin;
-    scrollbar-color: var(--outline) var(--background-color);
-}
-
 
 #app {
     height: 100%;
