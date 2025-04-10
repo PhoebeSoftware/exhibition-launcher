@@ -30,12 +30,11 @@
                 <div class="game-library-game-box" v-for="game in games" :key="game.igdb_id"
                      @click="openGamePage(game)"
                      :style="{
-                         backgroundImage: coverUrls[game.igdb_id] ? `url(${coverUrls[game.igdb_id]})` : 'none'
+                         backgroundImage: `url(${getCoverUrlFromGame(game)})`
                      }">
                     <div class="game-box-info">
                         <div class="text-container">
                             <h1>{{ game.name }}</h1>
-                            <p>{{ game.executable }}</p>
                         </div>
                         <button><i class="fa-solid fa-ellipsis"></i></button>
                     </div>
@@ -43,60 +42,124 @@
             </div>
         </div>
 
-        <!-- Simple Game Store Page -->
-        <div v-if="currentPage === 'store'" class="game-store-page">
-            <div class="game-store-header">
-                <button class="back-button" @click="returnToLibrary">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Library
-                </button>
-            </div>
+        <div v-if="currentPage === 'game'" class="game-page-new">
+            <button class="back-button" @click="returnToLibrary">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            
+            <!-- Image Carousel Section -->
+            <div class="carousel-container">
+                <div class="carousel-slides" ref="carouselSlides"
+                     :style="{ transform: `translateX(-${currentSlide * 100}%)` }">
+                    <div class="carousel-slide" 
+                         v-for="(image, index) in getGameImages()" 
+                         :key="index" 
+                         :style="{ backgroundImage: `url(${image})` }">
+                        <div class="banner-overlay"></div>
+                    </div>
+                </div>
+                
+                <div class="carousel-controls">
+                    <button class="carousel-btn prev" @click="prevSlide">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <div class="carousel-indicators">
+                        <span v-for="(_, index) in getGameImages()" 
+                              :key="index" 
+                              :class="{ active: index === currentSlide }"
+                              @click="goToSlide(index)">
+                        </span>
+                    </div>
+                    <button class="carousel-btn next" @click="nextSlide">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+                
+                <div class="game-info-overlay">
+                    <div class="game-branding">
+                        <h1 class="game-title">{{ selectedGame.name }}</h1>
+                    </div>
+                    
 
-            <div class="game-store-content">
-                <h1>Game Store Page</h1>
-                <div>
-                    <div class="game-store-banner"></div>
-                    <p>This is a placeholder for game #{{ selectedGame.igdb_id }}</p>
-                    <p>Store page content will be implemented later</p>
+                    
+                    <div class="game-stats-container">
+                        <div class="stat-box">
+                            <div class="stat-value">{{ selectedGame.playTime || '16hrs' }} <i class="fa-regular fa-clock"></i></div>
+                            <div class="stat-label">PLAY TIME</div>
+                        </div>
+                        
+                        <div class="stat-box">
+                            <div class="stat-value">{{ selectedGame.achievementPercent || '27%' }} <i class="fa-solid fa-trophy"></i></div>
+                            <div class="stat-label">ACHIEVEMENTS</div>
+                        </div>
+                    </div>
+                    
+                    <div class="game-actions">
+                        <button class="add-library-btn" @click="toggleFavorite">
+                            {{ selectedGame.isFavorite ? 'Remove from Favorites' : 'Add to Favorites' }} 
+                            <i :class="selectedGame.isFavorite ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
+                        </button>
+                        <button class="download-btn" @click="launchGame(selectedGame)">
+                            Play Game <i class="fa-solid fa-play"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Game Page -->
-        <div v-if="currentPage === 'game'" class="game-page">
-            <div class="game-page-content">
-                <button class="back-button" @click="returnToLibrary">
-                    <i class="fa-solid fa-arrow-left"></i> Back to Library
-                </button>
-                <!-- Add more game details here as needed -->
-            </div>
-            <div class="game-page-image-container"
-                 :style="{ backgroundImage: `url(${getBackgroundImage()})` }">
-                <div class="game-user-stats">
-                    <div class="game-user-stats-left">
-                        <button @click="launchGame(selectedGame)">
-                            <i class="fa-solid fa-play"></i>PLAY
-                        </button>
-                        <div class="last-played-wrapper">
-                            <h1>Last played</h1>
-                            <p>{{ selectedGame.last_played || 'Never' }}</p>
+            
+            <div class="game-details-section">
+                <div class="game-details-container">
+                    <div class="details-column">
+                        <div class="details-section">
+                            <h3>About</h3>
+                            <p>{{ selectedGame.fullDescription || selectedGame.description || 'A groundbreaking game experience.' }}</p>
                         </div>
-                        <div class="play-time-wrapper">
-                            <h1>Play time</h1>
-                            <p>{{ selectedGame.playTime || '0 hours' }}</p>
+                        
+                        <div class="details-section">
+                            <h3>Genre</h3>
+                            <div class="tags-container">
+                                <span class="tag" v-for="(genre, index) in (selectedGame.genres || ['RPG', 'Fantasy', 'Adventure'])" :key="index">
+                                    {{ genre }}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="details-section">
+                            <h3>Features</h3>
+                            <div class="tags-container">
+                                <span class="tag" v-for="(feature, index) in (selectedGame.features || ['Single-player', 'Controller Support', 'Cloud Saves'])" :key="index">
+                                    {{ feature }}
+                                </span>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="game-options-wrapper">
-                        <button @click="openGameSettings">
-                            <i class="fa-solid fa-gear"></i>
-                        </button>
-
-                        <button @click="toggleFavorite">
-                            <i :class="selectedGame.isFavorite ? 'fa-solid fa-star' : 'fa-regular fa-star'"></i>
-                        </button>
-                    </div>
-                    <div>
-                        <p>{{ selectedGame.description }}</p>
+                    
+                    <div class="details-column">
+                        <div class="details-section">
+                            <h3>System Requirements</h3>
+                            <div class="system-reqs">
+                                <div class="req-section">
+                                    <h4>Minimum</h4>
+                                    <ul>
+                                        <li><strong>OS:</strong> {{ selectedGame.minOS || 'Windows 10 (64-bit)' }}</li>
+                                        <li><strong>CPU:</strong> {{ selectedGame.minCPU || 'Intel Core i5-2500K | AMD FX-8320' }}</li>
+                                        <li><strong>RAM:</strong> {{ selectedGame.minRAM || '8 GB' }}</li>
+                                        <li><strong>GPU:</strong> {{ selectedGame.minGPU || 'NVIDIA GeForce GTX 760 | AMD Radeon HD 7950' }}</li>
+                                        <li><strong>Storage:</strong> {{ selectedGame.minStorage || '60 GB available space' }}</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="req-section">
+                                    <h4>Recommended</h4>
+                                    <ul>
+                                        <li><strong>OS:</strong> {{ selectedGame.recOS || 'Windows 10/11 (64-bit)' }}</li>
+                                        <li><strong>CPU:</strong> {{ selectedGame.recCPU || 'Intel Core i7-4790 | AMD Ryzen 5 1600' }}</li>
+                                        <li><strong>RAM:</strong> {{ selectedGame.recRAM || '16 GB' }}</li>
+                                        <li><strong>GPU:</strong> {{ selectedGame.recGPU || 'NVIDIA GeForce GTX 1060 6GB | AMD Radeon RX 580 8GB' }}</li>
+                                        <li><strong>Storage:</strong> {{ selectedGame.recStorage || '60 GB SSD' }}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -115,23 +178,50 @@ export default {
             games: [],
             currentPage: 'library',
             selectedGame: null,
-            coverUrls: {},
-            artworkUrls: {},
-            screenshotsUrls: {},
+            currentSlide: 0,
         };
     },
     methods: {
-        getBackgroundImage() {
-            let url;
-            if (this.selectedGame.artwork_filenames != null && this.selectedGame.artwork_filenames.length > 0) {
-                url = this.artworkUrls[this.selectedGame.igdb_id][0];
-            } else if (this.selectedGame.screenshot_filenames != null && this.selectedGame.screenshot_filenames.length > 0) {
-                url = this.screenshotsUrls[this.selectedGame.igdb_id][0];
-            } else {
-                url = this.coverUrls[this.selectedGame.igdb_id]
+        getGameImages() {
+            let images = [];
+            
+            // Use artwork images if available
+            if (this.selectedGame?.artwork_url_list && this.selectedGame.artwork_url_list.length > 0) {
+                images = [...this.selectedGame.artwork_url_list];
             }
-            return url
+            
+            // Add screenshots
+            if (this.selectedGame?.screenshot_url_list && this.selectedGame.screenshot_url_list.length > 0) {
+                images = [...images, ...this.selectedGame.screenshot_url_list];
+            }
+            
+            // Use cover as fallback if no images available
+            if (images.length === 0 && this.selectedGame?.cover_url) {
+                images = [this.selectedGame.cover_url];
+            }
+            
+            // At least 1 carousel image
+            if (images.length === 0) {
+                images = ['https://via.placeholder.com/1920x1080/222222/555555?text=No+Images+Available'];
+            }
+            
+            return images.map(url => new URL(url, import.meta.url).href);
         },
+        
+        nextSlide() {
+            const totalSlides = this.getGameImages().length;
+            this.currentSlide = (this.currentSlide + 1) % totalSlides;
+        },
+        
+        prevSlide() {
+            const totalSlides = this.getGameImages().length;
+            this.currentSlide = (this.currentSlide - 1 + totalSlides) % totalSlides;
+        },
+        
+        goToSlide(index) {
+            this.currentSlide = index;
+        },
+        
         async addGame() {
             let newGame = await LibraryManager.AddToLibrary(119277, true).catch((err) => {
                 console.warn(err)
@@ -139,31 +229,23 @@ export default {
             this.games.push(newGame)
         },
 
-
-        openGameStore(game) {
-            this.selectedGame = game;
-            this.currentPage = 'store';
+        getCoverUrlFromGame(game) {
+            return new URL(game.cover_url, import.meta.url).href
         },
 
         openGamePage(game) {
             this.selectedGame = game;
             this.currentPage = 'game';
+            this.currentSlide = 0; // reset carousel to first slide
         },
 
         launchGame(game) {
-            // Implement game launch logic
             LibraryManager.StartApp(game.igdb_id).catch((err) => {
                 console.log(err)
             })
         },
-
-        openGameSettings() {
-            // Implement game settings logic
-            console.log(`Opening settings for game ${this.selectedGame.igdb_id}`);
-        },
-
+        
         toggleFavorite() {
-            // Toggle favorite status
             if (this.selectedGame) {
                 this.selectedGame.isFavorite = !this.selectedGame.isFavorite;
                 console.log(`Favorite status for game ${this.selectedGame.igdb_id}: ${this.selectedGame.isFavorite}`);
@@ -172,24 +254,7 @@ export default {
 
         returnToLibrary() {
             this.currentPage = 'library';
-        },
-        async loadCoverImages(game) {
-            this.coverUrls[game.igdb_id] = await LibraryManager.GetImageBase64(game.cover_filename);
-        },
-        async loadArtworkImages(game) {
-            let list = [];
-            for (let i = 0; i < game.artwork_filenames.length; i++) {
-                list.push(await LibraryManager.GetImageBase64(game.artwork_filenames[i]))
-            }
-            this.artworkUrls[game.igdb_id] = list
-        },
-        async loadScreenshotImages(game) {
-            let list = [];
-            for (let i = 0; i < game.screenshot_filenames.length; i++) {
-                list.push(await LibraryManager.GetImageBase64(game.screenshot_filenames[i]))
-            }
-            this.screenshotsUrls[game.igdb_id] = list
-        },
+        }
     },
     async mounted() {
         const amountOfGames = await LibraryManager.GetAmountOfGames()
@@ -198,70 +263,45 @@ export default {
         const portion = 100;
 
         for (let i = 0; i < amountOfGames; i += portion) {
+            console.log(i)
             let games = await LibraryManager.GetRangeGame(portion, i)
             for (let j = 0; j < games.length; j++) {
                 let game = games[j]
-                await this.loadCoverImages(game);
-                await this.loadArtworkImages(game);
-                await this.loadScreenshotImages(game);
-                this.games.push(game)
+                console.log(game.name + " : " + game.igdb_id + " : " + j);
+                this.games.push(game);
             }
         }
-    },
+        
+        // auto carousel each 5 seconds
+        setInterval(() => {
+            if (this.currentPage === 'game') {
+                this.nextSlide();
+            }
+        }, 5000);
+    }
 };
 </script>
 
 <style scoped>
 .page {
-    padding: 20px;
+    padding: 0;
     height: auto;
 }
 
-.game-library-container {
+/* Library settings styles */
+.Library-settings-container {
     width: 100%;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 2fr));
-    gap: 20px;
-    padding-top: 30px;
-    margin-bottom: 50px;
-}
-
-.add-game-to-library-wrapper {
+    height: 90px;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-}
-
-#refresh-page i {
-    color: var(--secondary-text-color);
-    transition: color 0.3s ease;
-}
-
-#refresh-page:hover i {
-    color: var(--text-color);
-}
-
-#refresh-page {
-    background: none;
-    border: none;
-}
-
-.add-game-to-library-wrapper button {
-    outline: none;
-    border: none;
-    padding: 10px 20px;
-    color: var(--secondary-text-color);
-    border-radius: 15px;
-    background-color: var(--hover-background-color);
-    border: 1px solid var(--outline);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    gap: 10px;
-}
-
-.add-game-to-library-wrapper button:hover {
-    color: var(--text-color);
+    position: sticky;
+    top: 50px;
+    padding: 50px;
+    backdrop-filter: blur(15px);
+    background-color: rgba(25, 25, 25, 0.6);
+    z-index: 1;
+    margin-bottom: 10px;
 }
 
 .Library-settings-wrapper {
@@ -280,9 +320,14 @@ export default {
     cursor: pointer;
     color: var(--secondary-text-color);
     padding: 10px 20px;
-    border-radius: 15px;
-    background-color: var(--hover-background-color);
-    border: 1px solid var(--outline);
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
+}
+
+.Library-settings-wrapper button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 .Library-favorites-container {
@@ -299,14 +344,14 @@ export default {
     color: var(--secondary-text-color);
     font-size: 15px;
     cursor: pointer;
-    padding: 5px 10px;
+    padding: 5px 15px;
     position: relative;
     transition: color 0.3s ease, background-color 0.3s ease;
-    border-radius: 15px;
+    border-radius: 20px;
 }
 
 .Library-favorites-container button:hover {
-    background-color: rgb(29, 29, 29);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .Library-favorites-container button.active {
@@ -314,23 +359,80 @@ export default {
     background-color: rgba(0, 0, 0, 0) !important;
 }
 
-.Library-favorites-container button.active .active-indicator-horizontal {
-    opacity: 1;
-    animation: growWidth 0.3s ease forwards;
+.active-indicator-horizontal {
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    background-color: var(--accent-color);
+    border-radius: 2px;
+    opacity: 0;
+    transition: width 0.3s ease, opacity 0.3s ease;
 }
 
-.Library-settings-container {
-    width: 100%;
-    height: 90px;
+.Library-favorites-container button.active .active-indicator-horizontal {
+    width: 60%;
+    opacity: 1;
+}
+
+.add-game-to-library-wrapper {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    position: sticky;
-    top: 50px;
-    padding: 10px;
-    backdrop-filter: blur(15px);
-    background-color: rgba(25, 25, 25, 0.4);
-    z-index: 1;
+    gap: 10px;
+}
+
+#refresh-page i {
+    color: var(--secondary-text-color);
+    transition: color 0.3s ease;
+}
+
+#refresh-page:hover i {
+    color: var(--text-color);
+}
+
+#refresh-page {
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+#refresh-page:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.add-game-to-library-wrapper button.game-add-button {
+    outline: none;
+    border: none;
+    padding: 10px 20px;
+    color: var(--secondary-text-color);
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.add-game-to-library-wrapper button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: var(--text-color);
+}
+
+/* Game library container -*/
+.game-library-container {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 2fr));
+    gap: 20px;
+    padding-top: 20px;
+    margin-bottom: 50px;
 }
 
 .game-library-game-box {
@@ -344,38 +446,42 @@ export default {
     overflow: hidden;
     position: relative;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.game-library-game-box[style*="display: none"] {
-    display: none !important;
+.game-library-game-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 .game-box-info {
     width: 100%;
-    background-color: var(--game-box-info-background-color);
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
     color: var(--text-color);
     font-size: 13px;
     position: absolute;
     bottom: -100px;
-    padding: 10px 20px;
+    padding: 12px 15px;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: space-between;
-}
-
-.game-box-info p {
-    color: var(--secondary-text-color);
-    margin: 0;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
 }
 
 .game-box-info h1 {
-    font-size: 15px;
+    font-size: 14px;
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80%;
 }
 
 .game-library-game-box:hover .game-box-info {
@@ -385,178 +491,378 @@ export default {
 .game-box-info .text-container {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-}
-
-.game-box-info h1 {
-    font-size: 12px;
 }
 
 .game-box-info i {
     transition: color 0.3s ease, transform 0.3s ease;
     color: var(--secondary-text-color);
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .game-box-info button {
-    right: 60px;
     border: none;
     background: none;
     cursor: pointer;
-}
-
-/* Game Store Page Styles */
-.game-store-page {
-    width: 100%;
-    height: 100%;
-}
-
-.game-store-header {
-    margin-bottom: 20px;
-}
-
-.game-store-content {
-    padding: 20px;
-    background-color: var(--hover-background-color);
-    border-radius: 15px;
-}
-
-.game-store-banner {
-    height: 900px;
-    width: 100%;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-}
-
-/* Game Page Styles */
-.game-page {
-    position: relative;
-    width: 100%;
-    background-color: var(--background-color);
-}
-
-.game-page-content {
-    padding: 20px;
-}
-
-.game-page-image-container {
-    width: 100%;
-    height: 500px;
-    background-color: rgb(35, 35, 35);
-    background-position: center;
-    background-repeat: no-repeat;
-    border-radius: 15px;
-    display: flex;
-    align-items: end;
-    position: relative;
-}
-
-.game-user-stats-container {
-    position: sticky;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 10;
-}
-
-.game-user-stats {
-    width: 100%;
-    position: sticky;
-    top: 0;
-    left: 0;
-    backdrop-filter: blur(10px);
-    background: linear-gradient(
-        to bottom,
-        rgba(25, 25, 25, 0.6) 0%,
-        rgba(25, 25, 25, 0.8) 50%,
-        rgba(25, 25, 25, 1) 100%
-    );
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding: 10px 20px;
-    gap: 10px;
-}
-
-.game-user-stats p {
-    color: var(--secondary-text-color);
-}
-
-.last-played-wrapper {
-    display: flex;
-    flex-direction: column;
-    color: var(--text-color);
-    font-size: 12px;
-}
-
-.play-time-wrapper {
-    font-size: 12px;
-    display: flex;
-    flex-direction: column;
-    color: var(--text-color);
-}
-
-.game-user-stats-left {
-    display: flex;
-    gap: 20px;
-    flex-direction: row;
-    align-items: center;
-}
-
-.game-user-stats-left button {
-    cursor: pointer;
-    padding: 15px 40px;
-    border: 0;
-    background-color: var(--accent-color);
-    color: var(--text-color);
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    border-radius: 10px;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
 }
 
-.game-options-wrapper {
-    display: flex;
-    gap: 10px;
+.game-box-info button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
-.game-options-wrapper button {
-    background: none;
-    border: none;
-    color: var(--secondary-text-color);
-    cursor: pointer;
-    padding: 10px;
-    border-radius: 15px;
-    background-color: var(--hover-background-color);
-    border: 1px solid var(--outline);
-    transition: all 0.2s ease;
-}
-
-.game-options-wrapper button:hover {
+.game-box-info button:hover i {
     color: var(--text-color);
+}
+
+.game-page-new {
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
 }
 
 .back-button {
-    background: none;
+    position: fixed;
+    top: 60px;
+    margin-left: 10px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
     border: none;
-    color: var(--secondary-text-color);
+    color: white;
     cursor: pointer;
     padding: 10px;
-    border-radius: 15px;
-    background-color: var(--hover-background-color);
-    border: 1px solid var(--outline);
+    border-radius: 20px;
     transition: all 0.2s ease;
+    z-index: 10;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
 }
 
 .back-button:hover {
-    color: var(--text-color);
+    background: rgba(0, 0, 0, 0.8);
 }
 
-.placeholder {
-    height: 5000px;
+/* Carousel Styles */
+.carousel-container {
+    position: relative;
     width: 100%;
-    background-color: orange;
+    height: 600px;
+    overflow: hidden;
+
+}
+
+.carousel-slides {
+    display: flex;
+    height: 100%;
+    transition: transform 0.5s ease-in-out;
+}
+
+.carousel-slide {
+    min-width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.1) 0%,
+        rgba(0, 0, 0, 0.3) 50%,
+        rgba(0, 0, 0, 0.8) 90%
+    );
+}
+
+.carousel-controls {
+    position: absolute;
+    bottom: 30px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    gap: 30px;
+    z-index: 5;
+    padding: 0 5%;
+}
+
+.carousel-btn {
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.carousel-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.carousel-indicators {
+    display: flex;
+    gap: 8px;
+}
+
+.carousel-indicators span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.carousel-indicators span.active {
+    background-color: white;
+    transform: scale(1.2);
+}
+
+/* Game Info Overlay */
+.game-info-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 0 5%;
+    z-index: 2;
+}
+
+.game-branding {
+    margin-bottom: 15px;
+}
+
+.game-title {
+    font-size: 3rem;
+    font-weight: bold;
+    color: white;
+    margin: 0;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.game-description {
+    max-width: 600px;
+    margin-bottom: 20px;
+}
+
+.game-description p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.game-stats-container {
+    display: flex;
+    margin-bottom: 30px;
+}
+
+.stat-box {
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    padding: 15px 30px;
+    text-align: center;
+    border-radius: 10px;
+    margin-right: 15px;
+}
+
+.stat-value {
+    color: white;
+    font-size: 1.25rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.stat-label {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    margin-top: 4px;
+}
+
+.game-actions {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.add-library-btn, .download-btn {
+    padding: 12px 25px;
+    border-radius: 25px;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.add-library-btn {
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+    color: white;
+}
+
+.download-btn {
+    background-color: var(--accent-color, #3a86ff);
+    color: white;
+}
+
+.add-library-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.download-btn:hover {
+    filter: brightness(1.1);
+}
+
+/* Game Details Section */
+.game-details-section {
+    padding: 30px 5%;
+
+    
+}
+
+.game-details-container {
+    display: flex;
+    gap: 50px;
+    flex-wrap: wrap;
+}
+
+.details-column {
+    flex: 1;
+    min-width: 300px;
+}
+
+.details-section {
+    margin-bottom: 30px;
+}
+
+.details-section h3 {
+    font-size: 1.25rem;
+    margin-bottom: 15px;
+    color: var(--text-color, white);
+    font-weight: 600;
+}
+
+.details-section p {
+    color: var(--secondary-text-color, rgba(255, 255, 255, 0.7));
+    line-height: 1.6;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tag {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--secondary-text-color, rgba(255, 255, 255, 0.8));
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+}
+
+.system-reqs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 20px;
+}
+
+.req-section {
+    flex: 1;
+    min-width: 250px;
+}
+
+.req-section h4 {
+    color: var(--text-color, white);
+    margin-bottom: 15px;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.req-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.req-section li {
+    color: var(--secondary-text-color, rgba(255, 255, 255, 0.7));
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.req-section strong {
+    color: var(--text-color, white);
+}
+
+/* Media queries for better responsive design */
+@media (max-width: 768px) {
+    .carousel-container {
+        height: 450px;
+    }
+    
+    .game-title {
+        font-size: 2rem;
+    }
+    
+    .carousel-controls {
+        bottom: 70px;
+    }
+    
+    .system-reqs {
+        flex-direction: column;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .carousel-container {
+        height: 350px;
+    }
+    
+    .game-title {
+        font-size: 1.5rem;
+    }
+    
+    .game-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .add-library-btn, .download-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .stat-box {
+        padding: 10px 15px;
+    }
 }
 </style>

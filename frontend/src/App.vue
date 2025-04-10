@@ -53,6 +53,33 @@ body {
     color: white;
 }
 
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--background-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--outline); /* thumb color */
+    border-radius: 8px;
+    border: 2px solid var(--background-color); /* creates padding around thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--accent-color);
+}
+
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--outline) var(--background-color);
+}
+
+
 #app {
     height: 100%;
     background-color: rgb(25, 24, 24);
@@ -64,7 +91,6 @@ body {
     top: 40px;
     left: 200px;
     width: calc(100% - 200px);
-    height: calc(100% - 100px);
     background-color: rgb(25, 24, 24);
 }
 </style>
