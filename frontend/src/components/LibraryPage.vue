@@ -30,7 +30,7 @@
                 <div class="game-library-game-box" v-for="game in games" :key="game.igdb_id"
                      @click="openGamePage(game)"
                      :style="{
-                         backgroundImage: `url(${getCoverUrlFromGame(game)})`
+                         backgroundImage: coverUrls[game.igdb_id] ? `url(${coverUrls[game.igdb_id]})` : 'none'
                      }">
                     <div class="game-box-info">
                         <div class="text-container">
@@ -115,17 +115,20 @@ export default {
             games: [],
             currentPage: 'library',
             selectedGame: null,
+            coverUrls: {},
+            artworkUrls: {},
+            screenshotsUrls: {},
         };
     },
     methods: {
         getBackgroundImage() {
             let url;
             if (this.selectedGame.artwork_url_list != null && this.selectedGame.artwork_url_list.length > 0) {
-                url = this.selectedGame.artwork_url_list[0];
+                url = this.artworkUrls[this.selectedGame.igdb_id][0];
             } else if (this.selectedGame.screenshot_url_list != null && this.selectedGame.screenshot_url_list.length > 0) {
-                url = this.selectedGame.screenshot_url_list[0];
+                url = this.screenshotsUrls[this.selectedGame.igdb_id][0];
             } else {
-                url = this.selectedGame.cover_url;
+                url = this.coverUrls[this.selectedGame.igdb_id]
             }
             return new URL(url, import.meta.url).href
         },
@@ -136,9 +139,6 @@ export default {
             this.games.push(newGame)
         },
 
-        getCoverUrlFromGame(game) {
-            return new URL(game.cover_url, import.meta.url).href
-        },
 
         openGameStore(game) {
             this.selectedGame = game;
@@ -172,7 +172,24 @@ export default {
 
         returnToLibrary() {
             this.currentPage = 'library';
-        }
+        },
+        async loadCoverImages(game) {
+            this.coverUrls[game.igdb_id] = await LibraryManager.GetImageBase64(game.cover_url);
+        },
+        async loadArtworkImages(game) {
+            let list = [];
+            for (let i = 0; i < game.artwork_url_list.length; i++) {
+                list.push(await LibraryManager.GetImageBase64(game.artwork_url_list[i]))
+            }
+            this.artworkUrls[game.igdb_id] = list
+        },
+        async loadScreenshotImages(game) {
+            let list = [];
+            for (let i = 0; i < game.screenshot_url_list.length; i++) {
+                list.push(await LibraryManager.GetImageBase64(game.screenshot_url_list[i]))
+            }
+            this.screenshotsUrls[game.igdb_id] = list
+        },
     },
     async mounted() {
         const amountOfGames = await LibraryManager.GetAmountOfGames()
@@ -181,25 +198,16 @@ export default {
         const portion = 100;
 
         for (let i = 0; i < amountOfGames; i += portion) {
-            console.log(i)
             let games = await LibraryManager.GetRangeGame(portion, i)
             for (let j = 0; j < games.length; j++) {
                 let game = games[j]
-                console.log(game.name + " : " + game.igdb_id + " : " + j);
-                this.games.push(game);
+                await this.loadCoverImages(game);
+                await this.loadArtworkImages(game);
+                await this.loadScreenshotImages(game);
+                this.games.push(game)
             }
         }
-
-        // Library.GetRangeGame(100, 0).then()
-        //
-        //
-        // Library.GetAllGames().then((games) => {
-        //     Object.values(games).forEach((game) => {
-        //         console.log(game);
-        //         this.games.push(game);
-        //     });
-        // });
-    }
+    },
 };
 </script>
 

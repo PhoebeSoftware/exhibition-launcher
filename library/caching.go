@@ -1,6 +1,7 @@
 package library
 
 import (
+	"encoding/base64"
 	"exhibition-launcher/igdb"
 	"exhibition-launcher/utils/jsonUtils/jsonModels"
 	"fmt"
@@ -13,7 +14,16 @@ import (
 	"strings"
 )
 
-func (l *LibraryManager) CacheImageToDisk(gameName string, cachingPath string, uri string) (string, error) {
+func getImageCachePath() string {
+	cacheDir, err := os.UserCacheDir()
+	if err != nil {
+		// fallback
+		cacheDir = os.TempDir()
+	}
+	return filepath.Join(cacheDir, "exhibtion-launcher", "images")
+}
+
+func (l *LibraryManager) CacheImageToDisk(gameName string, uri string) (string, error) {
 	req, err := http.NewRequest(http.MethodGet, uri, nil)
 	if err != nil {
 		return "", err
@@ -26,7 +36,7 @@ func (l *LibraryManager) CacheImageToDisk(gameName string, cachingPath string, u
 
 	defer resp.Body.Close()
 	fileName := gameName + "-" + uuid.New().String() + ".jpg"
-	pathToFile := filepath.Join(cachingPath, gameName, fileName)
+	pathToFile := filepath.Join(getImageCachePath(), fileName)
 
 	if err = os.MkdirAll(filepath.Dir(pathToFile), 0755); err != nil {
 		return "", err
@@ -44,39 +54,41 @@ func (l *LibraryManager) CacheImageToDisk(gameName string, cachingPath string, u
 		return "", err
 	}
 
-	// Change the path so it is relative to the frontend
-	// In ./frontend
-	// for example: ./cache/{game}/image.jpg
-	relativePath := filepath.Join("..", "cache", gameName, fileName)
 	// Encode the path so weird characters like ', ", ? dont blow things up but exclude /'s for paths
-	encodedPath := encodePathSegments(relativePath)
+	fmt.Println("Succesfully cached image:", pathToFile)
 
-	fmt.Println("Succesfully cached image:", fileName)
+	return fileName, nil
+}
 
-	return encodedPath, nil
+func (l *LibraryManager) GetImageBase64(filename string) (string, error) {
+	path := filepath.Join(getImageCachePath(), filename)
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	base64Data := base64.StdEncoding.EncodeToString(data)
+	return "data:image/png;base64," + base64Data, nil
 }
 
 func (l *LibraryManager) CacheAllImagesAndChangePaths(game *jsonModels.Game, gameData igdb.ApiGame) error {
-	pathToCache := filepath.Join("./frontend/src/cache")
-
 	var (
 		err error
 	)
 
-	game.CoverURL, err = l.CacheImageToDisk(gameData.Name, pathToCache, gameData.CoverURL)
+	game.CoverURL, err = l.CacheImageToDisk(gameData.Name, gameData.CoverURL)
 	if err != nil {
 		return err
 	}
 
 	for i, uri := range game.ArtworkUrlList {
-		game.ArtworkUrlList[i], err = l.CacheImageToDisk(gameData.Name, pathToCache, uri)
+		game.ArtworkUrlList[i], err = l.CacheImageToDisk(gameData.Name , uri)
 		if err != nil {
 			return err
 		}
 	}
 
 	for i, uri := range game.ScreenshotUrlList {
-		game.ScreenshotUrlList[i], err = l.CacheImageToDisk(gameData.Name, pathToCache, uri)
+		game.ScreenshotUrlList[i], err = l.CacheImageToDisk(gameData.Name, uri)
 		if err != nil {
 			return err
 		}
