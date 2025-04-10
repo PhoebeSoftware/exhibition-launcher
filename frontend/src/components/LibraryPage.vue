@@ -168,7 +168,7 @@
 </template>
 
 <script>
-import {Library} from "../../bindings/exhibition-launcher/library/index.js";
+import {LibraryManager} from "../../bindings/exhibition-launcher/library/index.js";
 
 export default {
     name: 'LibraryPage',
