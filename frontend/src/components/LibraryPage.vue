@@ -223,7 +223,7 @@ export default {
         },
         
         async addGame() {
-            let newGame = await Library.AddToLibrary(119277, true).catch((err) => {
+            let newGame = await LibraryManager.AddToLibrary(119277, true).catch((err) => {
                 console.warn(err)
             });
             this.games.push(newGame)
@@ -240,7 +240,7 @@ export default {
         },
 
         launchGame(game) {
-            Library.StartApp(game.igdb_id).catch((err) => {
+            LibraryManager.StartApp(game.igdb_id).catch((err) => {
                 console.log(err)
             })
         },
@@ -257,14 +257,14 @@ export default {
         }
     },
     async mounted() {
-        const amountOfGames = await Library.GetAmountOfGames()
+        const amountOfGames = await LibraryManager.GetAmountOfGames()
 
         console.log(amountOfGames)
         const portion = 100;
 
         for (let i = 0; i < amountOfGames; i += portion) {
             console.log(i)
-            let games = await Library.GetRangeGame(portion, i)
+            let games = await LibraryManager.GetRangeGame(portion, i)
             for (let j = 0; j < games.length; j++) {
                 let game = games[j]
                 console.log(game.name + " : " + game.igdb_id + " : " + j);
