@@ -12,14 +12,14 @@ import (
 	"sort"
 	"time"
 
-	"github.com/sqweek/dialog"
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 type LibraryManager struct {
 	JsonManager *jsonUtils.JsonManager
 	Library     *jsonModels.Library
-	APIManager     *igdb.APIManager
-	Client         *http.Client
+	APIManager  *igdb.APIManager
+	Client      *http.Client
 }
 
 func (l *LibraryManager) GetSortedIDs() []int {
@@ -104,23 +104,28 @@ func (l *LibraryManager) GetRangeGame(amount int, offset int) ([]jsonModels.Game
 func (l *LibraryManager) AddToLibrary(igdbId int, promptDialog bool) (jsonModels.Game, error) {
 	// prompt executable location
 	var (
-		game jsonModels.Game
+		game       jsonModels.Game
 		executable = ""
-		err error
+		err        error
 	)
-	for _, gameInLoop := range l.Library.Games {
-		if gameInLoop.IGDBID == igdbId {
-			// TODO ADD MENU IF USER WANTS TO REFETCH DATA
-			fmt.Println("Game is already in library:", gameInLoop.Name)
-			return gameInLoop, nil
-		}
+
+	game, ok := l.Library.Games[igdbId]
+	if ok {
+		fmt.Println("Game is already in library:", game.Name)
+		//return game, nil
 	}
 
 	if promptDialog {
-		executable, err = dialog.File().Title("Select game executable").Filter("Executable files", "exe", "app", "ink", "bat").Load()
+		dialog := application.OpenFileDialog()
+		dialog.SetTitle("Select game executable")
+		dialog.AddFilter("Executable files", "*.exe; *.app; *.ink; *.bat;")
+		path, err := dialog.PromptForSingleSelection()
+
 		if err != nil {
 			return game, fmt.Errorf("failed to select executable: %w", err)
 		}
+
+		executable = path
 	}
 
 	// game data
@@ -131,7 +136,6 @@ func (l *LibraryManager) AddToLibrary(igdbId int, promptDialog bool) (jsonModels
 	if gameData.Name == "" {
 		return game, fmt.Errorf("failed to get game data")
 	}
-
 
 	// Append the new game
 	game = jsonModels.Game{
@@ -147,7 +151,6 @@ func (l *LibraryManager) AddToLibrary(igdbId int, promptDialog bool) (jsonModels
 		ScreenshotUrlList: gameData.ScreenshotUrlList,
 		ArtworkUrlList:    gameData.ArtworkUrlList,
 	}
-
 
 	// If caching fails still add game to library just with https instead
 	err = l.CacheAllImagesAndChangePaths(&game, gameData)
