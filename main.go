@@ -87,9 +87,7 @@ func main() {
 		return
 	}
 	if settings.UseCaching {
-		go func() {
-			libraryManager.CheckForCache()
-		}()
+		go libraryManager.CheckForCache()
 	}
 
 	if settings.RealDebridSettings.UseRealDebrid {
@@ -102,6 +100,11 @@ func main() {
 	}
 
 	torrentManager = torrent.StartClient(settings.DownloadPath, settings.BitTorrentSettings.UsePEX, settings.BitTorrentSettings.UseDHT, settings.BitTorrentSettings.Port)
+
+	// cache die sources wrm niet
+	for _, sourceLink := range settings.DownloadSources {
+		go torrentManager.GetSource(sourceLink)
+	}
 
 	queue := exhibitionQueue.Queue{
 		DownloadsInQueue: []exhibitionQueue.Download{},
@@ -179,15 +182,15 @@ func main() {
 	queue.App = app
 
 	// Add a bunch of games
-	
+
 	go func() {
 		for i := 2000; i < 7000; i++ {
-			game, err := libraryManager.AddToLibrary(i, false);
+			game, err := libraryManager.AddToLibrary(i, false)
 			if err != nil {
 				fmt.Println(err)
 				continue
 			}
-			fmt.Println("Added game:",game.Name)
+			fmt.Println("Added game:", game.Name)
 		}
 	}()
 

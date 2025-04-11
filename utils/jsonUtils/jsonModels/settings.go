@@ -7,6 +7,7 @@ import (
 
 type Settings struct {
 	DownloadPath       string             `json:"download_path"`
+	DownloadSources    []string           `json:"download_sources"`
 	UseDirectIGDB      bool               `json:"use_direct_igdb"`
 	UseCaching         bool               `json:"use_caching"`
 	RealDebridSettings RealDebridSettings `json:"real_debrid_settings"`
@@ -46,6 +47,7 @@ func (s *Settings) DefaultValues() {
 	s.DownloadPath = filepath.Join("downloads")
 	s.UseDirectIGDB = true
 	s.UseCaching = false
+	s.DownloadSources = []string{}
 
 	s.RealDebridSettings.UseRealDebrid = false
 	s.RealDebridSettings.DebridToken = ""

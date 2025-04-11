@@ -20,27 +20,33 @@ type Source struct {
 	Downloads  []SourceDownload `json:"downloads"`
 }
 
-func SaveSource(source Source, link string) {
+func SaveSource(source Source, link string) error {
+	fmt.Println(filepath.Base(link))
 	os.Mkdir("sources", os.ModePerm)
 
-	file, err := os.Create(filepath.Join("sources", link+".json"))
+	file, err := os.Create(filepath.Join("sources", filepath.Base(link)))
 	if err != nil {
 		fmt.Println("could not save source data")
+		return err
 	}
 	defer file.Close()
 
 	bytes, err := json.Marshal(source)
 	if err != nil {
 		fmt.Println("could not marshal source data")
+		return err
 	}
 
 	file.Write(bytes)
+	return nil
 }
 
 func LoadSource(link string) (*Source, error) {
-	file, err := os.Open(filepath.Join("sources", link+".json"))
+	fmt.Println(filepath.Base(link))
+
+	file, err := os.Open(filepath.Join("sources", filepath.Base(link)))
 	if err != nil {
-		fmt.Println("could not open source file")
+		fmt.Println("could not find source file")
 		return nil, err
 	}
 	defer file.Close()
@@ -58,36 +64,30 @@ func LoadSource(link string) (*Source, error) {
 	return &data, nil
 }
 
-func (manager Manager) GetSource(link string) Source {
-	linkFilename := filepath.Base(link)
-	fmt.Println(linkFilename)
-
-	source, err := LoadSource(linkFilename)
+func (manager Manager) GetSource(link string) (*Source, error) {
+	source, err := LoadSource(link)
 	if err == nil {
-		return *source
+		return source, nil
 	}
 
-	req, err := http.NewRequest("GET", link, nil)
+	res, err := http.Get(link)
 	if err != nil {
 		fmt.Println("could get source data")
+		return nil, err
 	}
-
-	res, err := manager.httpClient.Do(req)
-	if err != nil {
-		fmt.Println("could request source data")
-	}
-	defer res.Body.Close()
 
 	decoder := json.NewDecoder(res.Body)
 
 	var data Source
+
 	err = decoder.Decode(&data)
 	if err != nil {
 		fmt.Println("could decode source data")
+		return nil, err
 	}
 
 	SaveSource(data, link)
 
 	fmt.Println("loaded source data from API")
-	return data
+	return &data, nil
 }
