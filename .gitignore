@@ -6,10 +6,10 @@ bin
 ./.task
 settings.json
 library.json
-downloads.DS_Store 
+downloads.DS_Store
 downloads
 .task
-.DS_Store 
+.DS_Store
 sources
 /frontend/bindings
 ./frontend/package-lock.json
@@ -22,3 +22,4 @@ go.work
 go.work.sum
 proxysettings.json
 frontend/src/cache
+/cache

@@ -90,10 +90,7 @@ func (l *LibraryManager) GetRangeGame(amount int, offset int) ([]jsonModels.Game
 	}
 	sort.Ints(keys)
 
-	end := offset + amount
-	if end > len(keys) {
-		end = len(keys)
-	}
+	end := min(offset+amount, len(keys))
 
 	for _, key := range keys[offset:end] {
 		games = append(games, l.Library.Games[key])

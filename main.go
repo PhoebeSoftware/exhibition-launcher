@@ -6,6 +6,7 @@ import (
 	"exhibition-launcher/exhibitionQueue"
 	"exhibition-launcher/igdb"
 	"exhibition-launcher/library"
+	"exhibition-launcher/providers"
 	"exhibition-launcher/torrent"
 	"exhibition-launcher/torrent/realdebrid"
 	"exhibition-launcher/utils"
@@ -27,6 +28,7 @@ var libraryManager *library.LibraryManager
 var igdbApiManager *igdb.APIManager
 var torrentManager *torrent.Manager
 var debridClient *realdebrid.RealDebridClient
+var providerManager *providers.ProviderManager
 
 //go:embed all:frontend/dist
 var assets embed.FS
@@ -101,10 +103,21 @@ func main() {
 
 	torrentManager = torrent.StartClient(settings.DownloadPath, settings.BitTorrentSettings.UsePEX, settings.BitTorrentSettings.UseDHT, settings.BitTorrentSettings.Port)
 
-	// cache die sources wrm niet
-	for _, sourceLink := range settings.DownloadSources {
-		go torrentManager.GetSource(sourceLink)
-	}
+	// provider goroutine want het yield
+	go func() {
+		providerManager = providers.NewProviderManager()
+
+		// cache die sources wrm niet
+		for _, sourceLink := range settings.DownloadSources {
+			providerManager.CacheProvider(sourceLink)
+		}
+
+		// test query
+		results := providerManager.SearchDownloadsByGameName("Palworld")
+		for _, result := range results {
+			fmt.Println(result.Magnets)
+		}
+	}()
 
 	queue := exhibitionQueue.Queue{
 		DownloadsInQueue: []exhibitionQueue.Download{},
@@ -195,7 +208,7 @@ func main() {
 	//}()
 
 	// Schedule I v0.3.3f14
-	queue.AddTorrentDownloadToQueue("magnet:?xt=urn:btih:TJYZXLE3DEBYGA5GFVPCDXP2Z4BLHCWJ&dn=Schedule%20I&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce")
+	queue.AddTorrentDownloadToQueue("magnet:?xt=urn:btih:7027B6E2A1E4566B0B0DC4146E8B54235B743AE6&dn=Schedule+I+%28v0.3.3f15+%2B+Online+Multiplayer%29+%5BDODI+Repack%5D&tr=udp%3A%2F%2F9.rarbg.to%3A2870%2Fannounce&tr=udp%3A%2F%2Feddie4.nl%3A6969%2Fannounce&tr=udp%3A%2F%2Fthetracker.org%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337&tr=udp%3A%2F%2F9.rarbg.com%3A2710%2Fannounce&tr=udp%3A%2F%2Fexplodie.org%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker1.wasabii.com.tw%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Ftracker.cypherpunks.ru%3A6969%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=http%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Fopentracker.i2p.rocks%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fcoppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce")
 
 	// Einstein's Cats v0.1.0
 	queue.AddTorrentDownloadToQueue("magnet:?xt=urn:btih:1A2ED74D4E45E9FBACE0B24571051840D81045A4&dn=Einstein%26%23039%3Bs+Cats+v0.1.0&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.moeking.me%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.theoks.net%3A6969%2Fannounce&tr=udp%3A%2F%2Fmovies.zsw.ca%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.tiny-vps.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker-udp.gbitt.info%3A80%2Fannounce&tr=http%3A%2F%2Ftracker.gbitt.info%3A80%2Fannounce&tr=https%3A%2F%2Ftracker.gbitt.info%3A443%2Fannounce&tr=http%3A%2F%2Ftracker.ccp.ovh%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.ccp.ovh%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.dler.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=http%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Fopentracker.i2p.rocks%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fcoppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce")
