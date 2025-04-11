@@ -183,7 +183,7 @@ func main() {
 
 	queue.App = app
 
-	var consent_jij = false
+	var consent_jij = true
 
 	// provider goroutine want het yield
 	go func() {
@@ -199,7 +199,7 @@ func main() {
 		}
 
 		// test query
-		results := providerManager.SearchDownloadsByGameName("Palworld")
+		results := providerManager.SearchDownloadsByGameName("DARK SOULS REMASTERED")
 		once := false
 
 		for provider, download := range results {

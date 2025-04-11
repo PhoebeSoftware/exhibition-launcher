@@ -1,6 +1,7 @@
 package torrent
 
 import (
+	"bufio"
 	"errors"
 	"exhibition-launcher/utils"
 	"exhibition-launcher/utils/jsonUtils/jsonModels"
@@ -85,37 +86,35 @@ func IsTriggered(ch <-chan struct{}) bool {
 	}
 }
 
-// add download
-// start ook torrent meteen
-func (manager Manager) AddTorrent(app *application.App, uuid string, magnetLink string) (*torrent.Torrent, error) {
+func (m *Manager) handleTorrent(t *torrent.Torrent, uuid string, app *application.App) (*torrent.Torrent, error) {
 	startTime := time.Now()
-
-	// add torrent to session
-	fmt.Println("Adding torrent", uuid)
-	t, err := manager.session.AddURI(magnetLink, &torrent.AddTorrentOptions{
-		ID: uuid,
-	})
-	if err != nil {
-		return t, err
-	}
-
 	fmt.Println("using port:", t.Port())
 
 	// get metadata
 	for !IsTriggered(t.NotifyMetadata()) {
+		if t.Stats().Status == torrent.Stopped {
+			continue
+		}
+
 		fmt.Println("Searching for metadata...")
+		fmt.Println("BitTorrent blocked? Low seeders?")
+
+		app.EmitEvent("download_progress", map[string]interface{}{
+			"timePassed": time.Since(startTime).String(),
+		})
+
 		time.Sleep(time.Second)
 	}
 
 	// get space data
-	disk := utils.DiskUsage(manager.downloadDir)
+	disk := utils.DiskUsage(m.downloadDir)
 	sizeLeft := t.Stats().Bytes.Incomplete
 
 	fmt.Printf("%s free (%s left to download)\n", utils.HumanizeBytes(float64(disk.Free)), utils.HumanizeBytes(float64(sizeLeft)))
 
 	// check space
 	if int64(disk.Free) < sizeLeft {
-		manager.session.RemoveTorrent(uuid)
+		m.session.RemoveTorrent(uuid)
 		return t, errors.New("Insufficient disk space")
 	}
 
@@ -164,4 +163,38 @@ func (manager Manager) AddTorrent(app *application.App, uuid string, magnetLink 
 	}()
 
 	return t, nil
+}
+
+func (m Manager) AddMagnet(app *application.App, uuid string, magnetLink string) (*torrent.Torrent, error) {
+	// add torrent to session
+	fmt.Println("Adding magnet torrent", uuid)
+	fmt.Println(magnetLink)
+	t, err := m.session.AddURI(magnetLink, &torrent.AddTorrentOptions{
+		ID: uuid,
+	})
+	if err != nil {
+		return t, err
+	}
+
+	return m.handleTorrent(t, uuid, app)
+}
+
+func (m Manager) AddTorrent(app *application.App, uuid string, torrentFile string) (*torrent.Torrent, error) {
+	// get torrent torrentFile
+	file, err := os.Open(torrentFile)
+	if err != nil {
+		return nil, err
+	}
+
+	// add torrent to session
+	fmt.Println("Adding file torrent", uuid)
+	fmt.Println(torrentFile)
+	t, err := m.session.AddTorrent(bufio.NewReader(file), &torrent.AddTorrentOptions{
+		ID: uuid,
+	})
+	if err != nil {
+		return t, err
+	}
+
+	return m.handleTorrent(t, uuid, app)
 }

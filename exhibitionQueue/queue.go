@@ -104,7 +104,7 @@ func (q *Queue) StartDownloads() error {
 		}
 	case TorrentType:
 		fmt.Println("Starting BitTorrent download!!")
-		t, err := q.TorrentManager.AddTorrent(q.App, download.UUID, download.MagnetLink)
+		t, err := q.TorrentManager.AddMagnet(q.App, download.UUID, download.MagnetLink)
 		if err != nil {
 			return err
 		}
@@ -132,7 +132,7 @@ func (q *Queue) StartDownloads() error {
 		// remove torrent cuh
 		removeErr := q.TorrentManager.RemoveTorrent(download.UUID)
 		if removeErr != nil {
-			fmt.Println("Error removing torrent:", err)
+			fmt.Println("Error removing torrent:", removeErr)
 		}
 	}
 
