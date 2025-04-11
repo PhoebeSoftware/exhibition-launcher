@@ -73,6 +73,9 @@ func (l *LibraryManager) CacheImageToDisk(gameName string, uri string) (string, 
 func (l *LibraryManager) GetCoverURL(coverFileName string, coverURL string) string {
 	imageURL, err := l.GetImageURL(coverFileName)
 	if err != nil {
+		if l.Settings.UseCaching {
+			go l.CheckForCache()
+		}
 		return coverURL
 	}
 	return imageURL
@@ -148,11 +151,32 @@ func (l *LibraryManager) CacheScreenshots(game *jsonModels.Game, gameData igdb.A
 
 // CheckForCache checks if cache exists if it does not it caches the images
 func (l *LibraryManager) CheckForCache() {
+	cachePath := GetImageCachePath()
 	for _, game := range l.Library.Games {
-		if game.ArtworkFilenames != nil && game.ScreenshotFilenames != nil && game.CoverFilename != "" {
+
+		// Check for single missing files
+		for _, filename := range game.ArtworkFilenames {
+			if utils.FileExists(cachePath, filename) {
+				continue
+			}
+			game.ArtworkFilenames = nil
+		}
+
+		// Check for single missing files
+		for _, filename := range game.ScreenshotFilenames {
+			if utils.FileExists(cachePath, filename) {
+				continue
+			}
+			game.ScreenshotFilenames = nil
+		}
+
+		// Check for entire lists missing
+		if game.ArtworkFilenames != nil &&
+			game.ScreenshotFilenames != nil &&
+			game.CoverFilename != "" &&
+			!utils.FileExists(cachePath, game.CoverURL) {
 			continue
 		}
-		fmt.Println("No cache found trying to refetch...")
 
 		gameData, err := l.APIManager.GetGameData(game.IGDBID)
 		if err != nil {
@@ -163,8 +187,9 @@ func (l *LibraryManager) CheckForCache() {
 			fmt.Println("Failed to get game data", err)
 			continue
 		}
+		fmt.Println("No cache found trying to refetch...")
 
-		if game.ScreenshotFilenames == nil {
+		if len(game.ScreenshotFilenames) <= 0 || game.ScreenshotFilenames == nil {
 			err = l.CacheScreenshots(&game, gameData)
 			if err != nil {
 				fmt.Println(err)
@@ -172,7 +197,7 @@ func (l *LibraryManager) CheckForCache() {
 			}
 		}
 
-		if game.ArtworkFilenames == nil {
+		if len(game.ArtworkFilenames) <= 0 || game.ArtworkFilenames == nil {
 			err = l.CacheArtworks(&game, gameData)
 			if err != nil {
 				fmt.Println(err)
@@ -180,7 +205,7 @@ func (l *LibraryManager) CheckForCache() {
 			}
 		}
 
-		if game.CoverFilename == "" {
+		if game.CoverFilename == "" || !utils.FileExists(GetImageCachePath(), game.CoverFilename) {
 			game.CoverFilename, err = l.CacheImageToDisk(gameData.Name, gameData.CoverURL)
 			if err != nil {
 				fmt.Println(err)
