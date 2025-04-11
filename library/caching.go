@@ -71,7 +71,7 @@ func (l *LibraryManager) CacheImageToDisk(gameName string, uri string) (string, 
 }
 
 func (l *LibraryManager) GetCoverURL(coverFileName string, coverURL string) string {
-	if coverFileName != "" && l.Settings.UseCaching {
+	if coverFileName != "" && l.Settings.UseCaching && utils.FileExists(filepath.Join(GetImageCachePath(), coverFileName)){
 		imageURL, _ := l.GetImageURL(coverFileName)
 		return imageURL
 	}
