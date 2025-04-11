@@ -87,6 +87,9 @@ func (l *LibraryManager) GetAllImageURLs(filenames []string, urls []string) []st
 		for _, filename := range filenames {
 			imageURL, err := l.GetImageURL(filename)
 			if err != nil {
+				if l.Settings.UseCaching {
+					go l.CheckForCache()
+				}
 				listOfImages = urls
 				break
 			}
