@@ -141,7 +141,7 @@ func (l *LibraryManager) AddToLibrary(igdbId int, promptDialog bool) (jsonModels
 		Name:              gameData.Name,
 		Description:       gameData.Description,
 		PlayTime:          0,
-		Achievments:       []int{},
+		Achievements:      []int{},
 		Executable:        executable,
 		Running:           false,
 		Favorite:          false,
