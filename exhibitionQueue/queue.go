@@ -5,6 +5,8 @@ import (
 	"exhibition-launcher/torrent/realdebrid"
 	"fmt"
 
+	"slices"
+
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
@@ -56,7 +58,7 @@ func (q *Queue) AddDownloadToQueue(d Download) {
 }
 
 func (q *Queue) RemoveFromQueue(i int) {
-	q.DownloadsInQueue = append(q.DownloadsInQueue[:i], q.DownloadsInQueue[i+1:]...)
+	q.DownloadsInQueue = slices.Delete(q.DownloadsInQueue, i, i+1)
 }
 
 func (q *Queue) SetPaused(value bool) {
@@ -90,6 +92,11 @@ func (q *Queue) StartDownloads() error {
 
 	switch download.Type {
 	case RealDebridType:
+		if q.RealDebridClient == nil {
+			fmt.Println("Skipping Real-Debrid download, not configured")
+			break
+		}
+
 		fmt.Println("Starting Real-Debrid download!!")
 		err := q.RealDebridClient.DownloadByMagnet(q.App, download.MagnetLink, q.DownloadPath)
 		if err != nil {

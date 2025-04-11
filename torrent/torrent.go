@@ -3,6 +3,7 @@ package torrent
 import (
 	"errors"
 	"exhibition-launcher/utils"
+	"exhibition-launcher/utils/jsonUtils/jsonModels"
 	"fmt"
 	"net/http"
 	"os"
@@ -20,11 +21,10 @@ type Manager struct {
 }
 
 // start client en geef manager zodat je makkelijk kan bedienen zawg
-func StartClient(path string, pex bool, dht bool, port uint16) *Manager {
+func StartClient(path string, bittorentSettings jsonModels.BitTorrentSettings) (*Manager, error) {
 	dirErr := os.MkdirAll(path, os.ModePerm)
 	if dirErr != nil {
-		fmt.Println("Error creating downloads directory:", dirErr)
-		return nil
+		return nil, dirErr
 	}
 
 	conf := torrent.DefaultConfig
@@ -32,30 +32,29 @@ func StartClient(path string, pex bool, dht bool, port uint16) *Manager {
 	conf.DataDirIncludesTorrentID = false
 	conf.Debug = false
 
-	conf.DHTEnabled = dht
-	conf.PEXEnabled = pex
+	conf.DHTEnabled = bittorentSettings.UseDHT
+	conf.PEXEnabled = bittorentSettings.UsePEX
 
 	conf.ResumeOnStartup = false
 	conf.Database = filepath.Join(path, "bittorrent.db")
 
-	// alleen frigging ranges zijn er
-	conf.PortBegin = port
-	conf.PortEnd = port + 10
+	conf.PortBegin = bittorentSettings.StartPort
+	conf.PortEnd = bittorentSettings.EndPort
 
 	session, err := torrent.NewSession(conf)
 
-	fmt.Println("port available:", session.Stats().PortsAvailable)
+	fmt.Println("Ports available:", session.Stats().PortsAvailable)
 
 	if err != nil {
 		fmt.Println("Error starting torrent client:", err)
-		return nil
+		return nil, err
 	}
 
 	return &Manager{
 		session:     session,
 		httpClient:  &http.Client{},
 		downloadDir: path,
-	}
+	}, nil
 }
 
 func (manager *Manager) RemoveTorrent(uuid string) error {
@@ -97,7 +96,6 @@ func (manager Manager) AddTorrent(app *application.App, uuid string, magnetLink 
 		ID: uuid,
 	})
 	if err != nil {
-		fmt.Println("Error adding torrent:", err)
 		return t, err
 	}
 
@@ -118,8 +116,7 @@ func (manager Manager) AddTorrent(app *application.App, uuid string, magnetLink 
 	// check space
 	if int64(disk.Free) < sizeLeft {
 		manager.session.RemoveTorrent(uuid)
-		fmt.Println("Insufficient disk space")
-		return t, errors.New("get yo bread right nigga")
+		return t, errors.New("Insufficient disk space")
 	}
 
 	fmt.Println("BitTorrent download starting")

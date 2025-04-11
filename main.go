@@ -102,27 +102,11 @@ func main() {
 		debridClient = realdebrid.NewRealDebridClient(settings)
 	}
 
-	torrentManager = torrent.StartClient(settings.DownloadPath, settings.BitTorrentSettings.UsePEX, settings.BitTorrentSettings.UseDHT, settings.BitTorrentSettings.Port)
-
-	// provider goroutine want het yield
-	go func() {
-		providerManager = providers.NewProviderManager()
-
-		// cache die sources wrm niet
-		for _, sourceLink := range settings.DownloadSources {
-			err := providerManager.CacheProvider(sourceLink)
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-		}
-
-		// test query
-		results := providerManager.SearchDownloadsByGameName("Palworld")
-		for _, result := range results {
-			fmt.Println(result.Magnets)
-		}
-	}()
+	torrentManager, err = torrent.StartClient(settings.DownloadPath, settings.BitTorrentSettings)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	queue := exhibitionQueue.Queue{
 		DownloadsInQueue: []exhibitionQueue.Download{},
@@ -199,6 +183,36 @@ func main() {
 
 	queue.App = app
 
+	var consent_jij = false
+
+	// provider goroutine want het yield
+	go func() {
+		if !consent_jij {
+			return
+		}
+
+		providerManager = providers.NewProviderManager()
+
+		// download die sources wrm niet
+		for _, sourceLink := range settings.DownloadSources {
+			providerManager.DownloadProvider(sourceLink)
+		}
+
+		// test query
+		results := providerManager.SearchDownloadsByGameName("Palworld")
+		once := false
+
+		for provider, download := range results {
+			fmt.Printf("Provider: %s, Magnets: %d\n", provider, len(download.Magnets))
+
+			if !once {
+				queue.AddTorrentDownloadToQueue(download.Magnets[0])
+				once = true
+			}
+		}
+		fmt.Printf("results from %d providers found\n", len(results))
+	}()
+
 	// Add a bunch of games
 
 	//go func() {
@@ -213,7 +227,7 @@ func main() {
 	//}()
 
 	// Demo games for presentations idk
-/*	go func() {
+	/*	go func() {
 		listOfCoolGames := []int{
 			1905, 1942, 2155, 2368, 7194, 7331, 7334,
 			7346, 7360, 7360, 9927, 11133, 11208, 11737, 12517,
@@ -233,12 +247,6 @@ func main() {
 		}
 
 	}()*/
-
-	// Schedule I v0.3.3f14
-	queue.AddTorrentDownloadToQueue("magnet:?xt=urn:btih:7027B6E2A1E4566B0B0DC4146E8B54235B743AE6&dn=Schedule+I+%28v0.3.3f15+%2B+Online+Multiplayer%29+%5BDODI+Repack%5D&tr=udp%3A%2F%2F9.rarbg.to%3A2870%2Fannounce&tr=udp%3A%2F%2Feddie4.nl%3A6969%2Fannounce&tr=udp%3A%2F%2Fthetracker.org%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337&tr=udp%3A%2F%2F9.rarbg.com%3A2710%2Fannounce&tr=udp%3A%2F%2Fexplodie.org%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker1.wasabii.com.tw%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Ftracker.cypherpunks.ru%3A6969%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=http%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Fopentracker.i2p.rocks%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fcoppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce")
-
-	// Einstein's Cats v0.1.0
-	queue.AddTorrentDownloadToQueue("magnet:?xt=urn:btih:1A2ED74D4E45E9FBACE0B24571051840D81045A4&dn=Einstein%26%23039%3Bs+Cats+v0.1.0&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.moeking.me%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.theoks.net%3A6969%2Fannounce&tr=udp%3A%2F%2Fmovies.zsw.ca%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.tiny-vps.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker-udp.gbitt.info%3A80%2Fannounce&tr=http%3A%2F%2Ftracker.gbitt.info%3A80%2Fannounce&tr=https%3A%2F%2Ftracker.gbitt.info%3A443%2Fannounce&tr=http%3A%2F%2Ftracker.ccp.ovh%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.ccp.ovh%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.dler.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=http%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Fopentracker.i2p.rocks%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fcoppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce")
 
 	// Complete aot season 4
 	queue.AddRealDebridDownloadToQueue("magnet:?xt=urn:btih:ac8dc037d282f82efb2864abdd54399029105c0c&dn=%5BGolumpa-Yameii%5D%20Attack%20on%20Titan%20-%20The%20Final%20Season%20%5BEnglish%20Dub%5D%20%5BWEB-DL%20720p%5D%20-%20%28The%20Complete%20S04%29%20-%20Unofficial%20Batch&tr=http%3A%2F%2Fnyaa.tracker.wf%3A7777%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce")

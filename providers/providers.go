@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 )
 
 type ProviderDownload struct {
@@ -23,69 +24,82 @@ type Provider struct {
 }
 
 type ProviderManager struct {
-	Cache map[string]Provider
+	Providers map[string]Provider
 }
 
-var ProviderCacheDir = filepath.Join("cache", "providers")
+var ProviderDir = filepath.Join("provider")
 
 func NewProviderManager() *ProviderManager {
 	manager := &ProviderManager{
-		Cache: map[string]Provider{},
+		Providers: map[string]Provider{},
 	}
 
-	err := os.MkdirAll(ProviderCacheDir, os.ModePerm)
+	err := os.MkdirAll(ProviderDir, os.ModePerm)
 	if err != nil {
-		fmt.Println("could not create provider cache directory")
+		fmt.Println("could not create provider directory")
 		return nil
 	}
 
-	LoadCachedToMemory(manager)
+	LoadLocalToMemory(manager)
 	return manager
 }
 
-func LoadCachedToMemory(p *ProviderManager) {
-	entries, err := os.ReadDir(ProviderCacheDir)
+func LoadLocalToMemory(p *ProviderManager) {
+	entries, err := os.ReadDir(ProviderDir)
 	if err != nil {
-		fmt.Printf("could not read provider cache directory: %v\n", err)
+		fmt.Printf("could not read provider directory: %v\n", err)
 		return
 	}
 
-	for _, providerFile := range entries {
-		if providerFile.IsDir() {
+	mutex := sync.Mutex{}
+
+	var wg sync.WaitGroup
+
+	for _, entry := range entries {
+		if entry.IsDir() {
 			continue
 		}
 
-		originalName := providerFile.Name()
-		providerName := originalName[:len(originalName)-len(filepath.Ext(originalName))]
+		wg.Add(1)
 
-		_, ok := p.Cache[providerName]
-		if ok {
-			continue
-		}
+		go func(providerFile os.DirEntry) {
+			defer wg.Done()
 
-		filePath := filepath.Join(ProviderCacheDir, providerFile.Name())
-		file, err := os.Open(filePath)
-		if err != nil {
-			fmt.Printf("could not open provider file %s: %v\n", filePath, err)
-			continue
-		}
-		defer file.Close()
+			originalName := providerFile.Name()
+			providerName := originalName[:len(originalName)-len(filepath.Ext(originalName))]
 
-		var provider Provider
-		err = json.NewDecoder(file).Decode(&provider)
-		if err != nil {
-			fmt.Printf("could not decode provider data from file %s: %v\n", filePath, err)
-			continue
-		}
+			_, exists := p.Providers[providerName]
+			if exists {
+				return
+			}
 
-		p.Cache[provider.ProviderName] = provider
+			filePath := filepath.Join(ProviderDir, providerFile.Name())
+			file, err := os.Open(filePath)
+			if err != nil {
+				fmt.Printf("could not open provider file %s: %v\n", filePath, err)
+				return
+			}
+			defer file.Close()
+
+			var provider Provider
+			err = json.NewDecoder(file).Decode(&provider)
+			if err != nil {
+				fmt.Printf("could not decode provider data from file %s: %v\n", filePath, err)
+				return
+			}
+
+			mutex.Lock()
+			p.Providers[provider.ProviderName] = provider
+			mutex.Unlock()
+		}(entry)
 	}
+
+	wg.Wait()
 }
 
-func IsSourceCached(link string) bool {
-	file, err := os.Open(filepath.Join(ProviderCacheDir, filepath.Base(link)))
+func IsProviderDownloaded(link string) bool {
+	file, err := os.Open(filepath.Join(ProviderDir, filepath.Base(link)))
 	if err != nil {
-		fmt.Println("could not find source file")
 		return false
 	}
 	defer file.Close()
@@ -93,16 +107,16 @@ func IsSourceCached(link string) bool {
 	return true
 }
 
-func (p *ProviderManager) SearchDownloadsByGameName(query string) []ProviderDownload {
-	var providerDownloads []ProviderDownload
+func (p *ProviderManager) SearchDownloadsByGameName(query string) map[string]ProviderDownload {
+	var providerDownloads = map[string]ProviderDownload{}
 
 	fmt.Println("starting search for", query)
-	for _, provider := range p.Cache {
+	for _, provider := range p.Providers {
 		for _, download := range provider.Downloads {
 			go func() {
 				if strings.Contains(strings.ToLower(download.Name), strings.ToLower(query)) {
 					fmt.Println("found download", download.Name)
-					providerDownloads = append(providerDownloads, download)
+					providerDownloads[provider.ProviderName] = download
 				}
 			}()
 		}
@@ -111,15 +125,13 @@ func (p *ProviderManager) SearchDownloadsByGameName(query string) []ProviderDown
 	return providerDownloads
 }
 
-func (p *ProviderManager) CacheProvider(link string) error {
+func (p *ProviderManager) DownloadProvider(link string) error {
 	lil := filepath.Base(link)
 	providerName := lil[:len(lil)-len(filepath.Ext(lil))]
 
-	fmt.Println(providerName)
-
-	_, ok := p.Cache[providerName]
-	if IsSourceCached(link) || ok {
-		return errors.New("provider already cached")
+	_, ok := p.Providers[providerName]
+	if IsProviderDownloaded(link) || ok {
+		return nil
 	}
 
 	res, err := http.Get(link)
@@ -136,9 +148,9 @@ func (p *ProviderManager) CacheProvider(link string) error {
 		return errors.New("couldnt decode provider data")
 	}
 
-	file, err := os.Create(filepath.Join(ProviderCacheDir, filepath.Base(link)))
+	file, err := os.Create(filepath.Join(ProviderDir, filepath.Base(link)))
 	if err != nil {
-		fmt.Println("could not cache provider data")
+		fmt.Println("couldnt create provider data")
 		return err
 	}
 	defer file.Close()
@@ -153,7 +165,7 @@ func (p *ProviderManager) CacheProvider(link string) error {
 	file.Write(bytes)
 
 	// add to memory
-	p.Cache[data.ProviderName] = data
+	p.Providers[data.ProviderName] = data
 
 	fmt.Println("loaded source data from API")
 	return nil

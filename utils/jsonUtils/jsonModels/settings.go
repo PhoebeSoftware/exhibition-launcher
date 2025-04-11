@@ -34,9 +34,10 @@ type IgdbSettings struct {
 }
 
 type BitTorrentSettings struct {
-	UseDHT bool   `json:"use_dht"`
-	UsePEX bool   `json:"use_pex"`
-	Port   uint16 `json:"port"`
+	UseDHT    bool   `json:"use_dht"`
+	UsePEX    bool   `json:"use_pex"`
+	StartPort uint16 `json:"start_port"`
+	EndPort   uint16 `json:"end_port"`
 }
 
 func (s Settings) GetSettings() Settings {
@@ -60,5 +61,6 @@ func (s *Settings) DefaultValues() {
 
 	s.BitTorrentSettings.UseDHT = true
 	s.BitTorrentSettings.UsePEX = true
-	s.BitTorrentSettings.Port = 9000
+	s.BitTorrentSettings.StartPort = 9000
+	s.BitTorrentSettings.EndPort = 9010
 }
