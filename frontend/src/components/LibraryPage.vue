@@ -5,7 +5,9 @@
             <div class="Library-settings-container">
                 <div class="Library-settings-wrapper">
                     <span>Sort by:</span>
-                    <button id="sort-library-by">Time played <i class="fa-solid fa-chevron-down"></i></button>
+                    <button id="sort-library-by">
+                        Time played <i class="fa-solid fa-chevron-down"></i>
+                    </button>
                 </div>
 
                 <div class="Library-favorites-container">
@@ -19,19 +21,29 @@
                     </button>
                 </div>
                 <div class="add-game-to-library-wrapper">
-                    <button id="refresh-page"><i class="fa-solid fa-arrows-rotate"></i></button>
-                    <button class="game-add-button" id="Import-from-PC-TT" @click="addGame">
+                    <button id="refresh-page">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                    </button>
+                    <button
+                        class="game-add-button"
+                        id="Import-from-PC-TT"
+                        @click="addGame"
+                    >
                         Import from PC<i class="fa-solid fa-desktop"></i>
                     </button>
                 </div>
             </div>
 
             <div class="game-library-container">
-                <div class="game-library-game-box" v-for="game in games" :key="game.igdb_id"
-                     @click="openGamePage(game)"
-                     :style="{
-                         backgroundImage: `url(${coverUrls[game.igdb_id]})`
-                     }">
+                <div
+                    class="game-library-game-box"
+                    v-for="game in games"
+                    :key="game.igdb_id"
+                    @click="openGamePage(game)"
+                    :style="{
+                        backgroundImage: `url(${coverUrls[game.igdb_id]})`,
+                    }"
+                >
                     <div class="game-box-info">
                         <div class="text-container">
                             <h1>{{ game.name }}</h1>
@@ -46,93 +58,145 @@
             <button class="back-button" @click="returnToLibrary">
                 <i class="fa-solid fa-arrow-left"></i>
             </button>
-            
+
             <!-- Image Carousel Section -->
             <div class="carousel-container">
-                <div class="carousel-slides" ref="carouselSlides"
-                     :style="{ transform: `translateX(-${currentSlide * 100}%)` }">
-                    <div class="carousel-slide" 
-                         v-for="(image, index) in getGameImages()" 
-                         :key="index" 
-                         :style="{ backgroundImage: `url(${image})` }">
+                <div
+                    class="carousel-slides"
+                    ref="carouselSlides"
+                    :style="{
+                        transform: `translateX(-${currentSlide * 100}%)`,
+                    }"
+                >
+                    <div
+                        class="carousel-slide"
+                        v-for="(image, index) in getGameImages()"
+                        :key="index"
+                        :style="{ backgroundImage: `url(${image})` }"
+                    >
                         <div class="banner-overlay"></div>
                     </div>
                 </div>
-                
+
                 <div class="carousel-controls">
                     <button class="carousel-btn prev" @click="prevSlide">
                         <i class="fa-solid fa-chevron-left"></i>
                     </button>
                     <div class="carousel-indicators">
-                        <span v-for="(_, index) in getGameImages()" 
-                              :key="index" 
-                              :class="{ active: index === currentSlide }"
-                              @click="goToSlide(index)">
+                        <span
+                            v-for="(_, index) in getGameImages()"
+                            :key="index"
+                            :class="{ active: index === currentSlide }"
+                            @click="goToSlide(index)"
+                        >
                         </span>
                     </div>
                     <button class="carousel-btn next" @click="nextSlide">
                         <i class="fa-solid fa-chevron-right"></i>
                     </button>
                 </div>
-                
+
                 <div class="game-info-overlay">
                     <div class="game-branding">
                         <h1 class="game-title">{{ selectedGame.name }}</h1>
                     </div>
-                    
 
-                    
                     <div class="game-stats-container">
                         <div class="stat-box">
-                            <div class="stat-value">{{ selectedGame.playTime || '16hrs' }} <i class="fa-regular fa-clock"></i></div>
+                            <div class="stat-value">
+                                {{ selectedGame.playTime || "16hrs" }}
+                                <i class="fa-regular fa-clock"></i>
+                            </div>
                             <div class="stat-label">PLAY TIME</div>
                         </div>
-                        
+
                         <div class="stat-box">
-                            <div class="stat-value">{{ selectedGame.achievementPercent || '27%' }} <i class="fa-solid fa-trophy"></i></div>
+                            <div class="stat-value">
+                                {{ selectedGame.achievementPercent || "27%" }}
+                                <i class="fa-solid fa-trophy"></i>
+                            </div>
                             <div class="stat-label">ACHIEVEMENTS</div>
                         </div>
                     </div>
-                    
+
                     <div class="game-actions">
                         <button class="add-library-btn" @click="toggleFavorite">
-                            {{ selectedGame.isFavorite ? 'Remove from Favorites' : 'Add to Favorites' }} 
-                            <i :class="selectedGame.isFavorite ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
+                            {{
+                                selectedGame.isFavorite
+                                    ? "Remove from Favorites"
+                                    : "Add to Favorites"
+                            }}
+                            <i
+                                :class="
+                                    selectedGame.isFavorite
+                                        ? 'fa-solid fa-heart'
+                                        : 'fa-regular fa-heart'
+                                "
+                            ></i>
                         </button>
-                        <button class="download-btn" @click="launchGame(selectedGame)">
+                        <button
+                            class="download-btn"
+                            @click="launchGame(selectedGame)"
+                        >
                             Play Game <i class="fa-solid fa-play"></i>
                         </button>
                     </div>
                 </div>
             </div>
-            
+
             <div class="game-details-section">
                 <div class="game-details-container">
                     <div class="details-column">
                         <div class="details-section">
                             <h3>About</h3>
-                            <p>{{ selectedGame.fullDescription || selectedGame.description || 'A groundbreaking game experience.' }}</p>
+                            <p>
+                                {{
+                                    selectedGame.fullDescription ||
+                                    selectedGame.description ||
+                                    "A groundbreaking game experience."
+                                }}
+                            </p>
                         </div>
-                        
+
                         <div class="details-section">
                             <h3>Genre</h3>
                             <div class="tags-container">
-                                <span class="tag" v-for="(genre, index) in (selectedGame.genres || ['RPG', 'Fantasy', 'Adventure'])" :key="index">
+                                <span
+                                    class="tag"
+                                    v-for="(
+                                        genre, index
+                                    ) in selectedGame.genres || [
+                                        'RPG',
+                                        'Fantasy',
+                                        'Adventure',
+                                    ]"
+                                    :key="index"
+                                >
                                     {{ genre }}
                                 </span>
                             </div>
                         </div>
-                        
+
                         <div class="details-section">
                             <h3>Features</h3>
                             <div class="tags-container">
-                                <span class="tag" v-for="(feature, index) in (selectedGame.features || ['Single-player', 'Controller Support', 'Cloud Saves'])" :key="index">
+                                <span
+                                    class="tag"
+                                    v-for="(
+                                        feature, index
+                                    ) in selectedGame.features || [
+                                        'Single-player',
+                                        'Controller Support',
+                                        'Cloud Saves',
+                                    ]"
+                                    :key="index"
+                                >
                                     {{ feature }}
                                 </span>
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="details-column">
                         <div class="details-section">
                             <h3>System Requirements</h3>
@@ -140,22 +204,76 @@
                                 <div class="req-section">
                                     <h4>Minimum</h4>
                                     <ul>
-                                        <li><strong>OS:</strong> {{ selectedGame.minOS || 'Windows 10 (64-bit)' }}</li>
-                                        <li><strong>CPU:</strong> {{ selectedGame.minCPU || 'Intel Core i5-2500K | AMD FX-8320' }}</li>
-                                        <li><strong>RAM:</strong> {{ selectedGame.minRAM || '8 GB' }}</li>
-                                        <li><strong>GPU:</strong> {{ selectedGame.minGPU || 'NVIDIA GeForce GTX 760 | AMD Radeon HD 7950' }}</li>
-                                        <li><strong>Storage:</strong> {{ selectedGame.minStorage || '60 GB available space' }}</li>
+                                        <li>
+                                            <strong>OS:</strong>
+                                            {{
+                                                selectedGame.minOS ||
+                                                "Windows 10 (64-bit)"
+                                            }}
+                                        </li>
+                                        <li>
+                                            <strong>CPU:</strong>
+                                            {{
+                                                selectedGame.minCPU ||
+                                                "Intel Core i5-2500K | AMD FX-8320"
+                                            }}
+                                        </li>
+                                        <li>
+                                            <strong>RAM:</strong>
+                                            {{ selectedGame.minRAM || "8 GB" }}
+                                        </li>
+                                        <li>
+                                            <strong>GPU:</strong>
+                                            {{
+                                                selectedGame.minGPU ||
+                                                "NVIDIA GeForce GTX 760 | AMD Radeon HD 7950"
+                                            }}
+                                        </li>
+                                        <li>
+                                            <strong>Storage:</strong>
+                                            {{
+                                                selectedGame.minStorage ||
+                                                "60 GB available space"
+                                            }}
+                                        </li>
                                     </ul>
                                 </div>
-                                
+
                                 <div class="req-section">
                                     <h4>Recommended</h4>
                                     <ul>
-                                        <li><strong>OS:</strong> {{ selectedGame.recOS || 'Windows 10/11 (64-bit)' }}</li>
-                                        <li><strong>CPU:</strong> {{ selectedGame.recCPU || 'Intel Core i7-4790 | AMD Ryzen 5 1600' }}</li>
-                                        <li><strong>RAM:</strong> {{ selectedGame.recRAM || '16 GB' }}</li>
-                                        <li><strong>GPU:</strong> {{ selectedGame.recGPU || 'NVIDIA GeForce GTX 1060 6GB | AMD Radeon RX 580 8GB' }}</li>
-                                        <li><strong>Storage:</strong> {{ selectedGame.recStorage || '60 GB SSD' }}</li>
+                                        <li>
+                                            <strong>OS:</strong>
+                                            {{
+                                                selectedGame.recOS ||
+                                                "Windows 10/11 (64-bit)"
+                                            }}
+                                        </li>
+                                        <li>
+                                            <strong>CPU:</strong>
+                                            {{
+                                                selectedGame.recCPU ||
+                                                "Intel Core i7-4790 | AMD Ryzen 5 1600"
+                                            }}
+                                        </li>
+                                        <li>
+                                            <strong>RAM:</strong>
+                                            {{ selectedGame.recRAM || "16 GB" }}
+                                        </li>
+                                        <li>
+                                            <strong>GPU:</strong>
+                                            {{
+                                                selectedGame.recGPU ||
+                                                "NVIDIA GeForce GTX 1060 6GB | AMD Radeon RX 580 8GB"
+                                            }}
+                                        </li>
+                                        <li>
+                                            <strong>Storage:</strong>
+                                            {{
+                                                selectedGame.recStorage ||
+                                                "60 GB SSD"
+                                            }}
+                                        </li>
                                     </ul>
                                 </div>
                             </div>
@@ -168,10 +286,10 @@
 </template>
 
 <script>
-import {LibraryManager} from "../../bindings/exhibition-launcher/library/index.js";
+import { LibraryManager } from "../../bindings/exhibition-launcher/library/index.js";
 
 export default {
-    name: 'LibraryPage',
+    name: "LibraryPage",
 
     data() {
         return {
@@ -179,121 +297,139 @@ export default {
             coverUrls: {},
             screenshotUrls: {},
             artworkUrls: {},
-            currentPage: 'library',
+            currentPage: "library",
             selectedGame: null,
             currentSlide: 0,
         };
     },
     methods: {
         async loadCoverImages(game) {
-            this.coverUrls[game.igdb_id] = await LibraryManager.GetCoverURL(game.cover_filename, game.cover_url);
+            this.coverUrls[game.igdb_id] = await LibraryManager.GetCoverURL(
+                game.cover_filename,
+                game.cover_url,
+            );
         },
         async loadArtworkImages(game) {
             let list = [];
-            console.log(game.artwork_url_list)
-            console.log(game.artwork_filenames)
-            const artworks = await LibraryManager.GetAllImageURLs(game.artwork_filenames, game.artwork_url_list)
-            console.log(artworks)
-            list.push(...artworks)
-            this.artworkUrls[game.igdb_id] = list
+            console.log(game.artwork_url_list);
+            console.log(game.artwork_filenames);
+            const artworks = await LibraryManager.GetAllImageURLs(
+                game.artwork_filenames,
+                game.artwork_url_list,
+            );
+            console.log(artworks);
+            list.push(...artworks);
+            this.artworkUrls[game.igdb_id] = list;
         },
         async loadScreenshotImages(game) {
             let list = [];
-            const screens = await LibraryManager.GetAllImageURLs(game.screenshot_filenames, game.screenshot_url_list)
-            list.push(...screens)
-            this.screenshotUrls[game.igdb_id] = list
+            const screens = await LibraryManager.GetAllImageURLs(
+                game.screenshot_filenames,
+                game.screenshot_url_list,
+            );
+            list.push(...screens);
+            this.screenshotUrls[game.igdb_id] = list;
         },
         getGameImages() {
             let images = [];
             let game = this.selectedGame;
-            console.log(game)
+            console.log(game);
             // Use artwork images if available
-            console.log(this.artworkUrls[game.igdb_id])
-            images.push(...this.artworkUrls[game.igdb_id])
-            images.push(...this.screenshotUrls[game.igdb_id])
+            console.log(this.artworkUrls[game.igdb_id]);
+            images.push(...this.artworkUrls[game.igdb_id]);
+            images.push(...this.screenshotUrls[game.igdb_id]);
 
             // Use cover as fallback if no images available
             if (images.length === 0 && this.selectedGame?.cover_url) {
-                images = this.coverUrls[game.igdb_id]
+                images = this.coverUrls[game.igdb_id];
             }
             // At least 1 carousel image
             if (images.length === 0) {
-                images = ['https://via.placeholder.com/1920x1080/222222/555555?text=No+Images+Available'];
+                images = [
+                    "https://via.placeholder.com/1920x1080/222222/555555?text=No+Images+Available",
+                ];
             }
-            console.log(images)
+            console.log(images);
 
             return images;
         },
-        
+
         nextSlide() {
             const totalSlides = this.getGameImages().length;
             this.currentSlide = (this.currentSlide + 1) % totalSlides;
         },
-        
+
         prevSlide() {
             const totalSlides = this.getGameImages().length;
-            this.currentSlide = (this.currentSlide - 1 + totalSlides) % totalSlides;
+            this.currentSlide =
+                (this.currentSlide - 1 + totalSlides) % totalSlides;
         },
-        
+
         goToSlide(index) {
             this.currentSlide = index;
         },
-        
+
         async addGame() {
-            let newGame = await LibraryManager.AddToLibrary(119277, true).catch((err) => {
-                console.warn(err)
-            });
-            this.games.push(newGame)
+            LibraryManager.AddToLibrary(119277, true)
+                .catch((err) => {
+                    console.warn(err);
+                    return;
+                })
+                .then((game) => {
+                    this.games.push(game);
+                });
         },
 
         openGamePage(game) {
             this.selectedGame = game;
-            this.currentPage = 'game';
+            this.currentPage = "game";
             this.currentSlide = 0; // reset carousel to first slide
         },
 
         launchGame(game) {
             LibraryManager.StartApp(game.igdb_id).catch((err) => {
-                console.log(err)
-            })
+                console.log(err);
+            });
         },
-        
+
         toggleFavorite() {
             if (this.selectedGame) {
                 this.selectedGame.isFavorite = !this.selectedGame.isFavorite;
-                console.log(`Favorite status for game ${this.selectedGame.igdb_id}: ${this.selectedGame.isFavorite}`);
+                console.log(
+                    `Favorite status for game ${this.selectedGame.igdb_id}: ${this.selectedGame.isFavorite}`,
+                );
             }
         },
 
         returnToLibrary() {
-            this.currentPage = 'library';
-        }
+            this.currentPage = "library";
+        },
     },
     async mounted() {
-        const amountOfGames = await LibraryManager.GetAmountOfGames()
+        const amountOfGames = await LibraryManager.GetAmountOfGames();
 
-        console.log(amountOfGames)
+        console.log(amountOfGames);
         const portion = 100;
 
         for (let i = 0; i < amountOfGames; i += portion) {
-            console.log(i)
-            let games = await LibraryManager.GetRangeGame(portion, i)
+            console.log(i);
+            let games = await LibraryManager.GetRangeGame(portion, i);
             for (let j = 0; j < games.length; j++) {
-                let game = games[j]
+                let game = games[j];
                 await this.loadCoverImages(game);
                 await this.loadArtworkImages(game);
                 await this.loadScreenshotImages(game);
                 this.games.push(game);
             }
         }
-        
+
         // auto carousel each 5 seconds
         setInterval(() => {
-            if (this.currentPage === 'game') {
+            if (this.currentPage === "game") {
                 this.nextSlide();
             }
         }, 5000);
-    }
+    },
 };
 </script>
 
@@ -361,7 +497,9 @@ export default {
     cursor: pointer;
     padding: 5px 15px;
     position: relative;
-    transition: color 0.3s ease, background-color 0.3s ease;
+    transition:
+        color 0.3s ease,
+        background-color 0.3s ease;
     border-radius: 20px;
 }
 
@@ -384,7 +522,9 @@ export default {
     background-color: var(--accent-color);
     border-radius: 2px;
     opacity: 0;
-    transition: width 0.3s ease, opacity 0.3s ease;
+    transition:
+        width 0.3s ease,
+        opacity 0.3s ease;
 }
 
 .Library-favorites-container button.active .active-indicator-horizontal {
@@ -461,7 +601,9 @@ export default {
     overflow: hidden;
     position: relative;
     cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -509,7 +651,9 @@ export default {
 }
 
 .game-box-info i {
-    transition: color 0.3s ease, transform 0.3s ease;
+    transition:
+        color 0.3s ease,
+        transform 0.3s ease;
     color: var(--secondary-text-color);
     font-size: 18px;
 }
@@ -569,7 +713,6 @@ export default {
     width: 100%;
     height: 600px;
     overflow: hidden;
-
 }
 
 .carousel-slides {
@@ -720,7 +863,8 @@ export default {
     margin-bottom: 30px;
 }
 
-.add-library-btn, .download-btn {
+.add-library-btn,
+.download-btn {
     padding: 12px 25px;
     border-radius: 25px;
     border: none;
@@ -755,8 +899,6 @@ export default {
 /* Game Details Section */
 .game-details-section {
     padding: 30px 5%;
-
-    
 }
 
 .game-details-container {
@@ -842,15 +984,15 @@ export default {
     .carousel-container {
         height: 450px;
     }
-    
+
     .game-title {
         font-size: 2rem;
     }
-    
+
     .carousel-controls {
         bottom: 70px;
     }
-    
+
     .system-reqs {
         flex-direction: column;
         gap: 20px;
@@ -861,21 +1003,22 @@ export default {
     .carousel-container {
         height: 350px;
     }
-    
+
     .game-title {
         font-size: 1.5rem;
     }
-    
+
     .game-actions {
         flex-direction: column;
         width: 100%;
     }
-    
-    .add-library-btn, .download-btn {
+
+    .add-library-btn,
+    .download-btn {
         width: 100%;
         justify-content: center;
     }
-    
+
     .stat-box {
         padding: 10px 15px;
     }

@@ -20,7 +20,7 @@ type LibraryManager struct {
 	Library     *jsonModels.Library
 	APIManager  *igdb.APIManager
 	Client      *http.Client
-	Settings *jsonModels.Settings
+	Settings    *jsonModels.Settings
 }
 
 func (l *LibraryManager) GetSortedIDs() []int {
@@ -46,7 +46,7 @@ func GetLibrary(apiManager *igdb.APIManager, settings *jsonModels.Settings) (*Li
 		Library:     library,
 		APIManager:  apiManager,
 		Client:      &http.Client{},
-		Settings: settings,
+		Settings:    settings,
 	}, nil
 }
 
@@ -113,7 +113,7 @@ func (l *LibraryManager) AddToLibrary(igdbId int, promptDialog bool) (jsonModels
 	game, ok := l.Library.Games[igdbId]
 	if ok {
 		fmt.Println("Game is already in library:", game.Name)
-		return game, nil
+		return game, fmt.Errorf("Game already exists")
 	}
 
 	if promptDialog {
