@@ -59,16 +59,27 @@ func (l *LibraryManager) CacheImageToDisk(gameName string, uri string) (string, 
 
 func (l *LibraryManager) GetCoverURL(coverFileName string, coverURL string) string {
 	if coverFileName != "" {
-		return l.GetImageURL(coverFileName)
+		url, err := l.GetImageURL(coverFileName)
+		if err !=  nil {
+			fmt.Println(err)
+			return ""
+		}
+		return url
 	}
 	return coverURL
 }
 
-func (l *LibraryManager) GetAllImageURLs(filenames []string, urls []string) []string {
+func (l *LibraryManager) GetAllImageURLs(igdbId int, filenames []string, urls []string) []string {
 	var listOfImages []string
 	if len(filenames) > 0 {
 		for _, filename := range filenames {
-			listOfImages = append(listOfImages, l.GetImageURL(filename))
+			url, err := l.GetImageURL(filename)
+			if err != nil {
+				listOfImages = urls
+				break
+			}
+
+			listOfImages = append(listOfImages, url)
 		}
 	} else {
 		listOfImages = urls
@@ -77,15 +88,15 @@ func (l *LibraryManager) GetAllImageURLs(filenames []string, urls []string) []st
 }
 
 
-func (l *LibraryManager) GetImageURL(fileName string) string {
+func (l *LibraryManager) GetImageURL(fileName string) (string, error) {
 	path := filepath.Join(GetImageCachePath(), fileName)
 	data, err := os.ReadFile(path)
-	// If cant find filename fallback to https
+
 	if err != nil {
-		return ""
+		return "", err
 	}
 	base64Data := base64.StdEncoding.EncodeToString(data)
-	return "data:image/png;base64," + base64Data
+	return "data:image/png;base64," + base64Data, nil
 }
 
 func (l *LibraryManager) CacheAllImages(game *jsonModels.Game, gameData igdb.ApiGame) error {
