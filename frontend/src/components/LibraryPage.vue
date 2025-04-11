@@ -336,7 +336,10 @@ export default {
 
             // Use cover as fallback if no images available
             if (images.length === 0 && this.selectedGame?.cover_url) {
-                images = this.coverUrls[game.igdb_id];
+                images = [
+                    this.coverUrls[game.igdb_id],
+                ];
+
             }
             // At least 1 carousel image
             if (images.length === 0) {
