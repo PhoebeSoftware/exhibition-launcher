@@ -1,16 +1,29 @@
 package library
 
 import (
-	"encoding/base64"
 	"exhibition-launcher/igdb"
+	"exhibition-launcher/utils"
 	"exhibition-launcher/utils/jsonUtils/jsonModels"
 	"fmt"
 	"github.com/google/uuid"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 )
+
+func StartImageServer() {
+	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir(GetImageCachePath()))))
+	go func() {
+		err := http.ListenAndServe(":34115", nil)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}()
+	fmt.Println("Image server running at localhost:34115")
+}
 
 func GetImageCachePath() string {
 	cacheDir, err := os.UserCacheDir()
@@ -33,7 +46,7 @@ func (l *LibraryManager) CacheImageToDisk(gameName string, uri string) (string, 
 	}
 
 	defer resp.Body.Close()
-	fileName := gameName + "-" + uuid.New().String() + ".jpg"
+	fileName := url.QueryEscape(gameName + "-" + uuid.New().String() + ".jpg")
 	pathToFile := filepath.Join(GetImageCachePath(), fileName)
 
 	if err = os.MkdirAll(filepath.Dir(pathToFile), 0755); err != nil {
@@ -58,13 +71,9 @@ func (l *LibraryManager) CacheImageToDisk(gameName string, uri string) (string, 
 }
 
 func (l *LibraryManager) GetCoverURL(coverFileName string, coverURL string) string {
-	if coverFileName != "" {
-		url, err := l.GetImageURL(coverFileName)
-		if err !=  nil {
-			fmt.Println(err)
-			return ""
-		}
-		return url
+	if coverFileName != "" && l.Settings.UseCaching {
+		imageURL, _ := l.GetImageURL(coverFileName)
+		return imageURL
 	}
 	return coverURL
 }
@@ -73,13 +82,12 @@ func (l *LibraryManager) GetAllImageURLs(filenames []string, urls []string) []st
 	var listOfImages []string
 	if len(filenames) > 0 {
 		for _, filename := range filenames {
-			url, err := l.GetImageURL(filename)
+			imageURL, err := l.GetImageURL(filename)
 			if err != nil {
 				listOfImages = urls
 				break
 			}
-
-			listOfImages = append(listOfImages, url)
+			listOfImages = append(listOfImages, imageURL)
 		}
 	} else {
 		listOfImages = urls
@@ -87,16 +95,13 @@ func (l *LibraryManager) GetAllImageURLs(filenames []string, urls []string) []st
 	return listOfImages
 }
 
-
 func (l *LibraryManager) GetImageURL(fileName string) (string, error) {
-	path := filepath.Join(GetImageCachePath(), fileName)
-	data, err := os.ReadFile(path)
-
-	if err != nil {
-		return "", err
+	ok := utils.FileExists(filepath.Join(GetImageCachePath(), fileName))
+	fmt.Println(l.Settings.UseCaching)
+	if !ok || !l.Settings.UseCaching {
+		return "", fmt.Errorf("file not found or caching is turned off defaulting back to https")
 	}
-	base64Data := base64.StdEncoding.EncodeToString(data)
-	return "data:image/png;base64," + base64Data, nil
+	return "http://localhost:34115/images/" + url.QueryEscape(fileName), nil
 }
 
 func (l *LibraryManager) CacheAllImages(game *jsonModels.Game, gameData igdb.ApiGame) error {
@@ -115,7 +120,7 @@ func (l *LibraryManager) CacheAllImages(game *jsonModels.Game, gameData igdb.Api
 	}
 	err = l.CacheScreenshots(game, gameData)
 	if err != nil {
-	    return err
+		return err
 	}
 
 	return nil
