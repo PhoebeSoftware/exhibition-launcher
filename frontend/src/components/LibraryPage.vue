@@ -30,7 +30,7 @@
                 <div class="game-library-game-box" v-for="game in games" :key="game.igdb_id"
                      @click="openGamePage(game)"
                      :style="{
-                         backgroundImage: `url(${getCoverUrlFromGame(game)})`
+                         backgroundImage: `url(${coverUrls[game.igdb_id]})`
                      }">
                     <div class="game-box-info">
                         <div class="text-container">
@@ -176,36 +176,53 @@ export default {
     data() {
         return {
             games: [],
+            coverUrls: {},
+            screenshotUrls: {},
+            artworkUrls: {},
             currentPage: 'library',
             selectedGame: null,
             currentSlide: 0,
         };
     },
     methods: {
+        async loadCoverImages(game) {
+            this.coverUrls[game.igdb_id] = await LibraryManager.GetCoverURL(game.cover_filename, game.cover_url);
+        },
+        async loadArtworkImages(game) {
+            let list = [];
+            console.log(game.artwork_url_list)
+            console.log(game.artwork_filenames)
+            const artworks = await LibraryManager.GetAllImageURLs(game.artwork_filenames, game.artwork_url_list)
+            console.log(artworks)
+            list.push(...artworks)
+            this.artworkUrls[game.igdb_id] = list
+        },
+        async loadScreenshotImages(game) {
+            let list = [];
+            const screens = await LibraryManager.GetAllImageURLs(game.screenshot_filenames, game.screenshot_url_list)
+            list.push(...screens)
+            this.screenshotUrls[game.igdb_id] = list
+        },
         getGameImages() {
             let images = [];
-            
+            let game = this.selectedGame;
+            console.log(game)
             // Use artwork images if available
-            if (this.selectedGame?.artwork_url_list && this.selectedGame.artwork_url_list.length > 0) {
-                images = [...this.selectedGame.artwork_url_list];
-            }
-            
-            // Add screenshots
-            if (this.selectedGame?.screenshot_url_list && this.selectedGame.screenshot_url_list.length > 0) {
-                images = [...images, ...this.selectedGame.screenshot_url_list];
-            }
-            
+            console.log(this.artworkUrls[game.igdb_id])
+            images.push(...this.artworkUrls[game.igdb_id])
+            images.push(...this.screenshotUrls[game.igdb_id])
+
             // Use cover as fallback if no images available
             if (images.length === 0 && this.selectedGame?.cover_url) {
-                images = [this.selectedGame.cover_url];
+                images = this.coverUrls[game.igdb_id]
             }
-            
             // At least 1 carousel image
             if (images.length === 0) {
                 images = ['https://via.placeholder.com/1920x1080/222222/555555?text=No+Images+Available'];
             }
-            
-            return images.map(url => new URL(url, import.meta.url).href);
+            console.log(images)
+
+            return images;
         },
         
         nextSlide() {
@@ -227,10 +244,6 @@ export default {
                 console.warn(err)
             });
             this.games.push(newGame)
-        },
-
-        getCoverUrlFromGame(game) {
-            return new URL(game.cover_url, import.meta.url).href
         },
 
         openGamePage(game) {
@@ -267,7 +280,9 @@ export default {
             let games = await LibraryManager.GetRangeGame(portion, i)
             for (let j = 0; j < games.length; j++) {
                 let game = games[j]
-                console.log(game.name + " : " + game.igdb_id + " : " + j);
+                await this.loadCoverImages(game);
+                await this.loadArtworkImages(game);
+                await this.loadScreenshotImages(game);
                 this.games.push(game);
             }
         }

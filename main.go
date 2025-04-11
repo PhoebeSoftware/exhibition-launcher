@@ -81,7 +81,17 @@ func main() {
 			return
 		}
 	}
-	libraryManager = library.GetLibrary(igdbApiManager)
+	libraryManager, err = library.GetLibrary(igdbApiManager)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	if settings.UseCaching {
+		go func() {
+			libraryManager.CheckForCache()
+		}()
+	}
+
 	if settings.RealDebridSettings.UseRealDebrid {
 		if settings.RealDebridSettings.DebridToken == "" {
 			// TO:DO ADD A UI FOR THIS OR SMTH
@@ -110,9 +120,9 @@ func main() {
 	//		continue
 	//	}
 	//
-	//	game.CoverURL = gameData.CoverURL
-	//	game.ArtworkUrlList = gameData.ArtworkUrlList
-	//	game.ScreenshotUrlList = gameData.ScreenshotUrlList
+	//	game.CoverFilename = gameData.CoverFilename
+	//	game.ArtworkFilenames = gameData.ArtworkFilenames
+	//	game.ScreenshotFilenames = gameData.ScreenshotFilenames
 	//	libraryManager.Games[id] = game
 	//}
 	webViewWindowOpt := application.WebviewWindowOptions{
