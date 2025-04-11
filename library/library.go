@@ -18,8 +18,8 @@ import (
 type LibraryManager struct {
 	JsonManager *jsonUtils.JsonManager
 	Library     *jsonModels.Library
-	APIManager     *igdb.APIManager
-	Client         *http.Client
+	APIManager  *igdb.APIManager
+	Client      *http.Client
 }
 
 func (l *LibraryManager) GetSortedIDs() []int {
@@ -50,8 +50,6 @@ func GetLibrary(apiManager *igdb.APIManager) (*LibraryManager, error) {
 
 	return l, nil
 }
-
-
 
 func (l *LibraryManager) GetAllGames() map[int]jsonModels.Game {
 	return l.Library.Games
@@ -108,9 +106,9 @@ func (l *LibraryManager) GetRangeGame(amount int, offset int) ([]jsonModels.Game
 func (l *LibraryManager) AddToLibrary(igdbId int, promptDialog bool) (jsonModels.Game, error) {
 	// prompt executable location
 	var (
-		game jsonModels.Game
+		game       jsonModels.Game
 		executable = ""
-		err error
+		err        error
 	)
 	for _, gameInLoop := range l.Library.Games {
 		if gameInLoop.IGDBID == igdbId {
@@ -136,19 +134,20 @@ func (l *LibraryManager) AddToLibrary(igdbId int, promptDialog bool) (jsonModels
 		return game, fmt.Errorf("failed to get game data")
 	}
 
-
 	// Append the new game
 	game = jsonModels.Game{
-		IGDBID:              igdbId,
-		Name:                gameData.Name,
-		Description:         gameData.Description,
-		PlayTime:            0,
-		Achievments:         []int{},
-		Executable:          executable,
-		Running:             false,
-		Favorite:            false,
+		IGDBID:            igdbId,
+		Name:              gameData.Name,
+		Description:       gameData.Description,
+		PlayTime:          0,
+		Achievments:       []int{},
+		Executable:        executable,
+		Running:           false,
+		Favorite:          false,
+		CoverURL:          gameData.CoverURL,
+		ArtworkUrlList:    gameData.ArtworkUrlList,
+		ScreenshotUrlList: gameData.ScreenshotUrlList,
 	}
-
 
 	err = l.CacheAllImages(&game, gameData)
 	if err != nil {
