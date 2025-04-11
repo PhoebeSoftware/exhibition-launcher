@@ -86,10 +86,11 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-
-	go func() {
-		libraryManager.CheckForCache()
-	}()
+	if settings.UseCaching {
+		go func() {
+			libraryManager.CheckForCache()
+		}()
+	}
 
 	if settings.RealDebridSettings.UseRealDebrid {
 		if settings.RealDebridSettings.DebridToken == "" {
