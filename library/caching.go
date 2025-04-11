@@ -97,7 +97,6 @@ func (l *LibraryManager) GetAllImageURLs(filenames []string, urls []string) []st
 
 func (l *LibraryManager) GetImageURL(fileName string) (string, error) {
 	ok := utils.FileExists(filepath.Join(GetImageCachePath(), fileName))
-	fmt.Println(l.Settings.UseCaching)
 	if !ok || !l.Settings.UseCaching {
 		return "", fmt.Errorf("file not found or caching is turned off defaulting back to https")
 	}
