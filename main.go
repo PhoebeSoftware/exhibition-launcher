@@ -109,7 +109,11 @@ func main() {
 
 		// cache die sources wrm niet
 		for _, sourceLink := range settings.DownloadSources {
-			providerManager.CacheProvider(sourceLink)
+			err := providerManager.CacheProvider(sourceLink)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 		}
 
 		// test query

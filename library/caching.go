@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 )
 
-func getImageCachePath() string {
+func GetImageCachePath() string {
 	cacheDir, err := os.UserCacheDir()
 	if err != nil {
 		// fallback
@@ -34,7 +34,7 @@ func (l *LibraryManager) CacheImageToDisk(gameName string, uri string) (string, 
 
 	defer resp.Body.Close()
 	fileName := gameName + "-" + uuid.New().String() + ".jpg"
-	pathToFile := filepath.Join(getImageCachePath(), fileName)
+	pathToFile := filepath.Join(GetImageCachePath(), fileName)
 
 	if err = os.MkdirAll(filepath.Dir(pathToFile), 0755); err != nil {
 		return "", err
@@ -78,7 +78,7 @@ func (l *LibraryManager) GetAllImageURLs(filenames []string, urls []string) []st
 
 
 func (l *LibraryManager) GetImageURL(fileName string) string {
-	path := filepath.Join(getImageCachePath(), fileName)
+	path := filepath.Join(GetImageCachePath(), fileName)
 	data, err := os.ReadFile(path)
 	// If cant find filename fallback to https
 	if err != nil {
