@@ -20,6 +20,7 @@ type LibraryManager struct {
 	Library     *jsonModels.Library
 	APIManager  *igdb.APIManager
 	Client      *http.Client
+	Settings *jsonModels.Settings
 }
 
 func (l *LibraryManager) GetSortedIDs() []int {
@@ -33,7 +34,7 @@ func (l *LibraryManager) GetSortedIDs() []int {
 }
 
 // geeft library.json als LibraryManager struct vol met data
-func GetLibrary(apiManager *igdb.APIManager) (*LibraryManager, error) {
+func GetLibrary(apiManager *igdb.APIManager, settings *jsonModels.Settings) (*LibraryManager, error) {
 	library := &jsonModels.Library{}
 	jsonManager, err := jsonUtils.NewJsonManager(filepath.Join("library.json"), library)
 	if err != nil {
@@ -45,6 +46,7 @@ func GetLibrary(apiManager *igdb.APIManager) (*LibraryManager, error) {
 		Library:     library,
 		APIManager:  apiManager,
 		Client:      &http.Client{},
+		Settings: settings,
 	}, nil
 }
 
@@ -150,16 +152,17 @@ func (l *LibraryManager) AddToLibrary(igdbId int, promptDialog bool) (jsonModels
 		ScreenshotUrlList: gameData.ScreenshotUrlList,
 		ArtworkUrlList:    gameData.ArtworkUrlList,
 	}
-
-	// If caching fails still add game to library just with https instead
-	err = l.CacheAllImages(&game, gameData)
-	if err != nil {
-		l.Library.Games[igdbId] = game
-		err := l.JsonManager.Save()
+	if l.Settings.UseCaching {
+		// If caching fails still add game to library just with https instead
+		err = l.CacheAllImages(&game, gameData)
 		if err != nil {
+			l.Library.Games[igdbId] = game
+			err := l.JsonManager.Save()
+			if err != nil {
+				return game, err
+			}
 			return game, err
 		}
-		return game, err
 	}
 
 	l.Library.Games[igdbId] = game
