@@ -113,7 +113,7 @@ func (l *LibraryManager) AddToLibrary(igdbId int, promptDialog bool) (jsonModels
 	game, ok := l.Library.Games[igdbId]
 	if ok {
 		fmt.Println("Game is already in library:", game.Name)
-		//return game, nil
+		return game, nil
 	}
 
 	if promptDialog {
