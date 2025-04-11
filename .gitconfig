@@ -1,0 +1,7 @@
+# .gitconfig snippet
+[pull]
+    rebase = true
+[pull]
+    ff = only
+[merge]
+    ff = only
