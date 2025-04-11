@@ -114,9 +114,11 @@ func (l *LibraryManager) CacheAllImages(game *jsonModels.Game, gameData igdb.Api
 		err error
 	)
 
-	game.CoverFilename, err = l.CacheImageToDisk(gameData.Name, gameData.CoverURL)
-	if err != nil {
-		return err
+	if game.CoverURL != "" {
+		game.CoverFilename, err = l.CacheImageToDisk(gameData.Name, gameData.CoverURL)
+		if err != nil {
+			return err
+		}
 	}
 
 	err = l.CacheArtworks(game, gameData)
