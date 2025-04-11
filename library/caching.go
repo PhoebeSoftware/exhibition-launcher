@@ -179,7 +179,7 @@ func (l *LibraryManager) CheckForCache() {
 		if game.ArtworkFilenames != nil &&
 			game.ScreenshotFilenames != nil &&
 			game.CoverFilename != "" &&
-			!utils.FileExists(cachePath, game.CoverURL) {
+			utils.FileExists(cachePath, game.CoverURL) {
 			continue
 		}
 
