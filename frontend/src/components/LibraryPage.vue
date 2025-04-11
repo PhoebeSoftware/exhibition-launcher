@@ -311,13 +311,10 @@ export default {
         },
         async loadArtworkImages(game) {
             let list = [];
-            console.log(game.artwork_url_list);
-            console.log(game.artwork_filenames);
             const artworks = await LibraryManager.GetAllImageURLs(
                 game.artwork_filenames,
                 game.artwork_url_list,
             );
-            console.log(artworks);
             list.push(...artworks);
             this.artworkUrls[game.igdb_id] = list;
         },
@@ -333,9 +330,7 @@ export default {
         getGameImages() {
             let images = [];
             let game = this.selectedGame;
-            console.log(game);
             // Use artwork images if available
-            console.log(this.artworkUrls[game.igdb_id]);
             images.push(...this.artworkUrls[game.igdb_id]);
             images.push(...this.screenshotUrls[game.igdb_id]);
 
@@ -349,7 +344,6 @@ export default {
                     "https://via.placeholder.com/1920x1080/222222/555555?text=No+Images+Available",
                 ];
             }
-            console.log(images);
 
             return images;
         },
@@ -412,7 +406,6 @@ export default {
         const portion = 100;
 
         for (let i = 0; i < amountOfGames; i += portion) {
-            console.log(i);
             let games = await LibraryManager.GetRangeGame(portion, i);
             for (let j = 0; j < games.length; j++) {
                 let game = games[j];
