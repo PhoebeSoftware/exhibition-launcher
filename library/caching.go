@@ -18,7 +18,7 @@ func getImageCachePath() string {
 		// fallback
 		cacheDir = os.TempDir()
 	}
-	return filepath.Join(cacheDir, "exhibtion-launcher", "images")
+	return filepath.Join(cacheDir, "exhibition-launcher", "images")
 }
 
 func (l *LibraryManager) CacheImageToDisk(gameName string, uri string) (string, error) {
