@@ -33,12 +33,11 @@ func (l *LibraryManager) GetSortedIDs() []int {
 }
 
 // geeft library.json als LibraryManager struct vol met data
-func GetLibrary(apiManager *igdb.APIManager) *LibraryManager {
+func GetLibrary(apiManager *igdb.APIManager) (*LibraryManager, error) {
 	library := &jsonModels.Library{}
 	jsonManager, err := jsonUtils.NewJsonManager(filepath.Join("library.json"), library)
 	if err != nil {
-		fmt.Println(err)
-		return nil
+		return nil, err
 	}
 
 	return &LibraryManager{
@@ -46,7 +45,7 @@ func GetLibrary(apiManager *igdb.APIManager) *LibraryManager {
 		Library:     library,
 		APIManager:  apiManager,
 		Client:      &http.Client{},
-	}
+	}, nil
 }
 
 func (l *LibraryManager) GetAllGames() map[int]jsonModels.Game {
@@ -153,7 +152,7 @@ func (l *LibraryManager) AddToLibrary(igdbId int, promptDialog bool) (jsonModels
 	}
 
 	// If caching fails still add game to library just with https instead
-	err = l.CacheAllImagesAndChangePaths(&game, gameData)
+	err = l.CacheAllImages(&game, gameData)
 	if err != nil {
 		l.Library.Games[igdbId] = game
 		err := l.JsonManager.Save()
