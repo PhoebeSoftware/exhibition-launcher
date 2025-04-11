@@ -213,7 +213,7 @@ func main() {
 	//}()
 
 	// Demo games for presentations idk
-	go func() {
+/*	go func() {
 		listOfCoolGames := []int{
 			1905, 1942, 2155, 2368, 7194, 7331, 7334,
 			7346, 7360, 7360, 9927, 11133, 11208, 11737, 12517,
@@ -232,7 +232,7 @@ func main() {
 			fmt.Printf("Added new game %v : %v\n",id, game.Name)
 		}
 
-	}()
+	}()*/
 
 	// Schedule I v0.3.3f14
 	queue.AddTorrentDownloadToQueue("magnet:?xt=urn:btih:7027B6E2A1E4566B0B0DC4146E8B54235B743AE6&dn=Schedule+I+%28v0.3.3f15+%2B+Online+Multiplayer%29+%5BDODI+Repack%5D&tr=udp%3A%2F%2F9.rarbg.to%3A2870%2Fannounce&tr=udp%3A%2F%2Feddie4.nl%3A6969%2Fannounce&tr=udp%3A%2F%2Fthetracker.org%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337&tr=udp%3A%2F%2F9.rarbg.com%3A2710%2Fannounce&tr=udp%3A%2F%2Fexplodie.org%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker1.wasabii.com.tw%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Ftracker.cypherpunks.ru%3A6969%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=http%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Fopentracker.i2p.rocks%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fcoppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce")
