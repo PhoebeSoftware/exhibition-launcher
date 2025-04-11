@@ -45,7 +45,7 @@ func (s Settings) GetSettings() Settings {
 func (s *Settings) DefaultValues() {
 	s.DownloadPath = filepath.Join("downloads")
 	s.UseDirectIGDB = true
-	s.UseCaching = true
+	s.UseCaching = false
 
 	s.RealDebridSettings.UseRealDebrid = false
 	s.RealDebridSettings.DebridToken = ""
