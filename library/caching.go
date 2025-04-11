@@ -69,7 +69,7 @@ func (l *LibraryManager) GetCoverURL(coverFileName string, coverURL string) stri
 	return coverURL
 }
 
-func (l *LibraryManager) GetAllImageURLs(igdbId int, filenames []string, urls []string) []string {
+func (l *LibraryManager) GetAllImageURLs(filenames []string, urls []string) []string {
 	var listOfImages []string
 	if len(filenames) > 0 {
 		for _, filename := range filenames {
