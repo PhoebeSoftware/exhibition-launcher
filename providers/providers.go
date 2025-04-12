@@ -20,6 +20,8 @@ type ProviderDownload struct {
 
 type Provider struct {
 	ProviderName string             `json:"name"`
+	ProviderURL  string             `json:"url"`
+	ETag         string             `json:"etag"`
 	Downloads    []ProviderDownload `json:"downloads"`
 }
 
@@ -40,8 +42,63 @@ func NewProviderManager() *ProviderManager {
 		return nil
 	}
 
+	VerifyAllLocalProviders(manager)
+	fmt.Println("verified all providers")
 	LoadLocalToMemory(manager)
+	fmt.Println("loaded all providers")
 	return manager
+}
+
+func VerifyAllLocalProviders(p *ProviderManager) {
+	entries, err := os.ReadDir(ProviderDir)
+	if err != nil {
+		fmt.Printf("could not read provider directory: %v\n", err)
+		return
+	}
+
+	mutex := sync.Mutex{}
+
+	var wg sync.WaitGroup
+
+	for _, entry := range entries {
+		if entry.IsDir() {
+			continue
+		}
+
+		wg.Add(1)
+
+		go func(providerFile os.DirEntry) {
+			defer wg.Done()
+
+			file, err := os.Open(filepath.Join(ProviderDir, providerFile.Name()))
+			if err != nil {
+				fmt.Printf("couldnt create provider data for %s: %v\n", providerFile.Name(), err)
+				return
+			}
+			defer file.Close()
+
+			var serialisedProvider Provider
+
+			err = json.NewDecoder(file).Decode(&serialisedProvider)
+			if err != nil {
+				fmt.Println("could not marshal provider data")
+				return
+			}
+
+			mutex.Lock()
+
+			err = p.VerifyProvider(serialisedProvider, providerFile.Name())
+			if err != nil {
+				fmt.Printf("failed to verify provider %s: %v\n", providerFile.Name(), err)
+				mutex.Unlock()
+				return
+			}
+
+			mutex.Unlock()
+		}(entry)
+	}
+
+	wg.Wait()
 }
 
 func LoadLocalToMemory(p *ProviderManager) {
@@ -68,11 +125,13 @@ func LoadLocalToMemory(p *ProviderManager) {
 			originalName := providerFile.Name()
 			providerName := originalName[:len(originalName)-len(filepath.Ext(originalName))]
 
+			// provider already laoded
 			_, exists := p.Providers[providerName]
 			if exists {
 				return
 			}
 
+			// open provider file
 			filePath := filepath.Join(ProviderDir, providerFile.Name())
 			file, err := os.Open(filePath)
 			if err != nil {
@@ -81,6 +140,7 @@ func LoadLocalToMemory(p *ProviderManager) {
 			}
 			defer file.Close()
 
+			// read provider data
 			var provider Provider
 			err = json.NewDecoder(file).Decode(&provider)
 			if err != nil {
@@ -95,6 +155,48 @@ func LoadLocalToMemory(p *ProviderManager) {
 	}
 
 	wg.Wait()
+}
+
+// invalid or valid
+func (p *ProviderManager) VerifyProvider(provider Provider, providerFile string) error {
+	fmt.Println("verifying provider", providerFile)
+
+	res, err := http.Head(provider.ProviderURL)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	fmt.Printf("remote status code: %d\n", res.StatusCode)
+
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf("provider %s is not available", provider.ProviderName)
+	}
+
+	fmt.Printf("Remote ETag: %s, Local ETag: %s\n", res.Header.Get("ETag"), provider.ETag)
+	if provider.ETag == res.Header.Get("ETag") {
+		fmt.Printf("Provider %s is up to date\n", provider.ProviderName)
+		return nil
+	}
+
+	fmt.Printf("Provider %s is outdated\n", provider.ProviderName)
+
+	// remove memory provider
+	delete(p.Providers, provider.ProviderName)
+
+	// remove local provider
+	err = os.Remove(filepath.Join(providerFile))
+	if err != nil {
+		return err
+	}
+
+	// download new provider
+	err = p.DownloadProvider(provider.ProviderURL)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func IsProviderDownloaded(link string) bool {
@@ -139,6 +241,10 @@ func (p *ProviderManager) DownloadProvider(link string) error {
 		return errors.New("couldnt get provider data")
 	}
 
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf("provider with link %s is not available", link)
+	}
+
 	decoder := json.NewDecoder(res.Body)
 
 	var data Provider
@@ -147,6 +253,8 @@ func (p *ProviderManager) DownloadProvider(link string) error {
 	if err != nil {
 		return errors.New("couldnt decode provider data")
 	}
+	data.ETag = res.Header.Get("ETag")
+	data.ProviderURL = link
 
 	file, err := os.Create(filepath.Join(ProviderDir, filepath.Base(link)))
 	if err != nil {
