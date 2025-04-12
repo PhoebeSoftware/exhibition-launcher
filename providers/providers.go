@@ -181,9 +181,6 @@ func (p *ProviderManager) VerifyProvider(provider Provider, providerFile string)
 
 	fmt.Printf("Provider %s is outdated\n", provider.ProviderName)
 
-	// remove memory provider
-	delete(p.Providers, provider.ProviderName)
-
 	// remove local provider
 	err = os.Remove(filepath.Join(providerFile))
 	if err != nil {
