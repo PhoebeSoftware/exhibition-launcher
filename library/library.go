@@ -23,6 +23,10 @@ type LibraryManager struct {
 	Settings    *jsonModels.Settings
 }
 
+func (l *LibraryManager) GetGameByIGDBID(igdbID int) jsonModels.Game {
+	return l.Library.Games[igdbID]
+}
+
 func (l *LibraryManager) GetSortedIDs() []int {
 	keys := make([]int, 0, len(l.Library.Games))
 

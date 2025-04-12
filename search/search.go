@@ -75,14 +75,14 @@ func (searchManager *SearchManager) IndexGames() {
 	searchManager.BKNode = root
 }
 
-func (searchManager *SearchManager) SearchForName(name string) []int {
+func (searchManager *SearchManager) SearchByName(name string) []int {
 	L := 0
 	R := len(searchManager.SortedIGDBIDs) - 1
 	arr := searchManager.SortedIGDBIDs
 	games := searchManager.IndexedGames
 	var result []int
 
-	searchResults := searchManager.BKNode.Search(name, 2)
+	searchResults := searchManager.BKNode.Search(name, 4)
 	if len(searchResults) <= 0 {
 		return result
 	}

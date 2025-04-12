@@ -18,7 +18,6 @@ import (
 	"log"
 	"path/filepath"
 	"runtime"
-	"time"
 )
 
 // Wails uses Go's `embed` package to embed the frontend files into the binary.
@@ -118,19 +117,8 @@ func main() {
 		LibraryManager: libraryManager,
 	}
 
-	// Always index 
+	// Always index
 	searchManager.IndexGames()
-	// Demo
-	fmt.Println("Total games:", len(libraryManager.Library.Games))
-	startTime := time.Now()
-	ids := searchManager.SearchForName("bloodborn")
-	for _, id := range ids {
-		game := libraryManager.Library.Games[id]
-		fmt.Printf("%v:%v\n", game.Name, id)
-	}
-	fmt.Println(time.Since(startTime))
-	
-
 	webViewWindowOpt := application.WebviewWindowOptions{
 		Title:     "Exhibition Launcher",
 		Width:     1200,
@@ -154,6 +142,7 @@ func main() {
 		application.NewService(settings),
 		application.NewService(&utils.PathUtil{}),
 		application.NewService(&queue),
+		application.NewService(&searchManager),
 	}
 
 	if debridClient != nil {
@@ -214,7 +203,7 @@ func main() {
 		fmt.Printf("results from %d providers found\n", len(results))
 	}()
 
-//	Add a bunch of games
+	//	Add a bunch of games
 
 	//go func() {
 	//	for i := 2000; i < 7000; i++ {
