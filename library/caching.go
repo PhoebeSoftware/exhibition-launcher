@@ -14,9 +14,10 @@ import (
 )
 
 func StartImageServer() {
-	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir(GetImageCachePath()))))
+	mux := http.DefaultServeMux
+	mux.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir(GetImageCachePath()))))
 	go func() {
-		err := http.ListenAndServe(":34115", nil)
+		err := http.ListenAndServe(":34115", mux)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -189,7 +190,7 @@ func (l *LibraryManager) CheckForCache() {
 			continue
 		}
 		if gameData.Name == "" {
-			fmt.Println("Failed to get game data", err)
+			fmt.Println("Failed to get game data")
 			continue
 		}
 		fmt.Println("No cache found trying to refetch...")
