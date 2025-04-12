@@ -56,9 +56,8 @@ func VerifyAllLocalProviders(p *ProviderManager) {
 		return
 	}
 
-	mutex := sync.Mutex{}
-
 	var wg sync.WaitGroup
+	mutex := sync.Mutex{} // To protect DownloadProvider operations
 
 	for _, entry := range entries {
 		if entry.IsDir() {
@@ -86,15 +85,13 @@ func VerifyAllLocalProviders(p *ProviderManager) {
 			}
 
 			mutex.Lock()
-
 			err = p.VerifyProvider(serialisedProvider, providerFile.Name())
+			mutex.Unlock()
+
 			if err != nil {
 				fmt.Printf("failed to verify provider %s: %v\n", providerFile.Name(), err)
-				mutex.Unlock()
 				return
 			}
-
-			mutex.Unlock()
 		}(entry)
 	}
 
@@ -208,19 +205,26 @@ func IsProviderDownloaded(link string) bool {
 
 func (p *ProviderManager) SearchDownloadsByGameName(query string) map[string]ProviderDownload {
 	var providerDownloads = map[string]ProviderDownload{}
+	var mutex sync.Mutex
+	var wg sync.WaitGroup
 
 	fmt.Println("starting search for", query)
 	for _, provider := range p.Providers {
 		for _, download := range provider.Downloads {
-			go func() {
+			wg.Add(1)
+			go func(providerName string, download ProviderDownload) {
+				defer wg.Done()
 				if strings.Contains(strings.ToLower(download.Name), strings.ToLower(query)) {
 					fmt.Println("found download", download.Name)
-					providerDownloads[provider.ProviderName] = download
+					mutex.Lock()
+					providerDownloads[providerName] = download
+					mutex.Unlock()
 				}
-			}()
+			}(provider.ProviderName, download)
 		}
 	}
 
+	wg.Wait()
 	return providerDownloads
 }
 
