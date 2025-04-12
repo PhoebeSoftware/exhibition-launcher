@@ -53,6 +53,12 @@ func (searchManager *SearchManager) IndexGames() {
 			firstGameName = name
 		}
 		searchManager.IndexedGames[name] = id
+		splitNames := strings.Split(name, " ")
+
+		for _, splitName := range splitNames {
+			searchManager.IndexedGames[splitName] = id
+		}
+
 	}
 
 	root := &BKNode{
@@ -76,7 +82,7 @@ func (searchManager *SearchManager) SearchForName(name string) []int {
 	games := searchManager.IndexedGames
 	var result []int
 
-	searchResults := searchManager.BKNode.Search(name, 5)
+	searchResults := searchManager.BKNode.Search(name, 2)
 	if len(searchResults) <= 0 {
 		return result
 	}
