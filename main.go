@@ -7,17 +7,18 @@ import (
 	"exhibition-launcher/igdb"
 	"exhibition-launcher/library"
 	"exhibition-launcher/providers"
+	"exhibition-launcher/search"
 	"exhibition-launcher/torrent"
 	"exhibition-launcher/torrent/realdebrid"
 	"exhibition-launcher/utils"
 	"exhibition-launcher/utils/jsonUtils"
 	"exhibition-launcher/utils/jsonUtils/jsonModels"
 	"fmt"
+	"github.com/wailsapp/wails/v3/pkg/application"
 	"log"
 	"path/filepath"
 	"runtime"
-
-	"github.com/wailsapp/wails/v3/pkg/application"
+	"time"
 )
 
 // Wails uses Go's `embed` package to embed the frontend files into the binary.
@@ -89,7 +90,6 @@ func main() {
 		return
 	}
 
-
 	if settings.RealDebridSettings.UseRealDebrid {
 		if settings.RealDebridSettings.DebridToken == "" {
 			// TO:DO ADD A UI FOR THIS OR SMTH
@@ -114,19 +114,22 @@ func main() {
 		QueueStatus:      exhibitionQueue.Idle,
 	}
 
-	// This code is for refetching covers and banners but it will slow down startup
-	//for id, game := range libraryManager.Games {
-	//	gameData, err := igdbApiManager.GetGameData(game.IGDBID)
-	//	if err != nil {
-	//		fmt.Println("Error fetching data for game:", game.IGDBID, err)
-	//		continue
-	//	}
-	//
-	//	game.CoverFilename = gameData.CoverFilename
-	//	game.ArtworkFilenames = gameData.ArtworkFilenames
-	//	game.ScreenshotFilenames = gameData.ScreenshotFilenames
-	//	libraryManager.Games[id] = game
-	//}
+	searchManager := search.SearchManager{
+		LibraryManager: libraryManager,
+	}
+
+	// Always index 
+	searchManager.IndexGames()
+	// Demo
+	fmt.Println("Total games:", len(libraryManager.Library.Games))
+	startTime := time.Now()
+	ids := searchManager.SearchForName("elden ri")
+	for _, id := range ids {
+		game := libraryManager.Library.Games[id]
+		fmt.Printf("%v:%v\n", game.Name, id)
+	}
+	fmt.Println(time.Since(startTime))
+
 	webViewWindowOpt := application.WebviewWindowOptions{
 		Title:     "Exhibition Launcher",
 		Width:     1200,
@@ -180,7 +183,7 @@ func main() {
 
 	queue.App = app
 
-	var consent_jij = true
+	var consent_jij = false
 
 	// provider goroutine want het yield
 	go func() {
@@ -210,7 +213,7 @@ func main() {
 		fmt.Printf("results from %d providers found\n", len(results))
 	}()
 
-	// Add a bunch of games
+//	Add a bunch of games
 
 	//go func() {
 	//	for i := 2000; i < 7000; i++ {
