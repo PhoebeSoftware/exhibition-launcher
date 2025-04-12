@@ -129,20 +129,8 @@ func main() {
 		fmt.Printf("%v:%v\n", game.Name, id)
 	}
 	fmt.Println(time.Since(startTime))
-	startTime = time.Now()
-	ids = searchManager.SearchForName("overwatch 2")
-	for _, id := range ids {
-		game := libraryManager.Library.Games[id]
-		fmt.Printf("%v:%v\n", game.Name, id)
-	}
-	fmt.Println(time.Since(startTime))
-	startTime = time.Now()
-	ids = searchManager.SearchForName("zenless")
-	for _, id := range ids {
-		game := libraryManager.Library.Games[id]
-		fmt.Printf("%v:%v\n", game.Name, id)
-	}
-	fmt.Println(time.Since(startTime))
+	
+
 	webViewWindowOpt := application.WebviewWindowOptions{
 		Title:     "Exhibition Launcher",
 		Width:     1200,
