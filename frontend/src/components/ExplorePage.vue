@@ -90,17 +90,17 @@ export default {
         },
         async onInputChange() {
             console.log("Searching for:", this.name)
-            this.foundGames = []
+            this.foundGames.splice(0)
             try {
                 let ids = await FuzzyManager.SearchByName(this.name)
+                const uniqueNames = new Set()
+
                 for (const id of ids) {
                     let game = await LibraryManager.GetGame(id)
-                    if (this.foundGames.includes(game.name)) {
-                        continue
-                    }
-                    this.foundGames.push(game.name)
+                    uniqueNames.add(game.name)
                 }
 
+                this.foundGames.push(...uniqueNames)
             } catch (err) {
                 console.error(err)
             }
