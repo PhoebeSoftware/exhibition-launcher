@@ -57,7 +57,7 @@ func VerifyAllLocalProviders(p *ProviderManager) {
 	}
 
 	var wg sync.WaitGroup
-	mutex := sync.Mutex{} // To protect DownloadProvider operations
+	mutex := sync.Mutex{}
 
 	for _, entry := range entries {
 		if entry.IsDir() {
@@ -229,8 +229,8 @@ func (p *ProviderManager) SearchDownloadsByGameName(query string) map[string]Pro
 }
 
 func (p *ProviderManager) DownloadProvider(link string) error {
-	lil := filepath.Base(link)
-	providerName := lil[:len(lil)-len(filepath.Ext(lil))]
+	providerBase := filepath.Base(link)
+	providerName := providerBase[:len(providerBase)-len(filepath.Ext(providerBase))]
 
 	_, ok := p.Providers[providerName]
 	if IsProviderDownloaded(link) || ok {
