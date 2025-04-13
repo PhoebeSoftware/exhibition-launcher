@@ -91,9 +91,6 @@ export default {
         async onInputChange() {
             console.log("Searching for:", this.name)
             this.foundGames = []
-            if (!this.name.trim()) {
-                this.foundGames = []
-            }
             try {
                 let ids = await FuzzyManager.SearchByName(this.name)
                 for (const id of ids) {

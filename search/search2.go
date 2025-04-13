@@ -48,8 +48,6 @@ func (fuzzyManager *FuzzyManager) SearchByName(name string) []int {
 
 	searchResults := fuzzy.Find(name, gameNames)
 	var results []int
-
-
 	for _, searchResult := range searchResults {
 		results = append(results, fuzzyManager.GamesMap[searchResult])
 	}
