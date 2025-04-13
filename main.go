@@ -113,12 +113,21 @@ func main() {
 		QueueStatus:      exhibitionQueue.Idle,
 	}
 
-	searchManager := search.SearchManager{
-		LibraryManager: libraryManager,
+
+	fuzzyManager := search.FuzzyManager{LibraryManager: libraryManager}
+
+	// Always index when making changes!!
+	fuzzyManager.IndexFuzzy()
+	ids := fuzzyManager.SearchByName("overwa")
+	for _, id := range ids {
+		game, err := libraryManager.GetGame(id);
+		if err != nil {
+			fmt.Println("no game found")
+			continue
+		}
+		fmt.Println(game.Name)
 	}
 
-	// Always index
-	searchManager.IndexGames()
 	webViewWindowOpt := application.WebviewWindowOptions{
 		Title:     "Exhibition Launcher",
 		Width:     1200,
@@ -142,7 +151,7 @@ func main() {
 		application.NewService(settings),
 		application.NewService(&utils.PathUtil{}),
 		application.NewService(&queue),
-		application.NewService(&searchManager),
+		application.NewService(&fuzzyManager),
 	}
 
 	if debridClient != nil {

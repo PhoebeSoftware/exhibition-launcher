@@ -5,6 +5,7 @@ go 1.24.1
 require (
 	github.com/cenkalti/rain v1.13.0
 	github.com/google/uuid v1.6.0
+	github.com/lithammer/fuzzysearch v1.1.8
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.9
 	golift.io/xtractr v0.2.2
 

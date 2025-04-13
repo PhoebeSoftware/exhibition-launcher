@@ -26,11 +26,9 @@
 </template>
 
 
-
 <script setup>
-import { Settings } from "../../bindings/exhibition-launcher/utils/jsonUtils/jsonModels/index.js";
-import { RealDebridClient } from "../../bindings/exhibition-launcher/torrent/realdebrid/index.js";
-import {SearchManager} from "../../bindings/exhibition-launcher/search/index.js";
+import {Settings} from "../../bindings/exhibition-launcher/utils/jsonUtils/jsonModels/index.js";
+import {RealDebridClient} from "../../bindings/exhibition-launcher/torrent/realdebrid/index.js";
 import {LibraryManager} from "../../bindings/exhibition-launcher/library/index.js";
 import {Queue} from "../../bindings/exhibition-launcher/exhibitionQueue/index.js";
 
@@ -48,7 +46,6 @@ async function addToQueue(magnetLink) {
 }
 
 
-
 function startDownloads() {
     Queue.StartDownloads().catch((err) => {
         console.log(err);
@@ -57,10 +54,10 @@ function startDownloads() {
 </script>
 
 <script>
-import { Events } from "@wailsio/runtime";
-import { RealDebridClient } from "../../bindings/exhibition-launcher/torrent/realdebrid/index.js";
-import { Queue } from "../../bindings/exhibition-launcher/exhibitionQueue/index.js";
-import {SearchManager} from "../../bindings/exhibition-launcher/search/index.js";
+import {Events} from "@wailsio/runtime";
+import {RealDebridClient} from "../../bindings/exhibition-launcher/torrent/realdebrid/index.js";
+import {Queue} from "../../bindings/exhibition-launcher/exhibitionQueue/index.js";
+import {FuzzyManager} from "../../bindings/exhibition-launcher/search/index.js";
 import {LibraryManager} from "../../bindings/exhibition-launcher/library/index.js";
 
 export default {
@@ -93,14 +90,14 @@ export default {
         },
         async onInputChange() {
             console.log("Searching for:", this.name)
-
+            this.foundGames = []
             if (!this.name.trim()) {
                 this.foundGames = []
             }
             try {
-                let ids = await SearchManager.SearchByName(this.name)
+                let ids = await FuzzyManager.SearchByName(this.name)
                 for (const id of ids) {
-                    let game = await LibraryManager.GetGameByIGDBID(id)
+                    let game = await LibraryManager.GetGame(id)
                     if (this.foundGames.includes(game.name)) {
                         continue
                     }

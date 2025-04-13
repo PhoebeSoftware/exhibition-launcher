@@ -13,7 +13,7 @@ type SearchManager struct {
 	BKNode         *BKNode
 }
 
-var illegalCharacters = []string{
+var IllegalCharacters = []string{
 	",",
 	"!",
 	"?",
@@ -40,13 +40,13 @@ var illegalCharacters = []string{
 	">",
 }
 
-func (searchManager *SearchManager) IndexGames() {
+func (searchManager *SearchManager) IndexGamesBinary() {
 	searchManager.SortedIGDBIDs = searchManager.LibraryManager.GetSortedIDs()
 	searchManager.IndexedGames = map[string]int{}
 	var firstGameName string
 	for _, id := range searchManager.SortedIGDBIDs {
 		name := strings.ToLower(searchManager.LibraryManager.Library.Games[id].Name)
-		for _, character := range illegalCharacters {
+		for _, character := range IllegalCharacters {
 			name = strings.Trim(name, character)
 		}
 		if firstGameName == "" {
@@ -75,7 +75,7 @@ func (searchManager *SearchManager) IndexGames() {
 	searchManager.BKNode = root
 }
 
-func (searchManager *SearchManager) SearchByName(name string) []int {
+func (searchManager *SearchManager) SearchByNameBinary(name string) []int {
 	L := 0
 	R := len(searchManager.SortedIGDBIDs) - 1
 	arr := searchManager.SortedIGDBIDs
