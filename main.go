@@ -14,10 +14,11 @@ import (
 	"exhibition-launcher/utils/jsonUtils"
 	"exhibition-launcher/utils/jsonUtils/jsonModels"
 	"fmt"
-	"github.com/wailsapp/wails/v3/pkg/application"
 	"log"
 	"path/filepath"
 	"runtime"
+
+	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 // Wails uses Go's `embed` package to embed the frontend files into the binary.
@@ -113,14 +114,13 @@ func main() {
 		QueueStatus:      exhibitionQueue.Idle,
 	}
 
-
 	fuzzyManager := search.FuzzyManager{LibraryManager: libraryManager}
 
 	// Always index when making changes!!
 	fuzzyManager.IndexFuzzy()
 	ids := fuzzyManager.SearchByName("overwa")
 	for _, id := range ids {
-		game, err := libraryManager.GetGame(id);
+		game, err := libraryManager.GetGame(id)
 		if err != nil {
 			fmt.Println("no game found")
 			continue
@@ -262,4 +262,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	systray := app.NewSystemTray()
+	systray.SetLabel("My App")
+	systray.Run()
 }

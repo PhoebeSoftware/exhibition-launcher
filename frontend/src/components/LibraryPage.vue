@@ -134,11 +134,19 @@
                                 "
                             ></i>
                         </button>
-                        <button
-                            class="download-btn"
-                            @click="launchGame(selectedGame)"
-                        >
-                            Play Game <i class="fa-solid fa-play"></i>
+                        <button class="download-btn" @click="gameAction">
+                            {{
+                                selectedGame.executable
+                                    ? "Launch Game"
+                                    : "Select Game"
+                            }}
+                            <i
+                                :class="
+                                    selectedGame.executable
+                                        ? 'fa-solid fa-play'
+                                        : 'fa-solid fa-add'
+                                "
+                            ></i>
                         </button>
                     </div>
                 </div>
@@ -336,10 +344,7 @@ export default {
 
             // Use cover as fallback if no images available
             if (images.length === 0 && this.selectedGame?.cover_url) {
-                images = [
-                    this.coverUrls[game.igdb_id],
-                ];
-
+                images = [this.coverUrls[game.igdb_id]];
             }
             // At least 1 carousel image
             if (images.length === 0) {
@@ -366,8 +371,21 @@ export default {
             this.currentSlide = index;
         },
 
+        gameAction() {
+            console.log("gameAction called");
+            if (this.selectedGame.executable) {
+                this.launchGame();
+            } else {
+                this.addGame();
+            }
+        },
+
         async addGame() {
-            LibraryManager.AddToLibrary(119277, true)
+            if (this.selectedGame == null) {
+                return;
+            }
+
+            LibraryManager.AddToLibrary(this.selectedGame.igdb_id, true)
                 .catch((err) => {
                     console.warn(err);
                     return;
@@ -383,8 +401,8 @@ export default {
             this.currentSlide = 0; // reset carousel to first slide
         },
 
-        launchGame(game) {
-            LibraryManager.StartApp(game.igdb_id).catch((err) => {
+        launchGame() {
+            LibraryManager.StartApp(this.selectedGame.igdb_id).catch((err) => {
                 console.log(err);
             });
         },
