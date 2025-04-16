@@ -23,7 +23,6 @@ type LibraryManager struct {
 	Settings    *jsonModels.Settings
 }
 
-
 func (l *LibraryManager) GetSortedIDs() []int {
 	keys := make([]int, 0, len(l.Library.Games))
 
@@ -100,7 +99,7 @@ func (l *LibraryManager) GetRangeGame(amount int, offset int) ([]jsonModels.Game
 	return games, nil
 }
 
-func (l *LibraryManager) AddToLibrary(igdbId int, promptDialog bool) (jsonModels.Game, error) {
+func (l *LibraryManager) AddToLibrary(igdbId int) (jsonModels.Game, error) {
 	// prompt executable location
 	var (
 		game       jsonModels.Game
@@ -109,23 +108,21 @@ func (l *LibraryManager) AddToLibrary(igdbId int, promptDialog bool) (jsonModels
 	)
 
 	game, ok := l.Library.Games[igdbId]
-	if ok {
-		fmt.Println("Game is already in library:", game.Name)
+	if ok && game.Executable != "" {
+		fmt.Println("Game is already in library (and does not require path):", game.Name)
 		return game, fmt.Errorf("Game already exists")
 	}
 
-	if promptDialog {
-		dialog := application.OpenFileDialog()
-		dialog.SetTitle("Select game executable")
-		dialog.AddFilter("Executable files", "*.exe; *.app; *.ink; *.bat;")
-		path, err := dialog.PromptForSingleSelection()
+	dialog := application.OpenFileDialog()
+	dialog.SetTitle("Select game executable")
+	dialog.AddFilter("Executable files", "*.exe; *.app; *.ink; *.bat;")
+	path, err := dialog.PromptForSingleSelection()
 
-		if err != nil {
-			return game, fmt.Errorf("failed to select executable: %w", err)
-		}
-
-		executable = path
+	if err != nil {
+		return game, fmt.Errorf("failed to select executable: %w", err)
 	}
+
+	executable = path
 
 	// game data
 	gameData, err := l.APIManager.GetGameData(igdbId)

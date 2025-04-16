@@ -760,8 +760,8 @@ export default {
 .carousel-controls {
     position: absolute;
     bottom: 30px;
-    left: 0;
-    width: 100%;
+    right: 0;
+    width: 50%;
     display: flex;
     justify-content: right;
     align-items: center;
