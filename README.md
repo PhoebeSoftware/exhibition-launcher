@@ -25,7 +25,6 @@ A game launcher with builtin BitTorrent client. WIP!
 - [Vue](https://vuejs.org/)
 - [IGDB](https://www.igdb.com/)
 - [rain](https://github.com/cenkalti/rain)
-- 
 
 ## Contributions
-This project is public and permissively licensed, but I do not accept contributions or PRs. Fork freely!
+This project is public and permissively licensed, but we do not accept contributions or PRs. Fork freely!
