@@ -10,26 +10,12 @@
             <p>Time passed: {{ timePassed }}</p>
             <p>Paused: {{ paused }}</p>
         </div>
-        <div class="search">
-            <br>
-            <input
-                v-model="name"
-                @input="onInputChange"
-                type="text"
-            >
-            <div>
-                <p v-for="(game, index) in foundGames" :key="index">{{ game }}</p>
-            </div>
-
-        </div>
     </div>
 </template>
 
 
 <script setup>
 import {Settings} from "../../bindings/exhibition-launcher/utils/jsonUtils/jsonModels/index.js";
-import {RealDebridClient} from "../../bindings/exhibition-launcher/torrent/realdebrid/index.js";
-import {LibraryManager} from "../../bindings/exhibition-launcher/library/index.js";
 import {Queue} from "../../bindings/exhibition-launcher/exhibitionQueue/index.js";
 
 async function addToQueue(magnetLink) {
@@ -95,7 +81,6 @@ export default {
             progress: 0,
             paused: false,
             timePassed: "",
-            foundGames: [],
             name: '',
         };
     },
