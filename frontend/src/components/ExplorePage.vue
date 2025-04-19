@@ -88,25 +88,7 @@ export default {
             this.paused = pauseValue;
             console.log(pauseValue);
         },
-        async onInputChange() {
-            console.log("Searching for:", this.name)
-            this.foundGames.splice(0)
-            try {
-                let ids = await FuzzyManager.SearchByName(this.name)
-                const uniqueNames = new Set()
 
-                for (const id of ids) {
-                    let game = await LibraryManager.GetGame(id)
-                    uniqueNames.add(game.name)
-                }
-
-                this.foundGames.push(...uniqueNames)
-            } catch (err) {
-                console.error(err)
-            }
-        },
-        async searchForGame() {
-        },
     },
     data() {
         return {

@@ -21,6 +21,7 @@
                     </button>
                 </div>
                 <div class="add-game-to-library-wrapper">
+<!--
                     <button id="refresh-page">
                         <i class="fa-solid fa-arrows-rotate"></i>
                     </button>
@@ -31,6 +32,13 @@
                     >
                         Import from PC<i class="fa-solid fa-desktop"></i>
                     </button>
+-->
+                    <input
+                        type="text"
+                        placeholder="search for game"
+                        v-model="name"
+                        @input="onInputChange"
+                    >
                 </div>
             </div>
 
@@ -295,6 +303,7 @@
 
 <script>
 import { LibraryManager } from "../../bindings/exhibition-launcher/library/index.js";
+import {FuzzyManager} from "../../bindings/exhibition-launcher/search/index.js";
 
 export default {
     name: "LibraryPage",
@@ -308,9 +317,29 @@ export default {
             currentPage: "library",
             selectedGame: null,
             currentSlide: 0,
+            foundGames: [],
         };
     },
     methods: {
+        async onInputChange() {
+            if (this.name == "") {
+                this.games.splice(0)
+                await this.loadGames()
+                return
+            }
+            this.games.splice(0)
+            try {
+                let ids = await FuzzyManager.SearchByName(this.name)
+
+                for (const id of ids) {
+                    let game = await LibraryManager.GetGame(id)
+                    this.games.push(game)
+                    console.log(game)
+                }
+            } catch (err) {
+                console.error(err)
+            }
+        },
         async loadCoverImages(game) {
             this.coverUrls[game.igdb_id] = await LibraryManager.GetCoverURL(
                 game.cover_filename,
@@ -419,24 +448,26 @@ export default {
         returnToLibrary() {
             this.currentPage = "library";
         },
-    },
-    async mounted() {
-        const amountOfGames = await LibraryManager.GetAmountOfGames();
+        async loadGames() {
+            const amountOfGames = await LibraryManager.GetAmountOfGames();
 
-        console.log(amountOfGames);
-        const portion = 100;
+            console.log(amountOfGames);
+            const portion = 100;
 
-        for (let i = 0; i < amountOfGames; i += portion) {
-            let games = await LibraryManager.GetRangeGame(portion, i);
-            for (let j = 0; j < games.length; j++) {
-                let game = games[j];
-                await this.loadCoverImages(game);
-                await this.loadArtworkImages(game);
-                await this.loadScreenshotImages(game);
-                this.games.push(game);
+            for (let i = 0; i < amountOfGames; i += portion) {
+                let games = await LibraryManager.GetRangeGame(portion, i);
+                for (let j = 0; j < games.length; j++) {
+                    let game = games[j];
+                    await this.loadCoverImages(game);
+                    await this.loadArtworkImages(game);
+                    await this.loadScreenshotImages(game);
+                    this.games.push(game);
+                }
             }
         }
-
+    },
+    async mounted() {
+        await this.loadGames()
         // auto carousel each 5 seconds
         setInterval(() => {
             if (this.currentPage === "game") {
