@@ -20,6 +20,7 @@ func NewJsonManager(path string, config Configurable) (*JsonManager, error) {
 
 	if err := manager.Load(); err != nil {
 		manager.Config.DefaultValues()
+		config.DefaultValues()
 		if err := manager.Save(); err != nil {
 			return nil, err
 		}
@@ -46,7 +47,7 @@ func (manager *JsonManager) Load() error {
 func (manager *JsonManager) Save() error {
 	file, err := os.Create(manager.Path)
 	if err != nil {
-		return fmt.Errorf("could not save json_utils: %w", err)
+		return fmt.Errorf("could not save jsonManager: %w", err)
 	}
 	defer file.Close()
 

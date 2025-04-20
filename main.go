@@ -247,7 +247,7 @@ func main() {
 
 	}()*/
 
-	if settings.UseCaching {
+	if settings.CacheImagesToDisk {
 		library.StartImageServer()
 		go libraryManager.CheckForCache()
 	}

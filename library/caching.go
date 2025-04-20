@@ -74,7 +74,7 @@ func (l *LibraryManager) CacheImageToDisk(gameName string, uri string) (string, 
 func (l *LibraryManager) GetCoverURL(coverFileName string, coverURL string) string {
 	imageURL, err := l.GetImageURL(coverFileName)
 	if err != nil {
-		if l.Settings.UseCaching {
+		if l.Settings.CacheImagesToDisk {
 			go l.CheckForCache()
 		}
 		return coverURL
@@ -88,7 +88,7 @@ func (l *LibraryManager) GetAllImageURLs(filenames []string, urls []string) []st
 		for _, filename := range filenames {
 			imageURL, err := l.GetImageURL(filename)
 			if err != nil {
-				if l.Settings.UseCaching {
+				if l.Settings.CacheImagesToDisk {
 					go l.CheckForCache()
 				}
 				listOfImages = urls
@@ -104,7 +104,7 @@ func (l *LibraryManager) GetAllImageURLs(filenames []string, urls []string) []st
 
 func (l *LibraryManager) GetImageURL(fileName string) (string, error) {
 	ok := utils.FileExists(filepath.Join(GetImageCachePath(), fileName))
-	if !ok || !l.Settings.UseCaching {
+	if !ok || !l.Settings.CacheImagesToDisk {
 		return "", fmt.Errorf("file not found or caching is turned off defaulting back to https")
 	}
 	return "http://localhost:34115/images/" + url.QueryEscape(fileName), nil

@@ -147,7 +147,7 @@ func (l *LibraryManager) AddToLibrary(igdbId int) (json_models.Game, error) {
 		ScreenshotUrlList: gameData.ScreenshotUrlList,
 		ArtworkUrlList:    gameData.ArtworkUrlList,
 	}
-	if l.Settings.UseCaching {
+	if l.Settings.CacheImagesToDisk {
 		// If caching fails still add game to library just with https instead
 		err = l.CacheAllImages(&game, gameData)
 		if err != nil {

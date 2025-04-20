@@ -9,7 +9,7 @@ type Settings struct {
 	DownloadPath       string             `json:"download_path"`
 	DownloadSources    []string           `json:"download_sources"`
 	UseDirectIGDB      bool               `json:"use_direct_igdb"`
-	UseCaching         bool               `json:"use_caching"`
+	CacheImagesToDisk  bool               `json:"cache_images_to_disk"`
 	RealDebridSettings RealDebridSettings `json:"real_debrid_settings"`
 	IgdbSettings       IgdbSettings       `json:"igdb_settings"`
 	BitTorrentSettings BitTorrentSettings `json:"bittorrent_settings"`
@@ -47,7 +47,7 @@ func (s Settings) GetSettings() Settings {
 func (s *Settings) DefaultValues() {
 	s.DownloadPath = filepath.Join("downloads")
 	s.UseDirectIGDB = true
-	s.UseCaching = false
+	s.CacheImagesToDisk = false
 	s.DownloadSources = []string{}
 
 	s.RealDebridSettings.UseRealDebrid = false
