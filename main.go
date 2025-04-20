@@ -7,6 +7,7 @@ import (
 	"exhibition-launcher/igdb"
 	"exhibition-launcher/library"
 	"exhibition-launcher/providers"
+	"exhibition-launcher/proxy_client"
 	"exhibition-launcher/search"
 	"exhibition-launcher/torrent"
 	"exhibition-launcher/torrent/realdebrid"
@@ -89,6 +90,8 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+	proxyClient := proxy_client.NewProxyClient(settings)
+	fmt.Println("The server url is:", proxyClient.BaseURL)
 
 	if settings.RealDebridSettings.UseRealDebrid {
 		if settings.RealDebridSettings.DebridToken == "" {
@@ -118,15 +121,6 @@ func main() {
 
 	// Always index when making changes!!
 	fuzzyManager.IndexFuzzy()
-	ids := fuzzyManager.SearchByName("overwa")
-	for _, id := range ids {
-		game, err := libraryManager.GetGame(id)
-		if err != nil {
-			fmt.Println("no game found")
-			continue
-		}
-		fmt.Println(game.Name)
-	}
 
 	webViewWindowOpt := application.WebviewWindowOptions{
 		Title:     "Exhibition Launcher",

@@ -10,6 +10,7 @@ type Settings struct {
 	DownloadSources    []string           `json:"download_sources"`
 	UseDirectIGDB      bool               `json:"use_direct_igdb"`
 	CacheImagesToDisk  bool               `json:"cache_images_to_disk"`
+	ProxyServerLinks   []string           `json:"proxy_server_links"`
 	RealDebridSettings RealDebridSettings `json:"real_debrid_settings"`
 	IgdbSettings       IgdbSettings       `json:"igdb_settings"`
 	BitTorrentSettings BitTorrentSettings `json:"bittorrent_settings"`
@@ -48,6 +49,9 @@ func (s *Settings) DefaultValues() {
 	s.DownloadPath = filepath.Join("downloads")
 	s.UseDirectIGDB = true
 	s.CacheImagesToDisk = false
+	s.ProxyServerLinks = []string{
+		"https://exhibition-proxy.alexjonker.dev",
+	}
 	s.DownloadSources = []string{}
 
 	s.RealDebridSettings.UseRealDebrid = false
