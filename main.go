@@ -3,7 +3,7 @@ package main
 import (
 	"embed"
 	"errors"
-	"exhibition-launcher/exhibitionQueue"
+	"exhibition-launcher/exhibition_queue"
 	"exhibition-launcher/igdb"
 	"exhibition-launcher/library"
 	"exhibition-launcher/providers"
@@ -105,13 +105,13 @@ func main() {
 		return
 	}
 
-	queue := exhibitionQueue.Queue{
-		DownloadsInQueue: []exhibitionQueue.Download{},
+	queue := exhibition_queue.Queue{
+		DownloadsInQueue: []exhibition_queue.Download{},
 		TorrentManager:   torrentManager,
 		RealDebridClient: debridClient,
 		DownloadPath:     settings.DownloadPath,
 		Paused:           false,
-		QueueStatus:      exhibitionQueue.Idle,
+		QueueStatus:      exhibition_queue.Idle,
 	}
 
 	fuzzyManager := search.FuzzyManager{LibraryManager: libraryManager}

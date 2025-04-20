@@ -1,4 +1,4 @@
-package exhibitionQueue
+package exhibition_queue
 
 import (
 	"exhibition-launcher/utils"

@@ -16,7 +16,10 @@
 
 <script setup>
 import {Settings} from "../../bindings/exhibition-launcher/utils/jsonUtils/jsonModels/index.js";
-import {Queue} from "../../bindings/exhibition-launcher/exhibitionQueue/index.js";
+import {
+    AddRealDebridDownloadToQueue,
+    StartDownloads
+} from "../../bindings/exhibition-launcher/exhibition_queue/queue.js";
 
 async function addToQueue(magnetLink) {
     let magnetLinkHollowKnight =
@@ -28,12 +31,12 @@ async function addToQueue(magnetLink) {
         return;
     }
 
-    await Queue.AddRealDebridDownloadToQueue(magnetLinkHollowKnight);
+    await AddRealDebridDownloadToQueue(magnetLinkHollowKnight);
 }
 
 
 function startDownloads() {
-    Queue.StartDownloads().catch((err) => {
+    StartDownloads().catch((err) => {
         console.log(err);
     });
 }
@@ -41,10 +44,7 @@ function startDownloads() {
 
 <script>
 import {Events} from "@wailsio/runtime";
-import {RealDebridClient} from "../../bindings/exhibition-launcher/torrent/realdebrid/index.js";
-import {Queue} from "../../bindings/exhibition-launcher/exhibitionQueue/index.js";
-import {FuzzyManager} from "../../bindings/exhibition-launcher/search/index.js";
-import {LibraryManager} from "../../bindings/exhibition-launcher/library/index.js";
+import {Queue} from "../../bindings/exhibition-launcher/exhibition_queue/index.js";
 
 export default {
     name: "ExplorePage",
