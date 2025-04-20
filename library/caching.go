@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 )
 
+
 func StartImageServer() {
 	mux := http.DefaultServeMux
 	mux.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir(GetImageCachePath()))))
@@ -155,8 +156,17 @@ func (l *LibraryManager) CacheScreenshots(game *json_models.Game, gameData igdb.
 	return nil
 }
 
+var isCaching bool
 // CheckForCache checks if cache exists if it does not it caches the images
 func (l *LibraryManager) CheckForCache() {
+	// isCaching to make sure multiple cache checks aren't running
+	if isCaching {
+		return
+	}
+	isCaching = true
+	defer func() {
+		isCaching = false
+	}()
 	cachePath := GetImageCachePath()
 	for _, game := range l.Library.Games {
 
