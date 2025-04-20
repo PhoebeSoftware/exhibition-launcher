@@ -1,4 +1,4 @@
-package jsonModels
+package json_models
 
 type Game struct {
 	IGDBID              int      `json:"igdb_id"`

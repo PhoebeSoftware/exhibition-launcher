@@ -3,7 +3,7 @@ package library
 import (
 	"exhibition-launcher/igdb"
 	"exhibition-launcher/utils"
-	"exhibition-launcher/utils/jsonUtils/jsonModels"
+	"exhibition-launcher/utils/jsonUtils/json_models"
 	"fmt"
 	"github.com/google/uuid"
 	"io"
@@ -110,7 +110,7 @@ func (l *LibraryManager) GetImageURL(fileName string) (string, error) {
 	return "http://localhost:34115/images/" + url.QueryEscape(fileName), nil
 }
 
-func (l *LibraryManager) CacheAllImages(game *jsonModels.Game, gameData igdb.ApiGame) error {
+func (l *LibraryManager) CacheAllImages(game *json_models.Game, gameData igdb.ApiGame) error {
 	var (
 		err error
 	)
@@ -134,7 +134,7 @@ func (l *LibraryManager) CacheAllImages(game *jsonModels.Game, gameData igdb.Api
 	return nil
 }
 
-func (l *LibraryManager) CacheArtworks(game *jsonModels.Game, gameData igdb.ApiGame) error {
+func (l *LibraryManager) CacheArtworks(game *json_models.Game, gameData igdb.ApiGame) error {
 	for _, uri := range gameData.ArtworkUrlList {
 		fileName, err := l.CacheImageToDisk(gameData.Name, uri)
 		game.ArtworkFilenames = append(game.ArtworkFilenames, fileName)
@@ -144,7 +144,7 @@ func (l *LibraryManager) CacheArtworks(game *jsonModels.Game, gameData igdb.ApiG
 	}
 	return nil
 }
-func (l *LibraryManager) CacheScreenshots(game *jsonModels.Game, gameData igdb.ApiGame) error {
+func (l *LibraryManager) CacheScreenshots(game *json_models.Game, gameData igdb.ApiGame) error {
 	for _, uri := range gameData.ScreenshotUrlList {
 		fileName, err := l.CacheImageToDisk(gameData.Name, uri)
 		game.ScreenshotFilenames = append(game.ScreenshotFilenames, fileName)

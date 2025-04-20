@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"exhibition-launcher/utils"
-	"exhibition-launcher/utils/jsonUtils/jsonModels"
+	"exhibition-launcher/utils/jsonUtils/json_models"
 	"fmt"
 	"net/http"
 	"os"
@@ -22,7 +22,7 @@ type Manager struct {
 }
 
 // start client en geef manager zodat je makkelijk kan bedienen zawg
-func StartClient(path string, bittorentSettings jsonModels.BitTorrentSettings) (*Manager, error) {
+func StartClient(path string, bittorentSettings json_models.BitTorrentSettings) (*Manager, error) {
 	dirErr := os.MkdirAll(path, os.ModePerm)
 	if dirErr != nil {
 		return nil, dirErr

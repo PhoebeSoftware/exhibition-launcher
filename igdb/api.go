@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"exhibition-launcher/utils/jsonUtils"
-	"exhibition-launcher/utils/jsonUtils/jsonModels"
+	"exhibition-launcher/utils/jsonUtils/json_models"
 	"fmt"
 	"net/http"
 	"time"
@@ -28,7 +28,7 @@ type ApiGame struct {
 
 type APIManager struct {
 	client   *http.Client
-	settings *jsonModels.Settings
+	settings *json_models.Settings
 }
 
 func (a *APIManager) SetupHeader(request *http.Request) {
@@ -36,7 +36,7 @@ func (a *APIManager) SetupHeader(request *http.Request) {
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", a.settings.IgdbSettings.IgdbAuth))
 }
 
-func NewAPI(settings *jsonModels.Settings, settingsManager *jsonUtils.JsonManager) (*APIManager, error) {
+func NewAPI(settings *json_models.Settings, settingsManager *jsonUtils.JsonManager) (*APIManager, error) {
 	apiManager := &APIManager{
 		client:   &http.Client{},
 		settings: settings,

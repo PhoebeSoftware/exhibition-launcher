@@ -3,7 +3,7 @@ package library
 import (
 	"exhibition-launcher/igdb"
 	"exhibition-launcher/utils/jsonUtils"
-	"exhibition-launcher/utils/jsonUtils/jsonModels"
+	"exhibition-launcher/utils/jsonUtils/json_models"
 	"fmt"
 	"net/http"
 	"os/exec"
@@ -17,10 +17,10 @@ import (
 
 type LibraryManager struct {
 	JsonManager *jsonUtils.JsonManager
-	Library     *jsonModels.Library
+	Library     *json_models.Library
 	APIManager  *igdb.APIManager
 	Client      *http.Client
-	Settings    *jsonModels.Settings
+	Settings    *json_models.Settings
 }
 
 func (l *LibraryManager) GetSortedIDs() []int {
@@ -34,8 +34,8 @@ func (l *LibraryManager) GetSortedIDs() []int {
 }
 
 // geeft library.json als LibraryManager struct vol met data
-func GetLibrary(apiManager *igdb.APIManager, settings *jsonModels.Settings) (*LibraryManager, error) {
-	library := &jsonModels.Library{}
+func GetLibrary(apiManager *igdb.APIManager, settings *json_models.Settings) (*LibraryManager, error) {
+	library := &json_models.Library{}
 	jsonManager, err := jsonUtils.NewJsonManager(filepath.Join("library.json"), library)
 	if err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func GetLibrary(apiManager *igdb.APIManager, settings *jsonModels.Settings) (*Li
 	}, nil
 }
 
-func (l *LibraryManager) GetAllGames() map[int]jsonModels.Game {
+func (l *LibraryManager) GetAllGames() map[int]json_models.Game {
 	return l.Library.Games
 }
 
@@ -65,7 +65,7 @@ func (l *LibraryManager) GetAllGameIDs() []int {
 	}
 	return intList
 }
-func (l *LibraryManager) GetGame(igdbId int) (jsonModels.Game, error) {
+func (l *LibraryManager) GetGame(igdbId int) (json_models.Game, error) {
 	game, ok := l.Library.Games[igdbId]
 	if !ok {
 		return game, fmt.Errorf("game with IGDB ID %d not found", igdbId)
@@ -73,8 +73,8 @@ func (l *LibraryManager) GetGame(igdbId int) (jsonModels.Game, error) {
 	return game, nil
 }
 
-func (l *LibraryManager) GetRangeGame(amount int, offset int) ([]jsonModels.Game, error) {
-	var games []jsonModels.Game
+func (l *LibraryManager) GetRangeGame(amount int, offset int) ([]json_models.Game, error) {
+	var games []json_models.Game
 
 	if len(l.Library.Games) == 0 {
 		return games, fmt.Errorf("no games in library")
@@ -99,10 +99,10 @@ func (l *LibraryManager) GetRangeGame(amount int, offset int) ([]jsonModels.Game
 	return games, nil
 }
 
-func (l *LibraryManager) AddToLibrary(igdbId int) (jsonModels.Game, error) {
+func (l *LibraryManager) AddToLibrary(igdbId int) (json_models.Game, error) {
 	// prompt executable location
 	var (
-		game       jsonModels.Game
+		game       json_models.Game
 		executable = ""
 		err        error
 	)
@@ -134,7 +134,7 @@ func (l *LibraryManager) AddToLibrary(igdbId int) (jsonModels.Game, error) {
 	}
 
 	// Append the new game
-	game = jsonModels.Game{
+	game = json_models.Game{
 		IGDBID:            igdbId,
 		Name:              gameData.Name,
 		Description:       gameData.Description,
