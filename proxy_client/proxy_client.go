@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 var (
@@ -99,6 +100,7 @@ func (proxyClient *ProxyClient) do(req *http.Request, v interface{}) error {
 		if shouldRetry(err, resp) {
 			log.Println(err)
 			retries -= 1
+			time.Sleep(5 * time.Second)
 			continue
 		}
 
@@ -141,7 +143,8 @@ func shouldRetry(err error, resp *http.Response) bool {
 	}
 	if resp.StatusCode == http.StatusBadGateway ||
 		resp.StatusCode == http.StatusServiceUnavailable ||
-		resp.StatusCode == http.StatusGatewayTimeout {
+		resp.StatusCode == http.StatusGatewayTimeout ||
+		resp.StatusCode == http.StatusTooManyRequests {
 		return true
 	}
 	return false

@@ -71,27 +71,18 @@ var (
 func main() {
 	// 🐐routine
 	settings := &json_models.Settings{}
-	settingsManager, err := json_utils.NewJsonManager(filepath.Join("settings.json"), settings)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	// test code
-	settings.UseDirectIGDB = true
-	if settings.UseDirectIGDB {
-		igdbApiManager, err = igdb.NewAPI(settings, settingsManager)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-	}
-	libraryManager, err = library.GetLibrary(igdbApiManager, settings)
+	_, err := json_utils.NewJsonManager(filepath.Join("settings.json"), settings)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	proxyClient := proxy_client.NewProxyClient(settings)
 	fmt.Println("The server url is:", proxyClient.BaseURL)
+	libraryManager, err = library.GetLibrary(proxyClient, settings)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	if settings.RealDebridSettings.UseRealDebrid {
 		if settings.RealDebridSettings.DebridToken == "" {
@@ -118,7 +109,6 @@ func main() {
 	}
 
 	fuzzyManager := search.FuzzyManager{LibraryManager: libraryManager}
-
 	// Always index when making changes!!
 	fuzzyManager.IndexFuzzy()
 
@@ -139,7 +129,7 @@ func main() {
 	}
 	services := []application.Service{
 		application.NewService(torrentManager),
-		application.NewService(igdbApiManager),
+		application.NewService(proxyClient),
 		application.NewService(libraryManager),
 		application.NewService(&WindowService{}),
 		application.NewService(settings),

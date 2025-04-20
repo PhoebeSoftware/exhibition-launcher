@@ -2,6 +2,7 @@ package library
 
 import (
 	"exhibition-launcher/igdb"
+	"exhibition-launcher/proxy_client"
 	"exhibition-launcher/utils/json_utils"
 	"exhibition-launcher/utils/json_utils/json_models"
 	"fmt"
@@ -11,8 +12,6 @@ import (
 	"runtime"
 	"sort"
 	"time"
-
-	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
 type LibraryManager struct {
@@ -21,6 +20,7 @@ type LibraryManager struct {
 	APIManager  *igdb.APIManager
 	Client      *http.Client
 	Settings    *json_models.Settings
+	ProxyClient *proxy_client.ProxyClient
 }
 
 func (l *LibraryManager) GetSortedIDs() []int {
@@ -34,7 +34,7 @@ func (l *LibraryManager) GetSortedIDs() []int {
 }
 
 // geeft library.json als LibraryManager struct vol met data
-func GetLibrary(apiManager *igdb.APIManager, settings *json_models.Settings) (*LibraryManager, error) {
+func GetLibrary(proxyClient *proxy_client.ProxyClient, settings *json_models.Settings) (*LibraryManager, error) {
 	library := &json_models.Library{}
 	jsonManager, err := json_utils.NewJsonManager(filepath.Join("library.json"), library)
 	if err != nil {
@@ -44,7 +44,7 @@ func GetLibrary(apiManager *igdb.APIManager, settings *json_models.Settings) (*L
 	return &LibraryManager{
 		JsonManager: jsonManager,
 		Library:     library,
-		APIManager:  apiManager,
+		ProxyClient: proxyClient,
 		Client:      &http.Client{},
 		Settings:    settings,
 	}, nil
@@ -99,6 +99,7 @@ func (l *LibraryManager) GetRangeGame(amount int, offset int) ([]json_models.Gam
 	return games, nil
 }
 
+var isAddingGame bool
 func (l *LibraryManager) AddToLibrary(igdbId int) (json_models.Game, error) {
 	// prompt executable location
 	var (
@@ -106,26 +107,43 @@ func (l *LibraryManager) AddToLibrary(igdbId int) (json_models.Game, error) {
 		executable = ""
 		err        error
 	)
-
+	for {
+		if !isAddingGame {
+			break
+		}
+		time.Sleep(1 * time.Second)
+	}
+	isAddingGame = true
+	defer func() {
+		isAddingGame = false
+	}()
 	game, ok := l.Library.Games[igdbId]
 	if ok && game.Executable != "" {
 		fmt.Println("Game is already in library (and does not require path):", game.Name)
 		return game, fmt.Errorf("Game already exists")
 	}
 
-	dialog := application.OpenFileDialog()
-	dialog.SetTitle("Select game executable")
-	dialog.AddFilter("Executable files", "*.exe; *.app; *.ink; *.bat;")
-	path, err := dialog.PromptForSingleSelection()
+	/*	dialog := application.OpenFileDialog()
+		dialog.SetTitle("Select game executable")
+		dialog.AddFilter("Executable files", "*.exe; *.app; *.ink; *.bat;")
 
-	if err != nil {
-		return game, fmt.Errorf("failed to select executable: %w", err)
-	}
+		path, err := dialog.PromptForSingleSelection()
+		if err != nil {
+			fmt.Println("Error selecting file:", err)
+			return game, err
+		}
+		if path == "" {
+			fmt.Println("No file selected")
+			return game, err
+		}
 
-	executable = path
+		fmt.Println("Selected file:", path)
+
+	*/
+	executable = ""
 
 	// game data
-	gameData, err := l.APIManager.GetGameData(igdbId)
+	gameData, err := l.ProxyClient.GetMetadataByIGDBID(igdbId)
 	if err != nil {
 		return game, err
 	}
@@ -143,13 +161,13 @@ func (l *LibraryManager) AddToLibrary(igdbId int) (json_models.Game, error) {
 		Executable:        executable,
 		Running:           false,
 		Favorite:          false,
-		CoverURL:          gameData.CoverURL,
-		ScreenshotUrlList: gameData.ScreenshotUrlList,
-		ArtworkUrlList:    gameData.ArtworkUrlList,
+		CoverURL:          gameData.GetCoverURL(),
+		ScreenshotUrlList: gameData.GetScreenshotURLS(),
+		ArtworkUrlList:    gameData.GetArtworkURLS(),
 	}
 	if l.Settings.CacheImagesToDisk {
-		// If caching fails still add game to library just with https instead
-		err = l.CacheAllImages(&game, gameData)
+		// If caching fails still add game to library just with https images instead
+		err = l.CacheAllImages(&game)
 		if err != nil {
 			l.Library.Games[igdbId] = game
 			err := l.JsonManager.Save()

@@ -1,7 +1,6 @@
 package library
 
 import (
-	"exhibition-launcher/igdb"
 	"exhibition-launcher/utils"
 	"exhibition-launcher/utils/json_utils/json_models"
 	"fmt"
@@ -12,7 +11,6 @@ import (
 	"os"
 	"path/filepath"
 )
-
 
 func StartImageServer() {
 	mux := http.DefaultServeMux
@@ -111,23 +109,23 @@ func (l *LibraryManager) GetImageURL(fileName string) (string, error) {
 	return "http://localhost:34115/images/" + url.QueryEscape(fileName), nil
 }
 
-func (l *LibraryManager) CacheAllImages(game *json_models.Game, gameData igdb.ApiGame) error {
+func (l *LibraryManager) CacheAllImages(game *json_models.Game) error {
 	var (
 		err error
 	)
 
 	if game.CoverURL != "" {
-		game.CoverFilename, err = l.CacheImageToDisk(gameData.Name, gameData.CoverURL)
+		game.CoverFilename, err = l.CacheImageToDisk(game.Name, game.CoverURL)
 		if err != nil {
 			return err
 		}
 	}
 
-	err = l.CacheArtworks(game, gameData)
+	err = l.CacheArtworks(game)
 	if err != nil {
 		return err
 	}
-	err = l.CacheScreenshots(game, gameData)
+	err = l.CacheScreenshots(game)
 	if err != nil {
 		return err
 	}
@@ -135,9 +133,9 @@ func (l *LibraryManager) CacheAllImages(game *json_models.Game, gameData igdb.Ap
 	return nil
 }
 
-func (l *LibraryManager) CacheArtworks(game *json_models.Game, gameData igdb.ApiGame) error {
-	for _, uri := range gameData.ArtworkUrlList {
-		fileName, err := l.CacheImageToDisk(gameData.Name, uri)
+func (l *LibraryManager) CacheArtworks(game *json_models.Game) error {
+	for _, uri := range game.ArtworkUrlList {
+		fileName, err := l.CacheImageToDisk(game.Name, uri)
 		game.ArtworkFilenames = append(game.ArtworkFilenames, fileName)
 		if err != nil {
 			return err
@@ -145,9 +143,9 @@ func (l *LibraryManager) CacheArtworks(game *json_models.Game, gameData igdb.Api
 	}
 	return nil
 }
-func (l *LibraryManager) CacheScreenshots(game *json_models.Game, gameData igdb.ApiGame) error {
-	for _, uri := range gameData.ScreenshotUrlList {
-		fileName, err := l.CacheImageToDisk(gameData.Name, uri)
+func (l *LibraryManager) CacheScreenshots(game *json_models.Game) error {
+	for _, uri := range game.ScreenshotUrlList {
+		fileName, err := l.CacheImageToDisk(game.Name, uri)
 		game.ScreenshotFilenames = append(game.ScreenshotFilenames, fileName)
 		if err != nil {
 			return err
@@ -157,6 +155,7 @@ func (l *LibraryManager) CacheScreenshots(game *json_models.Game, gameData igdb.
 }
 
 var isCaching bool
+
 // CheckForCache checks if cache exists if it does not it caches the images
 func (l *LibraryManager) CheckForCache() {
 	// isCaching to make sure multiple cache checks aren't running
@@ -194,7 +193,7 @@ func (l *LibraryManager) CheckForCache() {
 			continue
 		}
 
-		gameData, err := l.APIManager.GetGameData(game.IGDBID)
+		gameData, err := l.ProxyClient.GetMetadataByIGDBID(game.IGDBID)
 		if err != nil {
 			fmt.Println(err)
 			continue
@@ -206,7 +205,7 @@ func (l *LibraryManager) CheckForCache() {
 		fmt.Println("No cache found trying to refetch...")
 
 		if len(game.ScreenshotFilenames) <= 0 || game.ScreenshotFilenames == nil {
-			err = l.CacheScreenshots(&game, gameData)
+			err = l.CacheScreenshots(&game)
 			if err != nil {
 				fmt.Println(err)
 				continue
@@ -214,7 +213,7 @@ func (l *LibraryManager) CheckForCache() {
 		}
 
 		if len(game.ArtworkFilenames) <= 0 || game.ArtworkFilenames == nil {
-			err = l.CacheArtworks(&game, gameData)
+			err = l.CacheArtworks(&game)
 			if err != nil {
 				fmt.Println(err)
 				continue
@@ -222,7 +221,7 @@ func (l *LibraryManager) CheckForCache() {
 		}
 
 		if game.CoverFilename == "" || !utils.FileExists(GetImageCachePath(), game.CoverFilename) {
-			game.CoverFilename, err = l.CacheImageToDisk(gameData.Name, gameData.CoverURL)
+			game.CoverFilename, err = l.CacheImageToDisk(gameData.Name, gameData.GetCoverURL())
 			if err != nil {
 				fmt.Println(err)
 				continue

@@ -3,6 +3,7 @@ module exhibition-launcher
 go 1.24.1
 
 require (
+	github.com/PhoebeSoftware/exhibition-proxy-library v0.0.0-20250420113925-0a435ebf461e
 	github.com/cenkalti/rain v1.13.0
 	github.com/google/uuid v1.6.0
 	github.com/lithammer/fuzzysearch v1.1.8
@@ -89,7 +90,6 @@ require (
 	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
 	golang.org/x/tools v0.31.0 // indirect
-	google.golang.org/protobuf v1.34.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	lukechampine.com/blake3 v1.1.6 // indirect
