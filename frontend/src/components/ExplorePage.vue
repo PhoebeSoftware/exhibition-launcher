@@ -10,6 +10,12 @@
             <p>Time passed: {{ timePassed }}</p>
             <p>Paused: {{ paused }}</p>
         </div>
+        <div>
+            <form @submit.prevent="addGames">
+                <input type="text" v-model="name" placeholder="Search to add game">
+                <button type="submit">Add game(s)</button>
+            </form>
+        </div>
     </div>
 </template>
 
@@ -45,6 +51,8 @@ function startDownloads() {
 <script>
 import {Events} from "@wailsio/runtime";
 import {Queue} from "../../bindings/exhibition-launcher/exhibition_queue/index.js";
+import {LibraryManager} from "../../bindings/exhibition-launcher/library/index.js";
+import {ProxyClient} from "../../bindings/exhibition-launcher/proxy_client/index.js";
 
 export default {
     name: "ExplorePage",
@@ -53,6 +61,12 @@ export default {
         this.paused = await Queue.GetPaused();
     },
     methods: {
+        async addGames() {
+            let games = await ProxyClient.GetMetadataByName(this.name)
+            for (let game of games) {
+               LibraryManager.AddToLibrary(game.id)
+            }
+        },
         updateDownloadProgress(event) {
             const progressData = event.data[0] || event.data["@"];
 
