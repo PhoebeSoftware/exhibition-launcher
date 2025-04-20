@@ -11,8 +11,8 @@ import (
 	"exhibition-launcher/torrent"
 	"exhibition-launcher/torrent/realdebrid"
 	"exhibition-launcher/utils"
-	"exhibition-launcher/utils/jsonUtils"
-	"exhibition-launcher/utils/jsonUtils/json_models"
+	"exhibition-launcher/utils/json_utils"
+	"exhibition-launcher/utils/json_utils/json_models"
 	"fmt"
 	"log"
 	"path/filepath"
@@ -70,7 +70,7 @@ var (
 func main() {
 	// 🐐routine
 	settings := &json_models.Settings{}
-	settingsManager, err := jsonUtils.NewJsonManager(filepath.Join("settings.json"), settings)
+	settingsManager, err := json_utils.NewJsonManager(filepath.Join("settings.json"), settings)
 	if err != nil {
 		fmt.Println(err)
 		return

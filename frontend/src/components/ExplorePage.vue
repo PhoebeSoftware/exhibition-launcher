@@ -19,7 +19,7 @@ import {
     AddRealDebridDownloadToQueue,
     StartDownloads
 } from "../../bindings/exhibition-launcher/exhibition_queue/queue.js";
-import {Settings} from "../../bindings/exhibition-launcher/utils/jsonUtils/json_models/index.js";
+import {Settings} from "../../bindings/exhibition-launcher/utils/json_utils/json_models/index.js";
 
 async function addToQueue(magnetLink) {
     let magnetLinkHollowKnight =

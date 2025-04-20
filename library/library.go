@@ -2,8 +2,8 @@ package library
 
 import (
 	"exhibition-launcher/igdb"
-	"exhibition-launcher/utils/jsonUtils"
-	"exhibition-launcher/utils/jsonUtils/json_models"
+	"exhibition-launcher/utils/json_utils"
+	"exhibition-launcher/utils/json_utils/json_models"
 	"fmt"
 	"net/http"
 	"os/exec"
@@ -16,7 +16,7 @@ import (
 )
 
 type LibraryManager struct {
-	JsonManager *jsonUtils.JsonManager
+	JsonManager *json_utils.JsonManager
 	Library     *json_models.Library
 	APIManager  *igdb.APIManager
 	Client      *http.Client
@@ -36,7 +36,7 @@ func (l *LibraryManager) GetSortedIDs() []int {
 // geeft library.json als LibraryManager struct vol met data
 func GetLibrary(apiManager *igdb.APIManager, settings *json_models.Settings) (*LibraryManager, error) {
 	library := &json_models.Library{}
-	jsonManager, err := jsonUtils.NewJsonManager(filepath.Join("library.json"), library)
+	jsonManager, err := json_utils.NewJsonManager(filepath.Join("library.json"), library)
 	if err != nil {
 		return nil, err
 	}

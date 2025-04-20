@@ -3,8 +3,8 @@ package igdb
 import (
 	"bytes"
 	"encoding/json"
-	"exhibition-launcher/utils/jsonUtils"
-	"exhibition-launcher/utils/jsonUtils/json_models"
+	"exhibition-launcher/utils/json_utils"
+	"exhibition-launcher/utils/json_utils/json_models"
 	"fmt"
 	"net/http"
 	"time"
@@ -36,7 +36,7 @@ func (a *APIManager) SetupHeader(request *http.Request) {
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %s", a.settings.IgdbSettings.IgdbAuth))
 }
 
-func NewAPI(settings *json_models.Settings, settingsManager *jsonUtils.JsonManager) (*APIManager, error) {
+func NewAPI(settings *json_models.Settings, settingsManager *json_utils.JsonManager) (*APIManager, error) {
 	apiManager := &APIManager{
 		client:   &http.Client{},
 		settings: settings,

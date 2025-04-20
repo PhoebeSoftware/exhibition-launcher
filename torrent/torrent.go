@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"exhibition-launcher/utils"
-	"exhibition-launcher/utils/jsonUtils/json_models"
+	"exhibition-launcher/utils/json_utils/json_models"
 	"fmt"
 	"net/http"
 	"os"

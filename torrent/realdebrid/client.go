@@ -3,7 +3,7 @@ package realdebrid
 import (
 	"encoding/json"
 	"errors"
-	"exhibition-launcher/utils/jsonUtils/json_models"
+	"exhibition-launcher/utils/json_utils/json_models"
 	"io"
 	"log"
 	"net/http"
