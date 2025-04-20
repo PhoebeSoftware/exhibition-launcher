@@ -2,6 +2,7 @@ package library
 
 import (
 	"exhibition-launcher/proxy_client"
+	"exhibition-launcher/search"
 	"exhibition-launcher/utils/json_utils"
 	"exhibition-launcher/utils/json_utils/json_models"
 	"fmt"
@@ -19,6 +20,7 @@ type LibraryManager struct {
 	Client      *http.Client
 	Settings    *json_models.Settings
 	ProxyClient *proxy_client.ProxyClient
+	FuzzyManager *search.FuzzyManager
 }
 
 func (l *LibraryManager) GetSortedIDs() []int {
@@ -32,12 +34,14 @@ func (l *LibraryManager) GetSortedIDs() []int {
 }
 
 // geeft library.json als LibraryManager struct vol met data
-func GetLibrary(proxyClient *proxy_client.ProxyClient, settings *json_models.Settings) (*LibraryManager, error) {
+func GetLibrary(proxyClient *proxy_client.ProxyClient, settings *json_models.Settings, fuzzyManager *search.FuzzyManager) (*LibraryManager, error) {
 	library := &json_models.Library{}
 	jsonManager, err := json_utils.NewJsonManager(filepath.Join("library.json"), library)
 	if err != nil {
 		return nil, err
 	}
+
+	fuzzyManager.IndexFuzzy(library.Games)
 
 	return &LibraryManager{
 		JsonManager: jsonManager,
@@ -45,6 +49,7 @@ func GetLibrary(proxyClient *proxy_client.ProxyClient, settings *json_models.Set
 		ProxyClient: proxyClient,
 		Client:      &http.Client{},
 		Settings:    settings,
+		FuzzyManager: fuzzyManager,
 	}, nil
 }
 
@@ -177,6 +182,7 @@ func (l *LibraryManager) AddToLibrary(igdbId int) (json_models.Game, error) {
 	}
 
 	l.Library.Games[igdbId] = game
+	l.FuzzyManager.IndexFuzzy(l.Library.Games)
 
 	saveErr := l.JsonManager.Save()
 	if saveErr != nil {

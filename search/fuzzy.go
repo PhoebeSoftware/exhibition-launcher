@@ -1,13 +1,12 @@
 package search
 
 import (
-	"exhibition-launcher/library"
+	"exhibition-launcher/utils/json_utils/json_models"
 	"github.com/lithammer/fuzzysearch/fuzzy"
 	"strings"
 )
 
 type FuzzyManager struct {
-	LibraryManager *library.LibraryManager
 	GamesMap       map[string]int
 }
 
@@ -19,9 +18,9 @@ func getKeys(m map[string]int) []string {
 	return keys
 }
 
-func (fuzzyManager *FuzzyManager) IndexFuzzy() {
+func (fuzzyManager *FuzzyManager) IndexFuzzy(games map[int]json_models.Game) {
 	fuzzyManager.GamesMap = make(map[string]int)
-	for id, game := range fuzzyManager.LibraryManager.Library.Games {
+	for id, game := range games {
 		name := strings.ToLower(game.Name)
 		// Remove weird characters
 		name = strings.Map(func(r rune) rune {
@@ -54,14 +53,3 @@ func (fuzzyManager *FuzzyManager) SearchByName(name string) []int {
 
 	return results
 }
-
-
-
-
-
-
-
-
-
-
-

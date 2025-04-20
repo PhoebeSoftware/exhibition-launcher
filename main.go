@@ -75,8 +75,9 @@ func main() {
 		return
 	}
 	proxyClient := proxy_client.NewProxyClient(settings)
+	fuzzyManager := &search.FuzzyManager{}
 	fmt.Println("The server url is:", proxyClient.BaseURL)
-	libraryManager, err = library.GetLibrary(proxyClient, settings)
+	libraryManager, err = library.GetLibrary(proxyClient, settings, fuzzyManager)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -106,9 +107,6 @@ func main() {
 		QueueStatus:      exhibition_queue.Idle,
 	}
 
-	fuzzyManager := search.FuzzyManager{LibraryManager: libraryManager}
-	// Always index when making changes!!
-	fuzzyManager.IndexFuzzy()
 
 	webViewWindowOpt := application.WebviewWindowOptions{
 		Title:     "Exhibition Launcher",
@@ -133,7 +131,7 @@ func main() {
 		application.NewService(settings),
 		application.NewService(&utils.PathUtil{}),
 		application.NewService(&queue),
-		application.NewService(&fuzzyManager),
+		application.NewService(fuzzyManager),
 	}
 
 	if debridClient != nil {
