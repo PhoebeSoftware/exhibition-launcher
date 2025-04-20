@@ -1,7 +1,6 @@
 package library
 
 import (
-	"exhibition-launcher/igdb"
 	"exhibition-launcher/proxy_client"
 	"exhibition-launcher/utils/json_utils"
 	"exhibition-launcher/utils/json_utils/json_models"
@@ -17,7 +16,6 @@ import (
 type LibraryManager struct {
 	JsonManager *json_utils.JsonManager
 	Library     *json_models.Library
-	APIManager  *igdb.APIManager
 	Client      *http.Client
 	Settings    *json_models.Settings
 	ProxyClient *proxy_client.ProxyClient

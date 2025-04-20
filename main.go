@@ -4,7 +4,6 @@ import (
 	"embed"
 	"errors"
 	"exhibition-launcher/exhibition_queue"
-	"exhibition-launcher/igdb"
 	"exhibition-launcher/library"
 	"exhibition-launcher/providers"
 	"exhibition-launcher/proxy_client"
@@ -27,7 +26,6 @@ import (
 // made available to the frontend.
 // See https://pkg.go.dev/embed for more information.
 var libraryManager *library.LibraryManager
-var igdbApiManager *igdb.APIManager
 var torrentManager *torrent.Manager
 var debridClient *realdebrid.RealDebridClient
 var providerManager *providers.ProviderManager
