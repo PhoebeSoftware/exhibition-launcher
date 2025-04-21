@@ -109,7 +109,7 @@ func main() {
 
 
 	webViewWindowOpt := application.WebviewWindowOptions{
-		Title:     "Exhibition Launcher",
+		Title:     "Exhibition",
 		Width:     1200,
 		Height:    900,
 		MinHeight: 700,
@@ -139,7 +139,7 @@ func main() {
 	}
 
 	appOptions := application.Options{
-		Name:     "Exhibition Launcher",
+		Name:     "Exhibition",
 		Services: services,
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
@@ -174,7 +174,11 @@ func main() {
 
 		// download die sources wrm niet
 		for _, sourceLink := range settings.DownloadSources {
-			providerManager.DownloadProvider(sourceLink)
+			err := providerManager.DownloadProvider(sourceLink)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
 		}
 
 		// test query
@@ -192,18 +196,6 @@ func main() {
 		fmt.Printf("results from %d providers found\n", len(results))
 	}()
 
-	//	Add a bunch of games
-
-	//go func() {
-	//	for i := 2000; i < 7000; i++ {
-	//		game, err := libraryManager.AddToLibrary(i, false)
-	//		if err != nil {
-	//			fmt.Println(err)
-	//			continue
-	//		}
-	//		fmt.Println("Added game:", game.Name)
-	//	}
-	//}()
 
 	// Demo games for presentations idk
 	/*	go func() {
@@ -232,18 +224,12 @@ func main() {
 		go libraryManager.CheckForCache()
 	}
 
-	// Complete aot season 4
-	queue.AddRealDebridDownloadToQueue("magnet:?xt=urn:btih:ac8dc037d282f82efb2864abdd54399029105c0c&dn=%5BGolumpa-Yameii%5D%20Attack%20on%20Titan%20-%20The%20Final%20Season%20%5BEnglish%20Dub%5D%20%5BWEB-DL%20720p%5D%20-%20%28The%20Complete%20S04%29%20-%20Unofficial%20Batch&tr=http%3A%2F%2Fnyaa.tracker.wf%3A7777%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce")
-
-	//  Various Artists - NOW – Yearbook The Vault 1980 (2025) Mp3 320kbp...
-	queue.AddRealDebridDownloadToQueue("magnet:?xt=urn:btih:BE08A4F593706D533D7A8B7BEEB5477EBD2D3F4F&dn=Various+Artists+-+NOW+%26ndash%3B+Yearbook+The+Vault+1980+%282025%29+Mp3+320kbps+%5BPMEDIA%5D+%E2%AD%90%EF%B8%8F&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fopen.stealth.si%3A80%2Fannounce&tr=udp%3A%2F%2Fopen.demonii.com%3A1337&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.torrent.eu.org%3A451%2Fannounce&tr=udp%3A%2F%2Fexplodie.org%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.tiny-vps.com%3A6969%2Fannounce&tr=udp%3A%2F%2Fp4p.arenabg.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.dler.com%3A6969%2Fannounce&tr=udp%3A%2F%2Fopentracker.io%3A6969%2Fannounce&tr=udp%3A%2F%2Fz.mercax.com%3A53%2Fannounce&tr=udp%3A%2F%2Ftracker.birkenwald.de%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.bittor.pw%3A1337%2Fannounce&tr=http%3A%2F%2Ftracker.renfei.net%3A8080%2Fannounce&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=http%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Fopentracker.i2p.rocks%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.internetwarriors.net%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969%2Fannounce&tr=udp%3A%2F%2Fcoppersurfer.tk%3A6969%2Fannounce&tr=udp%3A%2F%2Ftracker.zer0day.to%3A1337%2Fannounce")
-
 	err = app.Run()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	systray := app.NewSystemTray()
-	systray.SetLabel("My App")
+	systray.SetLabel("Exhibition")
 	systray.Run()
 }

@@ -1,7 +1,7 @@
 <template>
     <div class="topbar">
         <div class="topbar-left">
-            <span class="app-name">Exhibiton Launcher</span>
+            <span class="app-name">Exhibition</span>
         </div>
         <div class="topbar-right">
             <button class="topbar-button" id="minimize-btn" @click="minimize">

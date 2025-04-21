@@ -6,12 +6,12 @@ version: "3"
 # This information is used to generate the build assets.
 info:
   companyName: "Phoebe Softwart" # The name of the company
-  productName: "Exhibition Launcher" # The name of the application
+  productName: "Exhibition" # The name of the application
   productIdentifier: "com.phoebe.exhibition" # The unique product identifier
   description: "Game launcher" # The application description
   copyright: "(c) 2025, Phoebe Softwart" # Copyright text
   comments: "bruh" # Comments
-  version: "v0.0.1" # The application version
+  version: "v0.1.0" # The application version
 
 # Dev mode configuration
 dev_mode:
