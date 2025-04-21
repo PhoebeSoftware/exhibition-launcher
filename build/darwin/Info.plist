@@ -6,9 +6,9 @@
         <key>CFBundleName</key>
         <string>My Product</string>
         <key>CFBundleExecutable</key>
-        <string>derp</string>
+        <string>Exhibition</string>
         <key>CFBundleIdentifier</key>
-        <string>com.wails.derp</string>
+        <string>com.phoebe.exhibition</string>
         <key>CFBundleVersion</key>
         <string>0.1.0</string>
         <key>CFBundleGetInfoString</key>
